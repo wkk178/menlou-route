@@ -526,39 +526,44 @@
     };
     
     // 选项点击事件
-    // 找到 quiz.html 中的 submit-btn 点击事件，替换为：
+    // 找到 quiz.html 中处理 submit-btn 点击的地方，替换为：
+
 document.getElementById('submit-btn').addEventListener('click', async () => {
     const btn = document.getElementById('submit-btn');
-    const originalText = btn.textContent;
-    btn.textContent = "🔄 正在生成路线...";
+    btn.textContent = "🔄 智能计算中...";
     btn.disabled = true;
     
     try {
-        // 调用 Python 后端接口
+        // 1. 获取用户填写的数据
+        const formData = {
+            theme: userAnswers.theme,
+            duration: userAnswers.duration,
+            profile: userAnswers.profile,
+            tags: userAnswers.tags,
+            avoidResident: userAnswers.avoidResident
+        };
+
+        // 2. 发送请求给 Python 后端 (注意：这里要确保你的 app.py 正在运行)
         const response = await fetch('http://127.0.0.1:5000/api/generate-route', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(userAnswers)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
         });
-        
-        if (!response.ok) {
-            throw new Error('后端请求失败');
-        }
-        
+
+        if (!response.ok) throw new Error('后端响应错误');
+
         const data = await response.json();
-        
-        // 保存后端返回的路线数据
+
+        // 3. 将后端返回的路线数据保存到浏览器缓存
         localStorage.setItem('routeData', JSON.stringify(data));
-        
-        // 跳转到地图页面
+
+        // 4. 跳转到地图页
         window.location.href = 'map.html';
-        
+
     } catch (error) {
-        console.error('Error:', error);
-        alert('❌ 路线生成失败：\n\n请确保：\n1. app.py 正在运行\n2. 端口 5000 未被占用\n\n错误信息：' + error.message);
-        btn.textContent = originalText;
+        console.error(error);
+        alert("❌ 路线生成失败！\n请检查：\n1. PyCharm 中的 app.py 是否正在运行？\n2. 端口是否为 5000？");
+        btn.textContent = "✨ 查看我的路线";
         btn.disabled = false;
     }
 });
