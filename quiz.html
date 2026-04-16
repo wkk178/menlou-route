@@ -526,33 +526,42 @@
     };
     
     // 选项点击事件
-    document.querySelectorAll('.option-card').forEach(card => {
-      card.addEventListener('click', function(){
-        const questionNum = this.closest('.question-card').dataset.question;
+    // 找到 quiz.html 中的 submit-btn 点击事件，替换为：
+document.getElementById('submit-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('submit-btn');
+    const originalText = btn.textContent;
+    btn.textContent = "🔄 正在生成路线...";
+    btn.disabled = true;
+    
+    try {
+        // 调用 Python 后端接口
+        const response = await fetch('http://127.0.0.1:5000/api/generate-route', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userAnswers)
+        });
         
-        if(questionNum !== '4'){
-          // 单选
-          this.closest('.options-grid').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-          this.classList.add('selected');
-          
-          if(questionNum == '1') userAnswers.theme = this.dataset.weight;
-          else if(questionNum == '2') userAnswers.duration = parseInt(this.dataset.value);
-          else if(questionNum == '3') userAnswers.profile = this.dataset.profile;
-          else if(questionNum == '5') userAnswers.avoidResident = this.dataset.value === 'yes';
-        } else {
-          // 多选
-          this.classList.toggle('selected');
-          const value = this.dataset.tag;
-          if(this.classList.contains('selected')){
-            if(!userAnswers.tags.includes(value)) userAnswers.tags.push(value);
-          } else {
-            userAnswers.tags = userAnswers.tags.filter(t => t !== value);
-          }
+        if (!response.ok) {
+            throw new Error('后端请求失败');
         }
         
-        updateButtons();
-      });
-    });
+        const data = await response.json();
+        
+        // 保存后端返回的路线数据
+        localStorage.setItem('routeData', JSON.stringify(data));
+        
+        // 跳转到地图页面
+        window.location.href = 'map.html';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ 路线生成失败：\n\n请确保：\n1. app.py 正在运行\n2. 端口 5000 未被占用\n\n错误信息：' + error.message);
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+});
     
     function updateButtons(){
       const nextBtn = document.getElementById('next-btn');
