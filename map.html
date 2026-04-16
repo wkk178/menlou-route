@@ -553,18 +553,33 @@
     }
     
     // 从localStorage加载路线
-    function loadRouteFromStorage(){
-      const answers = localStorage.getItem('routeAnswers');
-      if(answers){
-        const parsed = JSON.parse(answers);
-        generateRouteVisual(parsed);
-      } else {
-        // 默认路线
+    // 在 map.html 中找到 loadRouteFromStorage 函数，替换为：
+function loadRouteFromStorage(){
+    const routeData = localStorage.getItem('routeData');
+    
+    if(routeData){
+        const data = JSON.parse(routeData);
+        
+        if(data.status === 'success'){
+            currentRoute = data.route;
+            
+            // 更新侧边栏信息
+            document.getElementById('total-time').textContent = data.totalTime + '分钟';
+            document.getElementById('total-points').textContent = currentRoute.length + '个';
+            document.getElementById('total-distance').textContent = data.distance + '公里';
+            
+            displayRoute(currentRoute);
+        } else {
+            alert('路线数据异常，请重新生成');
+            window.location.href = 'quiz.html';
+        }
+    } else {
+        // 默认路线（如果没有数据）
         const defaultRoute = ['N1', 'N2', 'N5', 'N7', 'N8'];
         currentRoute = defaultRoute.map(id => nodesData.find(n => n.id === id));
         displayRoute(currentRoute);
-      }
     }
+}
     
     // 生成路线可视化
     function generateRouteVisual(answers){
