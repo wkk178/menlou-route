@@ -553,32 +553,21 @@
     }
     
     // 从localStorage加载路线
-    // 在 map.html 中找到 loadRouteFromStorage 函数，替换为：
+   // 在 map.html 的 <script> 中找到 loadRouteFromStorage，替换为：
 function loadRouteFromStorage(){
-    const routeData = localStorage.getItem('routeData');
-    
-    if(routeData){
-        const data = JSON.parse(routeData);
-        
-        if(data.status === 'success'){
-            currentRoute = data.route;
-            
-            // 更新侧边栏信息
-            document.getElementById('total-time').textContent = data.totalTime + '分钟';
-            document.getElementById('total-points').textContent = currentRoute.length + '个';
-            document.getElementById('total-distance').textContent = data.distance + '公里';
-            
-            displayRoute(currentRoute);
-        } else {
-            alert('路线数据异常，请重新生成');
-            window.location.href = 'quiz.html';
+    const dataStr = localStorage.getItem('routeData');
+    if(dataStr){
+        const data = JSON.parse(dataStr);
+        if(data.route && data.route.length > 0){
+            currentRoute = data.route; // 使用后端生成的路线
+            displayRoute(currentRoute); // 渲染地图
+            return;
         }
-    } else {
-        // 默认路线（如果没有数据）
-        const defaultRoute = ['N1', 'N2', 'N5', 'N7', 'N8'];
-        currentRoute = defaultRoute.map(id => nodesData.find(n => n.id === id));
-        displayRoute(currentRoute);
     }
+    // 如果没有数据，使用默认路线
+    const defaultRoute = ['N1', 'N2', 'N5', 'N7', 'N8'];
+    currentRoute = defaultRoute.map(id => nodesData.find(n => n.id === id));
+    displayRoute(currentRoute);
 }
     
     // 生成路线可视化
