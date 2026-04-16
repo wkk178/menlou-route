@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的专属路线 | 门楼层记·故事里</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    :root{
+      --door-gray: #6B5B4F;
+      --brick-green: #4A6B5A;
+      --accent-gold: #C9A86C;
+      --bg-cream: #F5F1E8;
+      --text-dark: #2C2420;
+      --white: #FFFFFF;
+    }
+    
+    *{margin: 0;padding: 0;box-sizing: border-box;}
+    
+    body{
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(180deg, var(--bg-cream) 0%, #e8e4dc 100%);
+      color: var(--text-dark);
+    }
+    
+    /* 导航栏 */
+    .navbar{
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 50px;
+      background: rgba(245, 241, 232, 0.98);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo-placeholder{
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
+    }
+    
+    .brand-text h1{
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--door-gray);
+      letter-spacing: 2px;
+    }
+    
+    .brand-text p{
+      font-size: 12px;
+      color: var(--brick-green);
+      font-style: italic;
+    }
+    
+    .nav-links{
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-links a{
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: all 0.3s;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active{
+      background: var(--door-gray);
+      color: var(--white);
+    }
+    
+    /* 主内容 */
+    .main-content{
+      margin-top: 90px;
+      padding: 60px 50px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .page-header{
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .page-title{
+      font-size: 42px;
+      color: var(--door-gray);
+      margin-bottom: 15px;
+    }
+    
+    .page-subtitle{
+      font-size: 18px;
+      color: var(--brick-green);
+    }
+    
+    /* 路线卡片 */
+    .route-card{
+      background: var(--white);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 12px 40px rgba(107, 91, 79, 0.15);
+      margin-bottom: 30px;
+    }
+    
+    .route-header{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .route-title-section h2{
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .route-meta{
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .meta-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+    
+    .meta-icon{
+      font-size: 24px;
+    }
+    
+    /* 评分仪表盘 */
+    .score-dashboard{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .score-card{
+      background: linear-gradient(135deg, var(--bg-cream), var(--white));
+      border: 2px solid rgba(107, 91, 79, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .score-card::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));
+    }
+    
+    .score-card:hover{
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(107, 91, 79, 0.2);
+    }
+    
+    .score-icon{
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    .score-label{
+      font-size: 15px;
+      color: var(--text-dark);
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    
+    .score-value{
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      line-height: 1;
+    }
+    
+    .score-desc{
+      font-size: 13px;
+      color: var(--brick-green);
+      margin-top: 10px;
+    }
+    
+    /* 时间轴 */
+    .timeline-section{
+      margin-top: 40px;
+    }
+    
+    .section-title{
+      font-size: 28px;
+      color: var(--door-gray);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .timeline{
+      position: relative;
+      padding-left: 50px;
+    }
+    
+    .timeline::before{
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--door-gray), var(--accent-gold));
+      border-radius: 4px;
+    }
+    
+    .timeline-item{
+      position: relative;
+      margin-bottom: 35px;
+      background: linear-gradient(135deg, var(--bg-cream), var(--white));
+      padding: 30px;
+      border-radius: 16px;
+      transition: all 0.3s;
+      border: 2px solid rgba(107, 91, 79, 0.1);
+    }
+    
+    .timeline-item:hover{
+      transform: translateX(10px);
+      box-shadow: 0 8px 24px rgba(107, 91, 79, 0.15);
+    }
+    
+    .timeline-marker{
+      position: absolute;
+      left: -38px;
+      top: 30px;
+      width: 24px;
+      height: 24px;
+      background: var(--accent-gold);
+      border: 4px solid var(--white);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .timeline-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .timeline-title{
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--door-gray);
+    }
+    
+    .timeline-badge{
+      background: var(--brick-green);
+      color: var(--white);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .timeline-badge.business{
+      background: var(--accent-gold);
+    }
+    
+    .timeline-content{
+      color: var(--text-dark);
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+    
+    .timeline-tags{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    
+    .tag{
+      background: rgba(201, 168, 108, 0.2);
+      color: var(--door-gray);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .timeline-meta{
+      display: flex;
+      gap: 25px;
+      font-size: 14px;
+      color: var(--text-dark);
+      opacity: 0.8;
+      flex-wrap: wrap;
+    }
+    
+    /* 操作按钮 */
+    .action-buttons{
+      display: flex;
+      gap: 20px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    
+    .btn{
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn-primary{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(107, 91, 79, 0.3);
+    }
+    
+    .btn-primary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(107, 91, 79, 0.4);
+    }
+    
+    .btn-secondary{
+      background: var(--white);
+      color: var(--door-gray);
+      border: 2px solid var(--door-gray);
+    }
+    
+    .btn-secondary:hover{
+      background: var(--bg-cream);
+    }
+    
+    /* 提示卡片 */
+    .tips-card{
+      background: linear-gradient(135deg, rgba(107,91,79,0.1), rgba(74,107,90,0.1));
+      border-left: 4px solid var(--accent-gold);
+      padding: 25px;
+      border-radius: 12px;
+      margin-top: 30px;
+    }
+    
+    .tips-title{
+      font-size: 20px;
+      color: var(--door-gray);
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .tips-list{
+      list-style: none;
+      line-height: 2;
+    }
+    
+    .tips-list li{
+      padding-left: 25px;
+      position: relative;
+    }
+    
+    .tips-list li::before{
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-gold);
+      font-weight: bold;
+    }
+    
+    @media (max-width: 768px){
+      .navbar{padding: 15px 20px;}
+      .nav-links{gap: 15px;}
+      .nav-links a{padding: 6px 12px;font-size: 14px;}
+      .main-content{padding: 40px 20px;}
+      .page-title{font-size: 32px;}
+      .route-card{padding: 25px;}
+      .timeline{padding-left: 35px;}
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="logo-container">
+      <div class="logo-placeholder">🏮</div>
+      <div class="brand-text">
+        <h1>门楼里</h1>
+        <p>推开一座门楼，走进一层时光</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">智能推荐</a>
+      <a href="map.html">3D地图</a>
+      <a href="route.html" class="active">我的路线</a>
+      <a href="about.html">项目介绍</a>
+    </div>
+  </nav>
+  
+  <!-- 主内容 -->
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">📋 你的专属门楼探索路线</h1>
+      <p class="page-subtitle">基于你的偏好智能生成 · 可打印保存</p>
+    </div>
+    
+    <div class="route-card" id="route-content">
+      <div class="route-header">
+        <div class="route-title-section">
+          <h2>🎯 个性化推荐路线</h2>
+          <div style="opacity: 0.9; margin-top: 10px;">
+            生成时间：<span id="generate-time">-</span>
+          </div>
+        </div>
+        <div class="route-meta">
+          <div class="meta-item">
+            <span class="meta-icon">⏱</span>
+            <span id="display-time">90分钟</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">📍</span>
+            <span id="display-points">5个站点</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-icon">🚶</span>
+            <span id="display-distance">1.2公里</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="score-dashboard">
+        <div class="score-card">
+          <div class="score-icon">📚</div>
+          <div class="score-label">文化深度指数</div>
+          <div class="score-value" id="score-culture">-</div>
+          <div class="score-desc">深度文化体验</div>
+        </div>
+        <div class="score-card">
+          <div class="score-icon">🛍</div>
+          <div class="score-label">商业体验指数</div>
+          <div class="score-value" id="score-business">-</div>
+          <div class="score-desc">丰富业态体验</div>
+        </div>
+        <div class="score-card">
+          <div class="score-icon">🤝</div>
+          <div class="score-label">居民友好度</div>
+          <div class="score-value" id="score-resident">-</div>
+          <div class="score-desc">高度尊重居民</div>
+        </div>
+      </div>
+      
+      <div class="timeline-section">
+        <h3 class="section-title">
+          <span>📍</span>
+          路线详情
+        </h3>
+        <div class="timeline" id="timeline">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+      
+      <div class="tips-card">
+        <div class="tips-title">💡 温馨提示</div>
+        <ul class="tips-list">
+          <li>建议穿着舒适的步行鞋，胡同路面较为古朴</li>
+          <li>部分院落需提前预约，建议联系"石老娘议事厅"</li>
+          <li>尊重居民生活，拍照前请先征得同意</li>
+          <li>可携带《门楼里·故事集》边看边读</li>
+          <li>建议避开早晚高峰（7:00-9:00, 17:00-19:00）</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="downloadPDF()">
+        📥 下载PDF路线
+      </button>
+      <button class="btn btn-secondary" onclick="shareRoute()">
+        🔗 分享路线
+      </button>
+      <a href="map.html" class="btn btn-secondary">
+        🗺 查看3D地图
+      </a>
+      <a href="quiz.html" class="btn btn-secondary">
+        🔄 重新推荐
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // 节点数据
+    const nodesData = [
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,tags:["architecture","history","photo"],desc:"明代圣祚隆长寺旧址，存有乾隆诗碑，山门形制完整"},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,tags:["history","photo"],desc:"京剧大师程砚秋先生居住21年，院内石榴树为先生手植"},
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,tags:["architecture","photo"],desc:"高级官宦宅门，门簪四枚雕牡丹，寓意富贵"},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,tags:["history"],desc:"居民口述历史，砖雕墀头保存完好"},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,tags:["food","shopping"],desc:"一院一茗特调茶，可翻阅《门楼里·故事集》"},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,tags:["handcraft","photo","shopping"],desc:"御霜雅集主题，戏服旅拍、京剧茶点体验"},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,tags:["handcraft","shopping"],desc:"砖雕拓印、拼豆制作、脸谱绘制等DIY体验"},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,tags:["shopping","history"],desc:"门楼主题文创、故事集、主理人展示墙"},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,tags:["food","shopping","photo"],desc:"胡同小吃、手作摊位、露天电影"}
+    ];
+    
+    let currentRoute = [];
+    
+    // 页面加载
+    window.addEventListener('load', () => {
+      loadRoute();
+      document.getElementById('generate-time').textContent = new Date().toLocaleString('zh-CN');
+    });
+    
+    // 加载路线
+    function loadRoute(){
+      const answers = localStorage.getItem('routeAnswers');
+      if(answers){
+        const parsed = JSON.parse(answers);
+        generateRoute(parsed);
+      } else {
+        // 默认路线
+        currentRoute = nodesData.slice(0, 5);
+        displayRoute();
+      }
+    }
+    
+    // 生成路线
+    function generateRoute(answers){
+      const duration = answers.duration || 90;
+      const avoidResident = answers.avoidResident || false;
+      
+      let selectedNodes = nodesData.filter(n => {
+        if(avoidResident && n.interfere > 0.3) return false;
+        return true;
+      });
+      
+      // 根据主题筛选
+      if(answers.theme === 'read'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '读门');
+      } else if(answers.theme === 'push'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '推门');
+      } else if(answers.theme === 'create'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '创门');
+      }
+      
+      currentRoute = selectedNodes.slice(0, 6);
+      displayRoute();
+    }
+    
+    // 显示路线
+    function displayRoute(){
+      const totalTime = currentRoute.reduce((sum, n) => sum + n.stay + 5, 0);
+      const distance = (currentRoute.length * 0.3).toFixed(1);
+      
+      document.getElementById('display-time').textContent = totalTime + '分钟';
+      document.getElementById('display-points').textContent = currentRoute.length + '个站点';
+      document.getElementById('display-distance').textContent = distance + '公里';
+      
+      // 计算评分
+      const cultureCount = currentRoute.filter(n => n.type === '文化').length;
+      const businessCount = currentRoute.filter(n => n.type === '商业').length;
+      const cultureScore = Math.round((cultureCount / currentRoute.length) * 100);
+      const businessScore = Math.round((businessCount / currentRoute.length) * 100);
+      const residentScore = 85; // 简化
+      
+      document.getElementById('score-culture').textContent = cultureScore;
+      document.getElementById('score-business').textContent = businessScore;
+      document.getElementById('score-resident').textContent = residentScore + '%';
+      
+      // 生成时间轴
+      const timelineHtml = currentRoute.map((node, index) => {
+        const badgeClass = node.type === '文化' ? '' : 'business';
+        const badgeText = node.type === '文化' ? '文化景点' : '商业体验';
+        const tagsHtml = node.tags.map(t => `<span class="tag">${t}</span>`).join('');
+        
+        return `
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-header">
+              <div class="timeline-title">${index + 1}. ${node.name}</div>
+              <div class="timeline-badge ${badgeClass}">${badgeText}</div>
+            </div>
+            <div class="timeline-content">
+              ${node.desc}
+            </div>
+            <div class="timeline-tags">
+              ${tagsHtml}
+            </div>
+            <div class="timeline-meta">
+              <span>🏷 ${node.theme}</span>
+              <span>⏱ 停留${node.stay}分钟</span>
+              <span>📍 第${index + 1}站</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('timeline').innerHTML = timelineHtml;
+      
+      // 动画
+      gsap.from('.timeline-item', {
+        duration: 0.6,
+        x: -30,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power2.out'
+      });
+      
+      gsap.from('.score-card', {
+        duration: 0.8,
+        y: 30,
+        opacity: 0,
+        stagger: 0.15,
+        delay: 0.3,
+        ease: 'power3.out'
+      });
+    }
+    
+    // 下载PDF
+    function downloadPDF(){
+      const element = document.getElementById('route-content');
+      const opt = {
+        margin: 10,
+        filename: '门楼层记_我的路线.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save();
+    }
+    
+    // 分享路线
+    function shareRoute(){
+      const routeText = currentRoute.map((n, i) => 
+        `${i+1}. ${n.name} (${n.stay}分钟)`
+      ).join('\n');
+      
+      if(navigator.share){
+        navigator.share({
+          title: '我的门楼探索路线',
+          text: `我定制的胡同路线：\n\n${routeText}\n\n来自：门楼层记·故事里`,
+          url: window.location.href
+        });
+      } else {
+        // 复制到剪贴板
+        const text = `我的门楼探索路线：\n\n${routeText}\n\n来自：门楼层记·故事里\n${window.location.href}`;
+        navigator.clipboard.writeText(text).then(() => {
+          alert('路线已复制到剪贴板，可以分享给朋友了！');
+        });
+      }
+    }
+  </script>
+</body>
+</html>
