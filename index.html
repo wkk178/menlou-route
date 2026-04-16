@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>门楼层记·故事里 | 首页</title>
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  
   <style>
     :root{
       --door-gray: #6B5B4F;
@@ -16,209 +14,36 @@
       --text-dark: #2C2420;
       --white: #FFFFFF;
     }
-    
     *{margin: 0;padding: 0;box-sizing: border-box;}
+    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);overflow-x:hidden;}
     
-    body{
-      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      background: var(--bg-cream);
-      color: var(--text-dark);
-      overflow-x: hidden;
-    }
+    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+    .logo-container{display: flex;align-items: center;gap: 15px;}
+    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+    .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
+    .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
+    .nav-links{display: flex;gap: 30px;}
+    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
+    .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    /* 导航栏 */
-    .navbar{
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 15px 50px;
-      background: rgba(245, 241, 232, 0.98);
-      backdrop-filter: blur(12px);
-      z-index: 1000;
-      box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .hero-section{margin-top: 90px;height: 70vh;background: linear-gradient(135deg, rgba(107,91,79,0.85) 0%, rgba(74,107,90,0.85) 100%);display: flex;align-items: center;justify-content: center;text-align: center;color: var(--white);position: relative;overflow: hidden;}
+    .hero-content{position: relative;z-index: 2;padding: 40px;}
+    .hero-title{font-size: 64px;font-weight: 700;margin-bottom: 20px;letter-spacing: 6px;text-shadow: 0 4px 12px rgba(0,0,0,0.3);}
+    .hero-subtitle{font-size: 28px;font-style: italic;margin-bottom: 30px;opacity: 0.95;}
+    .hero-desc{font-size: 18px;max-width: 800px;margin: 0 auto 40px;opacity: 0.9;line-height: 1.8;}
+    .cta-button{display: inline-block;padding: 16px 40px;background: var(--accent-gold);color: var(--white);text-decoration: none;border-radius: 30px;font-size: 18px;font-weight: 600;transition: all 0.3s;box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);}
+    .cta-button:hover{transform: translateY(-3px);box-shadow: 0 6px 24px rgba(201, 168, 108, 0.6);}
     
-    .logo-container{
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
+    .features-section{padding: 80px 50px;background: var(--white);}
+    .section-title{text-align: center;font-size: 42px;color: var(--door-gray);margin-bottom: 60px;}
+    .features-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));gap: 30px;max-width: 1200px;margin: 0 auto;}
+    .feature-card{background: linear-gradient(135deg, var(--bg-cream), var(--white));border: 2px solid rgba(107, 91, 79, 0.1);border-radius: 20px;padding: 40px 30px;text-align: center;transition: all 0.3s;cursor: pointer;text-decoration: none;color: inherit;}
+    .feature-card:hover{transform: translateY(-10px);box-shadow: 0 12px 32px rgba(107, 91, 79, 0.2);border-color: var(--accent-gold);}
+    .feature-icon{font-size: 64px;margin-bottom: 20px;}
+    .feature-title{font-size: 24px;color: var(--door-gray);margin-bottom: 15px;font-weight: 600;}
+    .feature-desc{font-size: 15px;color: var(--text-dark);opacity: 0.8;line-height: 1.6;}
     
-    .logo-placeholder{
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
-    }
-    
-    .brand-text h1{
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--door-gray);
-      letter-spacing: 2px;
-    }
-    
-    .brand-text p{
-      font-size: 12px;
-      color: var(--brick-green);
-      font-style: italic;
-    }
-    
-    .nav-links{
-      display: flex;
-      gap: 30px;
-    }
-    
-    .nav-links a{
-      text-decoration: none;
-      color: var(--text-dark);
-      font-weight: 500;
-      transition: all 0.3s;
-      padding: 8px 16px;
-      border-radius: 8px;
-    }
-    
-    .nav-links a:hover,
-    .nav-links a.active{
-      background: var(--door-gray);
-      color: var(--white);
-    }
-    
-    /* Hero区域 */
-    .hero-section{
-      margin-top: 90px;
-      height: 70vh;
-      background: linear-gradient(135deg, rgba(107,91,79,0.85) 0%, rgba(74,107,90,0.85) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: var(--white);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .hero-content{
-      position: relative;
-      z-index: 2;
-      padding: 40px;
-    }
-    
-    .hero-title{
-      font-size: 64px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      letter-spacing: 6px;
-      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    
-    .hero-subtitle{
-      font-size: 28px;
-      font-style: italic;
-      margin-bottom: 30px;
-      opacity: 0.95;
-    }
-    
-    .hero-desc{
-      font-size: 18px;
-      max-width: 800px;
-      margin: 0 auto 40px;
-      opacity: 0.9;
-      line-height: 1.8;
-    }
-    
-    .cta-button{
-      display: inline-block;
-      padding: 16px 40px;
-      background: var(--accent-gold);
-      color: var(--white);
-      text-decoration: none;
-      border-radius: 30px;
-      font-size: 18px;
-      font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);
-    }
-    
-    .cta-button:hover{
-      transform: translateY(-3px);
-      box-shadow: 0 6px 24px rgba(201, 168, 108, 0.6);
-    }
-    
-    /* 特色卡片 */
-    .features-section{
-      padding: 80px 50px;
-      background: var(--white);
-    }
-    
-    .section-title{
-      text-align: center;
-      font-size: 42px;
-      color: var(--door-gray);
-      margin-bottom: 60px;
-    }
-    
-    .features-grid{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    .feature-card{
-      background: linear-gradient(135deg, var(--bg-cream), var(--white));
-      border: 2px solid rgba(107, 91, 79, 0.1);
-      border-radius: 20px;
-      padding: 40px 30px;
-      text-align: center;
-      transition: all 0.3s;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-    }
-    
-    .feature-card:hover{
-      transform: translateY(-10px);
-      box-shadow: 0 12px 32px rgba(107, 91, 79, 0.2);
-      border-color: var(--accent-gold);
-    }
-    
-    .feature-icon{
-      font-size: 64px;
-      margin-bottom: 20px;
-    }
-    
-    .feature-title{
-      font-size: 24px;
-      color: var(--door-gray);
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-    
-    .feature-desc{
-      font-size: 15px;
-      color: var(--text-dark);
-      opacity: 0.8;
-      line-height: 1.6;
-    }
-    
-    /* 页脚 */
-    .footer{
-      background: var(--door-gray);
-      color: var(--white);
-      text-align: center;
-      padding: 30px;
-      font-size: 14px;
-    }
+    .footer{background: var(--door-gray);color: var(--white);text-align: center;padding: 30px;font-size: 14px;}
     
     @media (max-width: 768px){
       .navbar{padding: 15px 20px;}
@@ -231,7 +56,6 @@
   </style>
 </head>
 <body>
-  <!-- 导航栏 -->
   <nav class="navbar">
     <div class="logo-container">
       <div class="logo-placeholder">🏮</div>
@@ -249,48 +73,32 @@
     </div>
   </nav>
   
-  <!-- Hero区域 -->
   <section class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">门楼层记·故事里</h1>
       <p class="hero-subtitle">西四北三条社区文商活化计划</p>
-      <p class="hero-desc">
-        探索226个院落的千年记忆，体验"读门·推门·创门"三层文化之旅<br>
-        让智能算法为你定制专属的胡同探索路线
-      </p>
+      <p class="hero-desc">探索226个院落的千年记忆，体验"读门·推门·创门"三层文化之旅<br>让智能算法为你定制专属的胡同探索路线</p>
       <a href="quiz.html" class="cta-button">🎯 开始智能推荐</a>
     </div>
   </section>
   
-  <!-- 特色功能 -->
   <section class="features-section">
     <h2 class="section-title">三大核心体验</h2>
     <div class="features-grid">
       <a href="quiz.html" class="feature-card">
         <div class="feature-icon">🎯</div>
         <h3 class="feature-title">智能路线推荐</h3>
-        <p class="feature-desc">
-          回答5个简单问题，AI算法根据你的偏好、时间、兴趣，
-          为你量身定制最佳游览路线
-        </p>
+        <p class="feature-desc">回答5个简单问题，AI算法根据你的偏好、时间、兴趣，为你量身定制最佳游览路线</p>
       </a>
-      
       <a href="map.html" class="feature-card">
         <div class="feature-icon">🗺</div>
-        <h3 class="feature-title">3D地图可视化</h3>
-        <p class="feature-desc">
-          沉浸式3D场景，直观查看推荐路线，
-          可旋转、缩放，提前预览胡同风貌
-        </p>
+        <h3 class="feature-title">交互式地图</h3>
+        <p class="feature-desc">清晰查看推荐路线，可缩放、拖拽，提前预览胡同风貌与站点分布</p>
       </a>
-      
       <a href="route.html" class="feature-card">
         <div class="feature-icon">📋</div>
         <h3 class="feature-title">个性化路线详情</h3>
-        <p class="feature-desc">
-          查看完整的路线规划、时间分配、文化深度评分，
-          附带温馨提示和故事卡片
-        </p>
+        <p class="feature-desc">查看完整的路线规划、时间分配、文化深度评分，附带温馨提示和故事卡片</p>
       </a>
     </div>
   </section>
@@ -301,20 +109,11 @@
   </footer>
   
   <script>
-    // 页面加载动画
     gsap.from('.hero-title', {duration: 1, y: 50, opacity: 0, ease: 'power3.out'});
     gsap.from('.hero-subtitle', {duration: 1, y: 30, opacity: 0, delay: 0.2, ease: 'power3.out'});
     gsap.from('.hero-desc', {duration: 1, y: 30, opacity: 0, delay: 0.4, ease: 'power3.out'});
     gsap.from('.cta-button', {duration: 1, y: 20, opacity: 0, delay: 0.6, ease: 'power3.out'});
-    gsap.from('.feature-card', {
-      duration: 0.8,
-      y: 40,
-      opacity: 0,
-      stagger: 0.2,
-      delay: 0.8,
-      ease: 'power3.out',
-      scrollTrigger: {trigger: '.features-section'}
-    });
+    gsap.from('.feature-card', {duration: 0.8, y: 40, opacity: 0, stagger: 0.2, delay: 0.8, ease: 'power3.out'});
   </script>
 </body>
 </html>
