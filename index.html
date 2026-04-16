@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>门楼层记·故事里 | 西四北三条文商活化计划</title>
   
-  <!-- 引入Three.js for 3D效果 -->
+  <!-- Three.js for 3D -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- 引入GSAP for 高级动画 -->
+  <!-- GSAP for animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <!-- OrbitControls for 3D interaction -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   
   <style>
     :root{
@@ -19,6 +21,7 @@
       --bg-cream: #F5F1E8;
       --text-dark: #2C2420;
       --white: #FFFFFF;
+      --shadow: rgba(107, 91, 79, 0.15);
     }
     
     *{
@@ -35,57 +38,54 @@
       line-height: 1.6;
     }
     
-    /* 粒子背景 */
-    #particles-canvas{
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.4;
-    }
-    
-    /* 3D场景容器 */
-    #canvas-container{
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 40%;
-      height: 100vh;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.6;
-    }
-    
-    /* 导航栏 */
+    /* ========== 导航栏 ========== */
     .navbar{
       position: fixed;
       top: 0;
       width: 100%;
-      padding: 20px 50px;
-      background: rgba(245, 241, 232, 0.95);
-      backdrop-filter: blur(10px);
+      padding: 15px 50px;
+      background: rgba(245, 241, 232, 0.98);
+      backdrop-filter: blur(12px);
       z-index: 1000;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 20px var(--shadow);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: all 0.3s;
     }
     
-    .logo{
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--door-gray);
+    .logo-container{
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
     }
     
-    .logo::before{
-      content: '🏮';
-      font-size: 28px;
+    /* Logo占位区 - 可替换为实际logo图片 */
+    .logo-placeholder{
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
+      /* 如果有实际logo图片，使用以下样式 */
+      /* background-image: url('your-logo.png'); background-size: cover; */
+    }
+    
+    .brand-text h1{
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--door-gray);
+      letter-spacing: 2px;
+    }
+    
+    .brand-text p{
+      font-size: 12px;
+      color: var(--brick-green);
+      font-style: italic;
     }
     
     .nav-links{
@@ -97,14 +97,15 @@
       text-decoration: none;
       color: var(--text-dark);
       font-weight: 500;
-      transition: color 0.3s;
+      transition: all 0.3s;
       position: relative;
+      padding: 5px 0;
     }
     
     .nav-links a::after{
       content: '';
       position: absolute;
-      bottom: -5px;
+      bottom: 0;
       left: 0;
       width: 0;
       height: 2px;
@@ -116,234 +117,60 @@
       width: 100%;
     }
     
-    /* 主容器 */
-    .main-container{
-      position: relative;
-      z-index: 10;
-      display: flex;
-      min-height: 100vh;
+    /* ========== 主容器 ========== */
+    .main-wrapper{
+      margin-top: 90px;
+      min-height: calc(100vh - 90px);
     }
     
-    /* 左侧内容区 */
-    .content-panel{
-      width: 60%;
-      padding: 120px 50px 50px;
-      overflow-y: auto;
-      max-height: 100vh;
-    }
-    
-    /* 标题区 */
+    /* ========== Hero区域 ========== */
     .hero-section{
-      margin-bottom: 40px;
-      padding: 40px;
-      background: linear-gradient(135deg, rgba(107,91,79,0.1) 0%, rgba(74,107,90,0.1) 100%);
-      border-radius: 20px;
-      border: 1px solid rgba(107,91,79,0.2);
-    }
-    
-    .hero-title{
-      font-size: 42px;
-      font-weight: 700;
-      color: var(--door-gray);
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-    
-    .hero-subtitle{
-      font-size: 18px;
-      color: var(--brick-green);
-      font-style: italic;
-      margin-bottom: 20px;
-    }
-    
-    .hero-desc{
-      font-size: 15px;
-      color: var(--text-dark);
-      opacity: 0.8;
-      line-height: 1.8;
-    }
-    
-    /* 控制面板 */
-    .control-panel{
-      background: var(--white);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(107,91,79,0.1);
-      margin-bottom: 30px;
-      border: 1px solid rgba(107,91,79,0.1);
-    }
-    
-    .panel-title{
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--door-gray);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .panel-title::before{
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: var(--accent-gold);
-      border-radius: 2px;
-    }
-    
-    /* 主题选择 */
-    .theme-selector{
-      display: flex;
-      gap: 15px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-    }
-    
-    .theme-chip{
-      padding: 12px 24px;
-      background: var(--bg-cream);
-      border: 2px solid transparent;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .theme-chip:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .theme-chip.active{
-      background: var(--door-gray);
-      color: var(--white);
-      border-color: var(--accent-gold);
-    }
-    
-    .theme-chip input{
-      display: none;
-    }
-    
-    /* 滑块 */
-    .slider-group{
-      margin: 20px 0;
-    }
-    
-    .slider-label{
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-    
-    .slider-value{
-      color: var(--accent-gold);
-      font-weight: 600;
-    }
-    
-    input[type="range"]{
-      width: 100%;
-      height: 6px;
-      background: var(--bg-cream);
-      border-radius: 3px;
-      outline: none;
-      -webkit-appearance: none;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb{
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      background: var(--accent-gold);
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    input[type="range"]::-webkit-slider-thumb:hover{
-      transform: scale(1.2);
-      box-shadow: 0 0 12px rgba(201,168,108,0.5);
-    }
-    
-    /* 复选框 */
-    .checkbox-group{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 15px 0;
-      cursor: pointer;
-    }
-    
-    .checkbox-group input[type="checkbox"]{
-      width: 20px;
-      height: 20px;
-      accent-color: var(--door-gray);
-      cursor: pointer;
-    }
-    
-    /* 按钮 */
-    .generate-btn{
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--door-gray) 0%, var(--brick-green) 100%);
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 20px;
       position: relative;
+      height: 60vh;
+      background: linear-gradient(135deg, rgba(107,91,79,0.8) 0%, rgba(74,107,90,0.8) 100%),
+                  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23F5F1E8" width="1200" height="600"/><path fill="%236B5B4F" opacity="0.1" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--white);
       overflow: hidden;
     }
     
-    .generate-btn::before{
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
+    .hero-content{
+      position: relative;
+      z-index: 2;
+      padding: 40px;
     }
     
-    .generate-btn:hover::before{
-      width: 300px;
-      height: 300px;
+    .hero-title{
+      font-size: 56px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      letter-spacing: 4px;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease;
     }
     
-    .generate-btn:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(107,91,79,0.3);
+    .hero-subtitle{
+      font-size: 24px;
+      font-style: italic;
+      margin-bottom: 20px;
+      opacity: 0.95;
+      animation: fadeInUp 1s ease 0.2s backwards;
     }
     
-    .generate-btn:active{
-      transform: translateY(0);
+    .hero-desc{
+      font-size: 16px;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease 0.4s backwards;
     }
     
-    /* 结果展示区 */
-    .result-section{
-      background: var(--white);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(107,91,79,0.1);
-      margin-top: 30px;
-      display: none;
-      animation: slideUp 0.6s ease;
-    }
-    
-    .result-section.show{
-      display: block;
-    }
-    
-    @keyframes slideUp{
+    @keyframes fadeInUp{
       from{
         opacity: 0;
         transform: translateY(30px);
@@ -354,128 +181,510 @@
       }
     }
     
-    /* 评分卡片 */
-    .score-cards{
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin: 20px 0;
+    /* ========== 智能问卷区域 ========== */
+    .quiz-section{
+      padding: 60px 50px;
+      background: var(--white);
+      position: relative;
     }
     
-    .score-card{
-      background: linear-gradient(135deg, var(--bg-cream) 0%, var(--white) 100%);
+    .section-header{
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .section-title{
+      font-size: 36px;
+      color: var(--door-gray);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .section-title::before,
+    .section-title::after{
+      content: '';
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-gold));
+    }
+    
+    .section-title::after{
+      background: linear-gradient(90deg, var(--accent-gold), transparent);
+    }
+    
+    .section-subtitle{
+      color: var(--brick-green);
+      font-size: 16px;
+    }
+    
+    /* 问卷容器 */
+    .quiz-container{
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-cream);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px var(--shadow);
+    }
+    
+    .quiz-progress{
+      height: 6px;
+      background: rgba(107, 91, 79, 0.1);
+      border-radius: 3px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+    
+    .progress-bar{
+      height: 100%;
+      background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .question-card{
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+    
+    .question-card.active{
+      display: block;
+    }
+    
+    @keyframes slideIn{
+      from{
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to{
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .question-text{
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--door-gray);
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .question-number{
+      background: var(--accent-gold);
+      color: var(--white);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .options-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .option-card{
+      background: var(--white);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .option-card:hover{
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      border-color: var(--accent-gold);
+    }
+    
+    .option-card.selected{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+      border-color: var(--accent-gold);
+    }
+    
+    .option-icon{
+      font-size: 32px;
+    }
+    
+    .option-text{
+      font-weight: 500;
+    }
+    
+    .option-desc{
+      font-size: 13px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+    
+    .quiz-navigation{
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    
+    .btn{
+      padding: 14px 32px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-secondary{
+      background: rgba(107, 91, 79, 0.1);
+      color: var(--door-gray);
+    }
+    
+    .btn-secondary:hover{
+      background: rgba(107, 91, 79, 0.2);
+    }
+    
+    .btn-primary{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
+    }
+    
+    .btn-primary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 91, 79, 0.4);
+    }
+    
+    .btn:disabled{
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* ========== 3D地图区域 ========== */
+    .map-section{
+      padding: 60px 50px;
+      background: linear-gradient(180deg, var(--bg-cream) 0%, #e8e4dc 100%);
+      display: none;
+    }
+    
+    .map-section.show{
+      display: block;
+      animation: fadeIn 1s ease;
+    }
+    
+    @keyframes fadeIn{
+      from{ opacity: 0; }
+      to{ opacity: 1; }
+    }
+    
+    .map-container{
+      position: relative;
+      height: 70vh;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px var(--shadow);
+      overflow: hidden;
+    }
+    
+    #canvas-container{
+      width: 100%;
+      height: 100%;
+    }
+    
+    .map-overlay{
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.95);
       padding: 20px;
       border-radius: 12px;
-      text-align: center;
-      border: 1px solid rgba(107,91,79,0.1);
-      transition: transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 300px;
+      z-index: 100;
     }
     
-    .score-card:hover{
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    .map-legend h4{
+      font-size: 16px;
+      color: var(--door-gray);
+      margin-bottom: 10px;
+    }
+    
+    .legend-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    
+    .legend-color{
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .legend-color.culture{ background: #4A6B5A; }
+    .legend-color.business{ background: #C9A86C; }
+    .legend-color.route{ background: #6B5B4F; }
+    
+    /* ========== 路线详情区域 ========== */
+    .route-detail-section{
+      padding: 60px 50px;
+      background: var(--white);
+      display: none;
+    }
+    
+    .route-detail-section.show{
+      display: block;
+      animation: slideUp 0.6s ease;
+    }
+    
+    @keyframes slideUp{
+      from{
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to{
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .route-header{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+      padding: 30px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .route-title{
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .route-meta{
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .meta-item{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+    
+    .meta-icon{
+      font-size: 20px;
+    }
+    
+    /* 评分卡片 */
+    .score-dashboard{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .score-card-advanced{
+      background: linear-gradient(135deg, var(--bg-cream), var(--white));
+      border: 2px solid rgba(107, 91, 79, 0.1);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .score-card-advanced::before{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));
+    }
+    
+    .score-card-advanced:hover{
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    
+    .score-icon{
+      font-size: 40px;
+      margin-bottom: 10px;
     }
     
     .score-label{
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-dark);
       opacity: 0.7;
       margin-bottom: 8px;
     }
     
-    .score-value{
-      font-size: 32px;
+    .score-value-advanced{
+      font-size: 36px;
       font-weight: 700;
       color: var(--accent-gold);
     }
     
-    /* 路线列表 */
-    .route-list{
-      margin-top: 20px;
-    }
-    
-    .route-item{
-      padding: 15px;
-      background: var(--bg-cream);
-      border-radius: 10px;
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      transition: all 0.3s;
-      border-left: 4px solid var(--accent-gold);
-    }
-    
-    .route-item:hover{
-      transform: translateX(8px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    
-    .route-number{
-      width: 32px;
-      height: 32px;
-      background: var(--door-gray);
-      color: var(--white);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-    
-    .route-info{
-      flex: 1;
-    }
-    
-    .route-name{
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-    }
-    
-    .route-meta{
+    .score-desc{
       font-size: 13px;
+      color: var(--brick-green);
+      margin-top: 5px;
+    }
+    
+    /* 路线时间轴 */
+    .timeline{
+      position: relative;
+      padding-left: 40px;
+    }
+    
+    .timeline::before{
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--door-gray), var(--accent-gold));
+      border-radius: 3px;
+    }
+    
+    .timeline-item{
+      position: relative;
+      margin-bottom: 30px;
+      background: var(--bg-cream);
+      padding: 25px;
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+    
+    .timeline-item:hover{
+      transform: translateX(8px);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+    
+    .timeline-marker{
+      position: absolute;
+      left: -33px;
+      top: 25px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-gold);
+      border: 4px solid var(--white);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .timeline-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .timeline-title{
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--door-gray);
+    }
+    
+    .timeline-badge{
+      background: var(--brick-green);
+      color: var(--white);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .timeline-badge.business{
+      background: var(--accent-gold);
+    }
+    
+    .timeline-content{
+      color: var(--text-dark);
+      opacity: 0.85;
+      line-height: 1.6;
+    }
+    
+    .timeline-meta{
+      display: flex;
+      gap: 20px;
+      margin-top: 12px;
+      font-size: 14px;
       color: var(--text-dark);
       opacity: 0.7;
     }
     
-    /* 响应式 */
-    @media (max-width: 1024px){
-      #canvas-container{
-        display: none;
-      }
-      .content-panel{
-        width: 100%;
-      }
-    }
-    
+    /* ========== 响应式设计 ========== */
     @media (max-width: 768px){
       .navbar{
         padding: 15px 20px;
       }
+      
       .nav-links{
         display: none;
       }
-      .content-panel{
-        padding: 100px 20px 30px;
-      }
+      
       .hero-title{
-        font-size: 28px;
+        font-size: 32px;
       }
-      .score-cards{
+      
+      .hero-subtitle{
+        font-size: 18px;
+      }
+      
+      .quiz-section,
+      .map-section,
+      .route-detail-section{
+        padding: 40px 20px;
+      }
+      
+      .section-title{
+        font-size: 26px;
+      }
+      
+      .options-grid{
         grid-template-columns: 1fr;
       }
-      .theme-selector{
+      
+      .route-header{
         flex-direction: column;
+        text-align: center;
       }
-      .theme-chip{
-        width: 100%;
-        justify-content: center;
+      
+      .score-dashboard{
+        grid-template-columns: 1fr;
       }
     }
     
-    /* 加载动画 */
+    /* ========== 加载动画 ========== */
     .loader{
       position: fixed;
       top: 0;
@@ -485,6 +694,7 @@
       background: var(--bg-cream);
       z-index: 9999;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       transition: opacity 0.5s;
@@ -495,9 +705,38 @@
       pointer-events: none;
     }
     
+    .loader-door{
+      width: 80px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 40px 40px 0 0;
+      position: relative;
+      animation: doorOpen 2s ease-in-out infinite;
+      box-shadow: 0 8px 24px rgba(107, 91, 79, 0.4);
+    }
+    
+    .loader-door::before{
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+    }
+    
+    @keyframes doorOpen{
+      0%, 100%{ transform: perspective(200px) rotateY(0deg); }
+      50%{ transform: perspective(200px) rotateY(-30deg); }
+    }
+    
     .loader-text{
-      font-size: 24px;
+      margin-top: 30px;
+      font-size: 20px;
       color: var(--door-gray);
+      font-weight: 600;
       animation: pulse 1.5s infinite;
     }
     
@@ -505,120 +744,353 @@
       0%, 100%{ opacity: 1; }
       50%{ opacity: 0.5; }
     }
+    
+    /* ========== 粒子背景 ========== */
+    #particles-canvas{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.3;
+    }
   </style>
 </head>
 <body>
   <!-- 加载动画 -->
   <div class="loader" id="loader">
-    <div class="loader-text">🏮 门楼层记·故事里</div>
+    <div class="loader-door"></div>
+    <div class="loader-text">推开一座门楼...</div>
   </div>
   
   <!-- 粒子背景 -->
   <canvas id="particles-canvas"></canvas>
   
-  <!-- 3D场景 -->
-  <div id="canvas-container"></div>
-  
   <!-- 导航栏 -->
   <nav class="navbar">
-    <div class="logo">门楼里</div>
+    <div class="logo-container">
+      <!-- Logo占位区 - 可替换 -->
+      <div class="logo-placeholder">🏮</div>
+      <div class="brand-text">
+        <h1>门楼里</h1>
+        <p>推开一座门楼，走进一层时光</p>
+      </div>
+    </div>
     <div class="nav-links">
       <a href="#home">首页</a>
-      <a href="#route">路线规划</a>
-      <a href="#about">关于</a>
+      <a href="#quiz">智能推荐</a>
+      <a href="#map">3D地图</a>
+      <a href="#route">我的路线</a>
     </div>
   </nav>
   
   <!-- 主容器 -->
-  <div class="main-container">
-    <!-- 左侧内容 -->
-    <div class="content-panel">
-      <!-- 标题区 -->
-      <section class="hero-section" id="home">
+  <div class="main-wrapper">
+    <!-- Hero区域 -->
+    <section class="hero-section" id="home">
+      <div class="hero-content">
         <h1 class="hero-title">门楼层记·故事里</h1>
-        <p class="hero-subtitle">推开一座门楼，走进一层时光</p>
+        <p class="hero-subtitle">西四北三条社区文商活化计划</p>
         <p class="hero-desc">
-          西四北三条社区文商活化计划 —— 以门楼为媒，串联226个院落的历史记忆与当代生活，
-          打造"读门·推门·创门"三层体验，让胡同文化在年轻世代中焕发新生。
+          探索226个院落的千年记忆，体验"读门·推门·创门"三层文化之旅<br>
+          让智能算法为你定制专属的胡同探索路线
         </p>
-      </section>
+      </div>
+    </section>
+    
+    <!-- 智能问卷区域 -->
+    <section class="quiz-section" id="quiz">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>🎯</span>
+          智能路线推荐
+        </h2>
+        <p class="section-subtitle">回答几个问题，我们将为你量身定制最佳游览路线</p>
+      </div>
       
-      <!-- 控制面板 -->
-      <div class="control-panel" id="route">
-        <h2 class="panel-title">路线偏好设置</h2>
-        
-        <!-- 主题选择 -->
-        <div class="theme-selector">
-          <label class="theme-chip active">
-            <input type="checkbox" id="read" checked>
-            <span>📖 读门·门楼探秘</span>
-          </label>
-          <label class="theme-chip">
-            <input type="checkbox" id="push">
-            <span>🏡 推门·院落寻访</span>
-          </label>
-          <label class="theme-chip">
-            <input type="checkbox" id="create">
-            <span>🎨 创门·新颜共生</span>
-          </label>
+      <div class="quiz-container">
+        <div class="quiz-progress">
+          <div class="progress-bar" id="progress-bar"></div>
         </div>
         
-        <!-- 时间滑块 -->
-        <div class="slider-group">
-          <div class="slider-label">
-            <span>⏱ 游览时长</span>
-            <span class="slider-value" id="time-val">90分钟</span>
+        <!-- 问题1: 游览主题偏好 -->
+        <div class="question-card active" data-question="1">
+          <div class="question-text">
+            <span class="question-number">1</span>
+            你更感兴趣的是哪种体验？
           </div>
-          <input type="range" id="time" min="60" max="120" step="10" value="90">
+          <div class="options-grid">
+            <div class="option-card" data-value="culture" data-weight="read">
+              <div class="option-icon">📖</div>
+              <div>
+                <div class="option-text">读门·门楼探秘</div>
+                <div class="option-desc">深入了解六种门楼形制与砖雕艺术</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="story" data-weight="push">
+              <div class="option-icon">🏡</div>
+              <div>
+                <div class="option-text">推门·院落故事</div>
+                <div class="option-desc">走进居民院落，聆听口述历史</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="creative" data-weight="create">
+              <div class="option-icon">🎨</div>
+              <div>
+                <div class="option-text">创门·新颜共生</div>
+                <div class="option-desc">体验京剧、手作等年轻化业态</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="mixed" data-weight="mixed">
+              <div class="option-icon">🌟</div>
+              <div>
+                <div class="option-text">综合体验</div>
+                <div class="option-desc">均衡感受文化、故事与创新</div>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <!-- 选项 -->
-        <label class="checkbox-group">
-          <input type="checkbox" id="avoid-res">
-          <span>🤫 避开高干扰区（居民友好模式）</span>
-        </label>
-        
-        <button class="generate-btn" onclick="planRoute()">
-          ✨ 生成推荐路线
-        </button>
-        
-        <!-- 结果展示 -->
-        <div class="result-section" id="result">
-          <h2 class="panel-title">🗺 推荐路线</h2>
-          
-          <div class="score-cards">
-            <div class="score-card">
-              <div class="score-label">文化深度</div>
-              <div class="score-value" id="s-c">-</div>
+        <!-- 问题2: 游览时长 -->
+        <div class="question-card" data-question="2">
+          <div class="question-text">
+            <span class="question-number">2</span>
+            你计划游览多长时间？
+          </div>
+          <div class="options-grid">
+            <div class="option-card" data-value="60">
+              <div class="option-icon">⏱</div>
+              <div>
+                <div class="option-text">1小时</div>
+                <div class="option-desc">快速精华游</div>
+              </div>
             </div>
-            <div class="score-card">
-              <div class="score-label">商业转化</div>
-              <div class="score-value" id="s-b">-</div>
+            <div class="option-card" data-value="90">
+              <div class="option-icon">🕐</div>
+              <div>
+                <div class="option-text">1.5小时</div>
+                <div class="option-desc">标准深度游</div>
+              </div>
             </div>
-            <div class="score-card">
-              <div class="score-label">居民干扰</div>
-              <div class="score-value" id="s-r">-</div>
+            <div class="option-card" data-value="120">
+              <div class="option-icon">🕑</div>
+              <div>
+                <div class="option-text">2小时</div>
+                <div class="option-desc">全面沉浸游</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="180">
+              <div class="option-icon">🕒</div>
+              <div>
+                <div class="option-text">3小时+</div>
+                <div class="option-desc">深度探索游</div>
+              </div>
             </div>
           </div>
-          
-          <div class="route-list" id="route-list"></div>
+        </div>
+        
+        <!-- 问题3: 同行人员 -->
+        <div class="question-card" data-question="3">
+          <div class="question-text">
+            <span class="question-number">3</span>
+            你和谁一起来？
+          </div>
+          <div class="options-grid">
+            <div class="option-card" data-value="solo" data-profile="independent">
+              <div class="option-icon">🚶</div>
+              <div>
+                <div class="option-text">独自一人</div>
+                <div class="option-desc">自由探索，深度体验</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="couple" data-profile="romantic">
+              <div class="option-icon">💑</div>
+              <div>
+                <div class="option-text">情侣/伴侣</div>
+                <div class="option-desc">浪漫漫步，拍照打卡</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="family" data-profile="family">
+              <div class="option-icon">👨‍‍👧👦</div>
+              <div>
+                <div class="option-text">家庭亲子</div>
+                <div class="option-desc">寓教于乐，适合儿童</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="friends" data-profile="social">
+              <div class="option-icon">👥</div>
+              <div>
+                <div class="option-text">朋友同行</div>
+                <div class="option-desc">互动体验，分享乐趣</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 问题4: 兴趣标签 -->
+        <div class="question-card" data-question="4">
+          <div class="question-text">
+            <span class="question-number">4</span>
+            你对哪些内容特别感兴趣？（可多选）
+          </div>
+          <div class="options-grid">
+            <div class="option-card" data-value="architecture" data-tag="architecture">
+              <div class="option-icon">🏛</div>
+              <div>
+                <div class="option-text">古建筑</div>
+                <div class="option-desc">门楼形制、砖雕艺术</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="history" data-tag="history">
+              <div class="option-icon">📜</div>
+              <div>
+                <div class="option-text">历史人文</div>
+                <div class="option-desc">名人故居、院落故事</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="handcraft" data-tag="handcraft">
+              <div class="option-icon">✋</div>
+              <div>
+                <div class="option-text">手作体验</div>
+                <div class="option-desc">拓印、拼豆、脸谱绘制</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="food" data-tag="food">
+              <div class="option-icon">🍵</div>
+              <div>
+                <div class="option-text">美食茶饮</div>
+                <div class="option-desc">胡同私房菜、特色茶铺</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="photo" data-tag="photo">
+              <div class="option-icon">📸</div>
+              <div>
+                <div class="option-text">摄影打卡</div>
+                <div class="option-desc">最美角度、出片圣地</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="shopping" data-tag="shopping">
+              <div class="option-icon">🛍</div>
+              <div>
+                <div class="option-text">文创购物</div>
+                <div class="option-desc">门楼主题文创产品</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 问题5: 居民友好 -->
+        <div class="question-card" data-question="5">
+          <div class="question-text">
+            <span class="question-number">5</span>
+            是否希望避开居民生活区，减少打扰？
+          </div>
+          <div class="options-grid">
+            <div class="option-card" data-value="yes">
+              <div class="option-icon">🤫</div>
+              <div>
+                <div class="option-text">是的，希望居民友好</div>
+                <div class="option-desc">优先选择公共空间和开放区域</div>
+              </div>
+            </div>
+            <div class="option-card" data-value="no">
+              <div class="option-icon">🏘</div>
+              <div>
+                <div class="option-text">没关系，想体验真实生活</div>
+                <div class="option-desc">愿意探访居民院落，感受原真性</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 导航按钮 -->
+        <div class="quiz-navigation">
+          <button class="btn btn-secondary" id="prev-btn" onclick="changeQuestion(-1)" disabled>
+            ← 上一题
+          </button>
+          <button class="btn btn-primary" id="next-btn" onclick="changeQuestion(1)" disabled>
+            下一题 →
+          </button>
+          <button class="btn btn-primary" id="submit-btn" onclick="generateRoute()" style="display:none;">
+            ✨ 生成我的专属路线
+          </button>
         </div>
       </div>
-    </div>
+    </section>
+    
+    <!-- 3D地图区域 -->
+    <section class="map-section" id="map">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>🗺</span>
+          3D路线可视化
+        </h2>
+        <p class="section-subtitle">沉浸式查看你的推荐路线</p>
+      </div>
+      
+      <div class="map-container">
+        <div id="canvas-container"></div>
+        <div class="map-overlay">
+          <div class="map-legend">
+            <h4>图例说明</h4>
+            <div class="legend-item">
+              <div class="legend-color culture"></div>
+              <span>文化景点</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color business"></div>
+              <span>商业体验</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color route"></div>
+              <span>推荐路线</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 路线详情区域 -->
+    <section class="route-detail-section" id="route">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span>📋</span>
+          你的专属路线
+        </h2>
+        <p class="section-subtitle">基于你的偏好智能生成</p>
+      </div>
+      
+      <div id="route-content">
+        <!-- 动态生成内容 -->
+      </div>
+    </section>
   </div>
 
   <script>
-    // ==================== 数据源 ====================
+    // ==================== 全局变量 ====================
+    let currentQuestion = 1;
+    const totalQuestions = 5;
+    let userAnswers = {
+      theme: null,
+      duration: null,
+      profile: null,
+      tags: [],
+      avoidResident: null
+    };
+    
+    // 节点数据（包含3D坐标）
     const nodesData = [
-      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,interfere:0.2,x:-2,y:1,z:-3},
-      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,interfere:0.3,x:1,y:0,z:-2},
-      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,interfere:0.25,x:-1,y:1,z:2},
-      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,interfere:0.4,x:2,y:-1,z:1},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,interfere:0.1,x:0,y:0,z:3},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,interfere:0.15,x:-2,y:-1,z:0},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,interfere:0.1,x:1,y:1,z:0},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,interfere:0.05,x:0,y:2,z:-1},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,interfere:0.35,x:-1,y:-2,z:2}
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,interfere:0.2,x:-3,y:0,z:-4,tags:["architecture","history","photo"]},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,interfere:0.3,x:0,y:0,z:-3,tags:["history","photo"]},
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,interfere:0.25,x:3,y:0,z:-2,tags:["architecture","photo"]},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,interfere:0.4,x:-2,y:0,z:2,tags:["history"]},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,interfere:0.1,x:0,y:0,z:3,tags:["food","shopping"]},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,interfere:0.15,x:2,y:0,z:0,tags:["handcraft","photo","shopping"]},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,interfere:0.1,x:-1,y:0,z:4,tags:["handcraft","shopping"]},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,interfere:0.05,x:1,y:0,z:5,tags:["shopping","history"]},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,interfere:0.35,x:4,y:0,z:3,tags:["food","shopping","photo"]}
     ];
     
     const edges = {
@@ -629,28 +1101,21 @@
     
     const nodeMap = {};
     nodesData.forEach(n => nodeMap[n.id] = n);
-
+    
+    let scene, camera, renderer, controls;
+    let routeLine, routePoints = [];
+    let markers = [];
+    
     // ==================== 初始化 ====================
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('loader').classList.add('hidden');
-      }, 1000);
+      }, 1500);
+      
       initParticles();
-      init3DScene();
+      setupQuiz();
     });
-
-    // 时间滑块
-    document.getElementById('time').addEventListener('input', function(){
-      document.getElementById('time-val').textContent = this.value + '分钟';
-    });
-
-    // 主题选择动画
-    document.querySelectorAll('.theme-chip').forEach(chip => {
-      chip.addEventListener('click', function(){
-        this.classList.toggle('active');
-      });
-    });
-
+    
     // ==================== 粒子背景 ====================
     function initParticles(){
       const canvas = document.getElementById('particles-canvas');
@@ -659,27 +1124,34 @@
       canvas.height = window.innerHeight;
       
       const particles = [];
-      const particleCount = 80;
+      const particleCount = 60;
       
       class Particle{
         constructor(){
+          this.reset();
+        }
+        
+        reset(){
           this.x = Math.random() * canvas.width;
           this.y = Math.random() * canvas.height;
-          this.size = Math.random() * 3 + 1;
-          this.speedX = Math.random() * 1 - 0.5;
-          this.speedY = Math.random() * 1 - 0.5;
-          this.color = `rgba(107, 91, 79, ${Math.random() * 0.3})`;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.opacity = Math.random() * 0.5;
         }
+        
         update(){
           this.x += this.speedX;
           this.y += this.speedY;
+          
           if(this.x > canvas.width) this.x = 0;
           if(this.x < 0) this.x = canvas.width;
           if(this.y > canvas.height) this.y = 0;
           if(this.y < 0) this.y = canvas.height;
         }
+        
         draw(){
-          ctx.fillStyle = this.color;
+          ctx.fillStyle = `rgba(107, 91, 79, ${this.opacity})`;
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fill();
@@ -705,180 +1177,442 @@
         canvas.height = window.innerHeight;
       });
     }
-
-    // ==================== 3D场景（Three.js）====================
-    function init3DScene(){
-      const container = document.getElementById('canvas-container');
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      renderer.setClearColor(0x000000, 0);
-      container.appendChild(renderer.domElement);
-      
-      // 创建门楼几何体（简化版3D门楼）
-      const doorGroup = new THREE.Group();
-      
-      // 门框
-      const frameGeometry = new THREE.BoxGeometry(2, 3, 0.3);
-      const frameMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0x6B5B4F,
-        shininess: 30
-      });
-      const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-      doorGroup.add(frame);
-      
-      // 门扇
-      const doorGeometry = new THREE.BoxGeometry(1.6, 2.6, 0.1);
-      const doorMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0x8B7355,
-        shininess: 20
-      });
-      const door = new THREE.Mesh(doorGeometry, doorMaterial);
-      door.position.z = 0.1;
-      doorGroup.add(door);
-      
-      // 门簪（装饰）
-      for(let i = 0; i < 4; i++){
-        const knobGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-        const knobMaterial = new THREE.MeshPhongMaterial({ 
-          color: 0xC9A86C,
-          shininess: 100
+    
+    // ==================== 问卷逻辑 ====================
+    function setupQuiz(){
+      document.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', function(){
+          const questionNum = this.closest('.question-card').dataset.question;
+          
+          // 单选逻辑
+          if(questionNum !== '4'){
+            this.closest('.options-grid').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // 保存答案
+            if(questionNum == '1'){
+              userAnswers.theme = this.dataset.weight;
+            } else if(questionNum == '2'){
+              userAnswers.duration = parseInt(this.dataset.value);
+            } else if(questionNum == '3'){
+              userAnswers.profile = this.dataset.profile;
+            } else if(questionNum == '5'){
+              userAnswers.avoidResident = this.dataset.value === 'yes';
+            }
+          }
+          // 多选逻辑
+          else{
+            this.classList.toggle('selected');
+            const value = this.dataset.tag;
+            if(this.classList.contains('selected')){
+              if(!userAnswers.tags.includes(value)){
+                userAnswers.tags.push(value);
+              }
+            } else{
+              userAnswers.tags = userAnswers.tags.filter(t => t !== value);
+            }
+          }
+          
+          updateButtons();
         });
-        const knob = new THREE.Mesh(knobGeometry, knobMaterial);
-        knob.position.set(-0.5 + i * 0.33, 1.2, 0.2);
-        doorGroup.add(knob);
-      }
-      
-      scene.add(doorGroup);
-      
-      // 灯光
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      directionalLight.position.set(5, 5, 5);
-      scene.add(directionalLight);
-      
-      camera.position.z = 5;
-      
-      // 动画
-      let mouseX = 0, mouseY = 0;
-      document.addEventListener('mousemove', (event) => {
-        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
-        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-      });
-      
-      function animate3D(){
-        requestAnimationFrame(animate3D);
-        
-        doorGroup.rotation.y += 0.005;
-        doorGroup.rotation.x = mouseY * 0.2;
-        doorGroup.rotation.z = mouseX * 0.1;
-        
-        renderer.render(scene, camera);
-      }
-      animate3D();
-      
-      window.addEventListener('resize', () => {
-        if(container.clientWidth > 0 && container.clientHeight > 0){
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        }
       });
     }
-
-    // ==================== 路线规划算法 ====================
-    function planRoute(){
-      const themes = [];
-      if(document.getElementById('read').checked) themes.push('读门');
-      if(document.getElementById('push').checked) themes.push('推门');
-      if(document.getElementById('create').checked) themes.push('创门');
+    
+    function updateButtons(){
+      const nextBtn = document.getElementById('next-btn');
+      const prevBtn = document.getElementById('prev-btn');
+      const submitBtn = document.getElementById('submit-btn');
       
-      const maxT = parseInt(document.getElementById('time').value);
-      const avoid = document.getElementById('avoid-res').checked;
+      // 检查当前问题是否有答案
+      const currentCard = document.querySelector(`.question-card[data-question="${currentQuestion}"]`);
+      const selectedOptions = currentCard.querySelectorAll('.option-card.selected');
       
-      if(themes.length === 0){
-        alert('请至少选择一个主题');
-        return;
+      if(currentQuestion < totalQuestions){
+        nextBtn.disabled = selectedOptions.length === 0;
+        nextBtn.style.display = 'inline-block';
+        submitBtn.style.display = 'none';
+      } else{
+        nextBtn.style.display = 'none';
+        const hasTheme = userAnswers.theme;
+        const hasDuration = userAnswers.duration;
+        const hasProfile = userAnswers.profile;
+        const hasTags = userAnswers.tags.length > 0;
+        const hasAvoid = userAnswers.avoidResident !== null;
+        
+        submitBtn.disabled = !(hasTheme && hasDuration && hasProfile && hasTags && hasAvoid);
+        submitBtn.style.display = 'inline-block';
       }
       
-      let avail = nodesData.filter(n => themes.includes(n.theme) && (!avoid || n.interfere < 0.3));
-      if(avail.length === 0){
-        alert('无符合条件节点，请放宽筛选条件');
-        return;
-      }
+      prevBtn.disabled = currentQuestion === 1;
       
-      let route = [], cur = 'N1', total = 0;
-      let visited = new Set([cur]);
-      route.push(nodeMap[cur]);
+      // 更新进度条
+      const progress = (currentQuestion / totalQuestions) * 100;
+      document.getElementById('progress-bar').style.width = progress + '%';
+    }
+    
+    function changeQuestion(direction){
+      const currentCard = document.querySelector(`.question-card[data-question="${currentQuestion}"]`);
+      currentCard.classList.remove('active');
       
-      while(route.length <= avail.length){
-        let best = null, minT = 999;
-        for(let n of avail){
-          if(visited.has(n.id)) continue;
-          let wt = (edges[cur] && edges[cur][n.id]) ? edges[cur][n.id] : 6;
-          let sum = total + wt + n.stay;
-          if(sum <= maxT && wt < minT){
-            minT = wt;
-            best = n;
+      currentQuestion += direction;
+      
+      const nextCard = document.querySelector(`.question-card[data-question="${currentQuestion}"]`);
+      nextCard.classList.add('active');
+      
+      updateButtons();
+      
+      // 滚动到问卷顶部
+      document.getElementById('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // ==================== 路线生成算法 ====================
+    function generateRoute(){
+      // 基于用户答案计算节点权重
+      const scoredNodes = nodesData.map(node => {
+        let score = 0;
+        
+        // 主题匹配
+        if(userAnswers.theme === 'read' && node.theme === '读门') score += 30;
+        if(userAnswers.theme === 'push' && node.theme === '推门') score += 30;
+        if(userAnswers.theme === 'create' && node.theme === '创门') score += 30;
+        if(userAnswers.theme === 'mixed') score += 15;
+        
+        // 标签匹配
+        node.tags.forEach(tag => {
+          if(userAnswers.tags.includes(tag)) score += 10;
+        });
+        
+        // 居民友好
+        if(userAnswers.avoidResident && node.interfere > 0.3) score -= 20;
+        
+        // 用户画像调整
+        if(userAnswers.profile === 'family' && node.type === '商业') score += 10;
+        if(userAnswers.profile === 'romantic' && node.tags.includes('photo')) score += 10;
+        if(userAnswers.profile === 'independent' && node.theme === '读门') score += 10;
+        
+        return { ...node, score };
+      });
+      
+      // 排序并选择节点
+      scoredNodes.sort((a, b) => b.score - a.score);
+      const selectedNodes = scoredNodes.slice(0, 5);
+      
+      // 贪心路径规划
+      let route = [], current = 'N1', totalTime = 0;
+      let visited = new Set([current]);
+      route.push(nodeMap[current]);
+      
+      const maxTime = userAnswers.duration;
+      const available = selectedNodes.filter(n => n.id !== 'N1');
+      
+      while(route.length < Math.min(6, available.length + 1)){
+        let best = null, bestScore = -Infinity;
+        
+        for(let node of available){
+          if(visited.has(node.id)) continue;
+          
+          let walkTime = (edges[current] && edges[current][node.id]) ? edges[current][node.id] : 8;
+          let newTotal = totalTime + walkTime + node.stay;
+          
+          if(newTotal <= maxTime){
+            let score = node.score / (walkTime + node.stay); // 性价比
+            if(score > bestScore){
+              bestScore = score;
+              best = node;
+            }
           }
         }
+        
         if(!best) break;
+        
+        let walkTime = (edges[current] && edges[current][best.id]) ? edges[current][best.id] : 8;
         visited.add(best.id);
         route.push(best);
-        total += minT + best.stay;
-        cur = best.id;
+        totalTime += walkTime + best.stay;
+        current = best.id;
       }
       
-      // 渲染结果
-      let listHtml = '';
-      route.forEach((n, i) => {
-        let warn = n.interfere > 0.3 ? ' <span style="color:#c0392b;">⚠️</span>' : '';
-        listHtml += `
-          <div class="route-item">
-            <div class="route-number">${i+1}</div>
-            <div class="route-info">
-              <div class="route-name">${n.name}${warn}</div>
-              <div class="route-meta">${n.theme} · 停留${n.stay}分钟 · ${n.type}</div>
+      // 显示结果
+      displayRoute(route, totalTime);
+      init3DMap(route);
+      
+      // 滚动到地图
+      document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    // ==================== 显示路线详情 ====================
+    function displayRoute(route, totalTime){
+      const content = document.getElementById('route-content');
+      
+      // 计算评分
+      const cultureCount = route.filter(n => n.type === '文化').length;
+      const businessCount = route.filter(n => n.type === '商业').length;
+      const avgInterfere = route.reduce((s, n) => s + n.interfere, 0) / route.length;
+      
+      const cultureScore = Math.round((cultureCount / route.length) * 100);
+      const businessScore = Math.round((businessCount / route.length) * 100);
+      const residentScore = Math.round((1 - avgInterfere) * 100);
+      
+      let html = `
+        <div class="route-header">
+          <div>
+            <div class="route-title">🎯 你的专属门楼探索路线</div>
+            <div style="margin-top:10px;opacity:0.9;">
+              基于你的偏好智能生成 · 共${route.length}个站点
+            </div>
+          </div>
+          <div class="route-meta">
+            <div class="meta-item">
+              <span class="meta-icon">⏱</span>
+              <span>预计 ${totalTime} 分钟</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-icon">📍</span>
+              <span>${route.length} 个站点</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-icon">🎨</span>
+              <span>${userAnswers.theme === 'read' ? '文化深度' : userAnswers.theme === 'push' ? '故事体验' : '创新活力'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="score-dashboard">
+          <div class="score-card-advanced">
+            <div class="score-icon">📚</div>
+            <div class="score-label">文化深度指数</div>
+            <div class="score-value-advanced">${cultureScore}</div>
+            <div class="score-desc">${cultureScore > 60 ? '深度文化体验' : '均衡文化商业'}</div>
+          </div>
+          <div class="score-card-advanced">
+            <div class="score-icon">🛍</div>
+            <div class="score-label">商业体验指数</div>
+            <div class="score-value-advanced">${businessScore}</div>
+            <div class="score-desc">${businessScore > 60 ? '丰富业态体验' : '适度商业配套'}</div>
+          </div>
+          <div class="score-card-advanced">
+            <div class="score-icon">🤝</div>
+            <div class="score-label">居民友好度</div>
+            <div class="score-value-advanced">${residentScore}</div>
+            <div class="score-desc">${residentScore > 70 ? '高度尊重居民' : '平衡游客居民'}</div>
+          </div>
+        </div>
+        
+        <h3 style="font-size:24px;color:var(--door-gray);margin:30px 0 20px;">📍 路线详情</h3>
+        <div class="timeline">
+      `;
+      
+      route.forEach((node, index) => {
+        const badgeClass = node.type === '文化' ? '' : 'business';
+        const badgeText = node.type === '文化' ? '文化景点' : '商业体验';
+        const warnIcon = node.interfere > 0.3 ? ' ⚠️' : '';
+        
+        html += `
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-header">
+              <div class="timeline-title">${index + 1}. ${node.name}${warnIcon}</div>
+              <div class="timeline-badge ${badgeClass}">${badgeText}</div>
+            </div>
+            <div class="timeline-content">
+              <strong>${node.theme}</strong>主题 · 
+              停留约 <strong>${node.stay}分钟</strong> · 
+              标签：${node.tags.map(t => `<span style="background:rgba(201,168,108,0.2);padding:2px 8px;border-radius:4px;margin:0 4px;">${t}</span>`).join('')}
+            </div>
+            <div class="timeline-meta">
+              <span>🏷 ${node.theme === '读门' ? '门楼探秘' : node.theme === '推门' ? '院落故事' : '新业态体验'}</span>
+              <span>👥 ${node.interfere > 0.3 ? '居民生活区' : '公共空间'}</span>
             </div>
           </div>
         `;
       });
       
-      document.getElementById('route-list').innerHTML = listHtml;
+      html += `
+        </div>
+        
+        <div style="margin-top:40px;padding:25px;background:linear-gradient(135deg, rgba(107,91,79,0.1), rgba(74,107,90,0.1));border-radius:12px;border-left:4px solid var(--accent-gold);">
+          <h4 style="color:var(--door-gray);margin-bottom:10px;">💡 温馨提示</h4>
+          <ul style="line-height:2;color:var(--text-dark);opacity:0.85;">
+            <li>建议穿着舒适的步行鞋，胡同路面较为古朴</li>
+            <li>部分院落需提前预约，建议联系"石老娘议事厅"</li>
+            <li>尊重居民生活，拍照前请先征得同意</li>
+            <li>可携带《门楼里·故事集》边看边读</li>
+          </ul>
+        </div>
+      `;
       
-      // 评分
-      let cult = route.filter(n => n.type === '文化').length * 20;
-      let busi = route.filter(n => n.type === '商业').length * 15 + (total > 60 ? 10 : 0);
-      let intv = route.reduce((s, n) => s + n.interfere, 0) / route.length;
+      content.innerHTML = html;
+      document.getElementById('route').classList.add('show');
+    }
+    
+    // ==================== 3D地图初始化 ====================
+    function init3DMap(route){
+      const container = document.getElementById('map');
+      container.classList.add('show');
       
-      document.getElementById('s-c').textContent = cult;
-      document.getElementById('s-b').textContent = busi;
-      document.getElementById('s-r').textContent = Math.round(intv * 100) + '%';
+      // 清理旧场景
+      const canvasDiv = document.getElementById('canvas-container');
+      canvasDiv.innerHTML = '';
+      markers = [];
+      routePoints = [];
       
-      // 显示结果
-      document.getElementById('result').classList.add('show');
-      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // 创建场景
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xF5F1E8);
       
-      // GSAP动画
-      gsap.from('.score-card', {
-        duration: 0.6,
-        y: 30,
-        opacity: 0,
-        stagger: 0.1,
-        ease: 'power3.out'
+      // 相机
+      const width = canvasDiv.clientWidth;
+      const height = canvasDiv.clientHeight;
+      camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+      camera.position.set(0, 15, 20);
+      camera.lookAt(0, 0, 0);
+      
+      // 渲染器
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(width, height);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      canvasDiv.appendChild(renderer.domElement);
+      
+      // 控制器
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2.2;
+      controls.minDistance = 10;
+      controls.maxDistance = 50;
+      
+      // 灯光
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(10, 20, 10);
+      dirLight.castShadow = true;
+      dirLight.shadow.mapSize.width = 2048;
+      dirLight.shadow.mapSize.height = 2048;
+      scene.add(dirLight);
+      
+      // 地面
+      const groundGeometry = new THREE.PlaneGeometry(50, 50);
+      const groundMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0xE8E4DC,
+        side: THREE.DoubleSide
+      });
+      const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+      
+      // 网格辅助线
+      const gridHelper = new THREE.GridHelper(50, 50, 0x6B5B4F, 0xC9A86C);
+      gridHelper.material.opacity = 0.2;
+      gridHelper.material.transparent = true;
+      scene.add(gridHelper);
+      
+      // 创建节点标记
+      route.forEach((node, index) => {
+        const color = node.type === '文化' ? 0x4A6B5A : 0xC9A86C;
+        
+        // 柱状标记
+        const height = 2 + Math.random() * 2;
+        const geometry = new THREE.CylinderGeometry(0.4, 0.6, height, 8);
+        const material = new THREE.MeshPhongMaterial({ 
+          color: color,
+          shininess: 100
+        });
+        const marker = new THREE.Mesh(geometry, material);
+        marker.position.set(node.x, height / 2, node.z);
+        marker.castShadow = true;
+        marker.receiveShadow = true;
+        scene.add(marker);
+        markers.push(marker);
+        
+        // 顶部球体
+        const sphereGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+        const sphereMaterial = new THREE.MeshPhongMaterial({ 
+          color: 0xFFFFFF,
+          shininess: 100
+        });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.set(node.x, height + 0.5, node.z);
+        sphere.castShadow = true;
+        scene.add(sphere);
+        
+        // 保存路径点
+        routePoints.push(new THREE.Vector3(node.x, 0.5, node.z));
+        
+        // 添加文字标签（使用canvas纹理）
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = 256;
+        canvas.height = 64;
+        context.fillStyle = '#6B5B4F';
+        context.font = 'bold 32px Microsoft YaHei';
+        context.textAlign = 'center';
+        context.fillText(`${index + 1}. ${node.name}`, 128, 40);
+        
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+        const sprite = new THREE.Sprite(spriteMaterial);
+        sprite.position.set(node.x, height + 2, node.z);
+        sprite.scale.set(6, 1.5, 1);
+        scene.add(sprite);
       });
       
-      gsap.from('.route-item', {
-        duration: 0.5,
-        x: -20,
-        opacity: 0,
-        stagger: 0.08,
-        ease: 'power2.out',
-        delay: 0.3
+      // 创建路线
+      if(routePoints.length > 1){
+        const curve = new THREE.CatmullRomCurve3(routePoints);
+        const tubeGeometry = new THREE.TubeGeometry(curve, 64, 0.15, 8, false);
+        const tubeMaterial = new THREE.MeshPhongMaterial({ 
+          color: 0x6B5B4F,
+          emissive: 0xC9A86C,
+          emissiveIntensity: 0.3,
+          shininess: 100
+        });
+        routeLine = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        scene.add(routeLine);
+        
+        // 动画路径点
+        const pointsGeometry = new THREE.BufferGeometry();
+        const points = new Float32Array(routePoints.length * 3);
+        routePoints.forEach((p, i) => {
+          points[i * 3] = p.x;
+          points[i * 3 + 1] = p.y;
+          points[i * 3 + 2] = p.z;
+        });
+        pointsGeometry.setAttribute('position', new THREE.BufferAttribute(points, 3));
+        const pointsMaterial = new THREE.PointsMaterial({ 
+          color: 0xC9A86C, 
+          size: 0.5,
+          transparent: true,
+          opacity: 0.8
+        });
+        const pointsMesh = new THREE.Points(pointsGeometry, pointsMaterial);
+        scene.add(pointsMesh);
+      }
+      
+      // 动画循环
+      function animate3D(){
+        requestAnimationFrame(animate3D);
+        
+        // 标记上下浮动动画
+        markers.forEach((marker, index) => {
+          marker.position.y += Math.sin(Date.now() * 0.002 + index) * 0.005;
+        });
+        
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate3D();
+      
+      // 窗口大小调整
+      window.addEventListener('resize', () => {
+        const newWidth = canvasDiv.clientWidth;
+        const newHeight = canvasDiv.clientHeight;
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
       });
     }
   </script>
