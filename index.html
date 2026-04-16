@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>门楼层记·故事里 | 西四北三条文商活化计划</title>
+  
+  <!-- 引入Three.js for 3D效果 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- 引入GSAP for 高级动画 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  
+  <style>
+    :root{
+      --door-gray: #6B5B4F;
+      --brick-green: #4A6B5A;
+      --accent-gold: #C9A86C;
+      --bg-cream: #F5F1E8;
+      --text-dark: #2C2420;
+      --white: #FFFFFF;
+    }
+    
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body{
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    
+    /* 粒子背景 */
+    #particles-canvas{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+    
+    /* 3D场景容器 */
+    #canvas-container{
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    
+    /* 导航栏 */
+    .navbar{
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 20px 50px;
+      background: rgba(245, 241, 232, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo{
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--door-gray);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo::before{
+      content: '🏮';
+      font-size: 28px;
+    }
+    
+    .nav-links{
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-links a{
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-links a::after{
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-gold);
+      transition: width 0.3s;
+    }
+    
+    .nav-links a:hover::after{
+      width: 100%;
+    }
+    
+    /* 主容器 */
+    .main-container{
+      position: relative;
+      z-index: 10;
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* 左侧内容区 */
+    .content-panel{
+      width: 60%;
+      padding: 120px 50px 50px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    
+    /* 标题区 */
+    .hero-section{
+      margin-bottom: 40px;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(107,91,79,0.1) 0%, rgba(74,107,90,0.1) 100%);
+      border-radius: 20px;
+      border: 1px solid rgba(107,91,79,0.2);
+    }
+    
+    .hero-title{
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--door-gray);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    
+    .hero-subtitle{
+      font-size: 18px;
+      color: var(--brick-green);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    
+    .hero-desc{
+      font-size: 15px;
+      color: var(--text-dark);
+      opacity: 0.8;
+      line-height: 1.8;
+    }
+    
+    /* 控制面板 */
+    .control-panel{
+      background: var(--white);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(107,91,79,0.1);
+      margin-bottom: 30px;
+      border: 1px solid rgba(107,91,79,0.1);
+    }
+    
+    .panel-title{
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--door-gray);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .panel-title::before{
+      content: '';
+      width: 4px;
+      height: 24px;
+      background: var(--accent-gold);
+      border-radius: 2px;
+    }
+    
+    /* 主题选择 */
+    .theme-selector{
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    
+    .theme-chip{
+      padding: 12px 24px;
+      background: var(--bg-cream);
+      border: 2px solid transparent;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .theme-chip:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .theme-chip.active{
+      background: var(--door-gray);
+      color: var(--white);
+      border-color: var(--accent-gold);
+    }
+    
+    .theme-chip input{
+      display: none;
+    }
+    
+    /* 滑块 */
+    .slider-group{
+      margin: 20px 0;
+    }
+    
+    .slider-label{
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    
+    .slider-value{
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+    
+    input[type="range"]{
+      width: 100%;
+      height: 6px;
+      background: var(--bg-cream);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover{
+      transform: scale(1.2);
+      box-shadow: 0 0 12px rgba(201,168,108,0.5);
+    }
+    
+    /* 复选框 */
+    .checkbox-group{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+      cursor: pointer;
+    }
+    
+    .checkbox-group input[type="checkbox"]{
+      width: 20px;
+      height: 20px;
+      accent-color: var(--door-gray);
+      cursor: pointer;
+    }
+    
+    /* 按钮 */
+    .generate-btn{
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--door-gray) 0%, var(--brick-green) 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .generate-btn::before{
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .generate-btn:hover::before{
+      width: 300px;
+      height: 300px;
+    }
+    
+    .generate-btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(107,91,79,0.3);
+    }
+    
+    .generate-btn:active{
+      transform: translateY(0);
+    }
+    
+    /* 结果展示区 */
+    .result-section{
+      background: var(--white);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(107,91,79,0.1);
+      margin-top: 30px;
+      display: none;
+      animation: slideUp 0.6s ease;
+    }
+    
+    .result-section.show{
+      display: block;
+    }
+    
+    @keyframes slideUp{
+      from{
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to{
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* 评分卡片 */
+    .score-cards{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .score-card{
+      background: linear-gradient(135deg, var(--bg-cream) 0%, var(--white) 100%);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(107,91,79,0.1);
+      transition: transform 0.3s;
+    }
+    
+    .score-card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    
+    .score-label{
+      font-size: 13px;
+      color: var(--text-dark);
+      opacity: 0.7;
+      margin-bottom: 8px;
+    }
+    
+    .score-value{
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent-gold);
+    }
+    
+    /* 路线列表 */
+    .route-list{
+      margin-top: 20px;
+    }
+    
+    .route-item{
+      padding: 15px;
+      background: var(--bg-cream);
+      border-radius: 10px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.3s;
+      border-left: 4px solid var(--accent-gold);
+    }
+    
+    .route-item:hover{
+      transform: translateX(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .route-number{
+      width: 32px;
+      height: 32px;
+      background: var(--door-gray);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .route-info{
+      flex: 1;
+    }
+    
+    .route-name{
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+    
+    .route-meta{
+      font-size: 13px;
+      color: var(--text-dark);
+      opacity: 0.7;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 1024px){
+      #canvas-container{
+        display: none;
+      }
+      .content-panel{
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 768px){
+      .navbar{
+        padding: 15px 20px;
+      }
+      .nav-links{
+        display: none;
+      }
+      .content-panel{
+        padding: 100px 20px 30px;
+      }
+      .hero-title{
+        font-size: 28px;
+      }
+      .score-cards{
+        grid-template-columns: 1fr;
+      }
+      .theme-selector{
+        flex-direction: column;
+      }
+      .theme-chip{
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    /* 加载动画 */
+    .loader{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-cream);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s;
+    }
+    
+    .loader.hidden{
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loader-text{
+      font-size: 24px;
+      color: var(--door-gray);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse{
+      0%, 100%{ opacity: 1; }
+      50%{ opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 加载动画 -->
+  <div class="loader" id="loader">
+    <div class="loader-text">🏮 门楼层记·故事里</div>
+  </div>
+  
+  <!-- 粒子背景 -->
+  <canvas id="particles-canvas"></canvas>
+  
+  <!-- 3D场景 -->
+  <div id="canvas-container"></div>
+  
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="logo">门楼里</div>
+    <div class="nav-links">
+      <a href="#home">首页</a>
+      <a href="#route">路线规划</a>
+      <a href="#about">关于</a>
+    </div>
+  </nav>
+  
+  <!-- 主容器 -->
+  <div class="main-container">
+    <!-- 左侧内容 -->
+    <div class="content-panel">
+      <!-- 标题区 -->
+      <section class="hero-section" id="home">
+        <h1 class="hero-title">门楼层记·故事里</h1>
+        <p class="hero-subtitle">推开一座门楼，走进一层时光</p>
+        <p class="hero-desc">
+          西四北三条社区文商活化计划 —— 以门楼为媒，串联226个院落的历史记忆与当代生活，
+          打造"读门·推门·创门"三层体验，让胡同文化在年轻世代中焕发新生。
+        </p>
+      </section>
+      
+      <!-- 控制面板 -->
+      <div class="control-panel" id="route">
+        <h2 class="panel-title">路线偏好设置</h2>
+        
+        <!-- 主题选择 -->
+        <div class="theme-selector">
+          <label class="theme-chip active">
+            <input type="checkbox" id="read" checked>
+            <span>📖 读门·门楼探秘</span>
+          </label>
+          <label class="theme-chip">
+            <input type="checkbox" id="push">
+            <span>🏡 推门·院落寻访</span>
+          </label>
+          <label class="theme-chip">
+            <input type="checkbox" id="create">
+            <span>🎨 创门·新颜共生</span>
+          </label>
+        </div>
+        
+        <!-- 时间滑块 -->
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>⏱ 游览时长</span>
+            <span class="slider-value" id="time-val">90分钟</span>
+          </div>
+          <input type="range" id="time" min="60" max="120" step="10" value="90">
+        </div>
+        
+        <!-- 选项 -->
+        <label class="checkbox-group">
+          <input type="checkbox" id="avoid-res">
+          <span>🤫 避开高干扰区（居民友好模式）</span>
+        </label>
+        
+        <button class="generate-btn" onclick="planRoute()">
+          ✨ 生成推荐路线
+        </button>
+        
+        <!-- 结果展示 -->
+        <div class="result-section" id="result">
+          <h2 class="panel-title">🗺 推荐路线</h2>
+          
+          <div class="score-cards">
+            <div class="score-card">
+              <div class="score-label">文化深度</div>
+              <div class="score-value" id="s-c">-</div>
+            </div>
+            <div class="score-card">
+              <div class="score-label">商业转化</div>
+              <div class="score-value" id="s-b">-</div>
+            </div>
+            <div class="score-card">
+              <div class="score-label">居民干扰</div>
+              <div class="score-value" id="s-r">-</div>
+            </div>
+          </div>
+          
+          <div class="route-list" id="route-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== 数据源 ====================
+    const nodesData = [
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,interfere:0.2,x:-2,y:1,z:-3},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,interfere:0.3,x:1,y:0,z:-2},
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,interfere:0.25,x:-1,y:1,z:2},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,interfere:0.4,x:2,y:-1,z:1},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,interfere:0.1,x:0,y:0,z:3},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,interfere:0.15,x:-2,y:-1,z:0},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,interfere:0.1,x:1,y:1,z:0},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,interfere:0.05,x:0,y:2,z:-1},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,interfere:0.35,x:-1,y:-2,z:2}
+    ];
+    
+    const edges = {
+      N1:{N2:4,N3:3},N2:{N1:4,N4:5,N5:3},N3:{N1:3,N6:6},
+      N4:{N2:5,N7:4},N5:{N2:3,N7:2},N6:{N3:6,N9:5},
+      N7:{N4:4,N5:2,N8:3},N8:{N7:3,N9:4},N9:{N6:5,N8:4}
+    };
+    
+    const nodeMap = {};
+    nodesData.forEach(n => nodeMap[n.id] = n);
+
+    // ==================== 初始化 ====================
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+      }, 1000);
+      initParticles();
+      init3DScene();
+    });
+
+    // 时间滑块
+    document.getElementById('time').addEventListener('input', function(){
+      document.getElementById('time-val').textContent = this.value + '分钟';
+    });
+
+    // 主题选择动画
+    document.querySelectorAll('.theme-chip').forEach(chip => {
+      chip.addEventListener('click', function(){
+        this.classList.toggle('active');
+      });
+    });
+
+    // ==================== 粒子背景 ====================
+    function initParticles(){
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      const particles = [];
+      const particleCount = 80;
+      
+      class Particle{
+        constructor(){
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 3 + 1;
+          this.speedX = Math.random() * 1 - 0.5;
+          this.speedY = Math.random() * 1 - 0.5;
+          this.color = `rgba(107, 91, 79, ${Math.random() * 0.3})`;
+        }
+        update(){
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if(this.x > canvas.width) this.x = 0;
+          if(this.x < 0) this.x = canvas.width;
+          if(this.y > canvas.height) this.y = 0;
+          if(this.y < 0) this.y = canvas.height;
+        }
+        draw(){
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      for(let i = 0; i < particleCount; i++){
+        particles.push(new Particle());
+      }
+      
+      function animate(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+      
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+
+    // ==================== 3D场景（Three.js）====================
+    function init3DScene(){
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setClearColor(0x000000, 0);
+      container.appendChild(renderer.domElement);
+      
+      // 创建门楼几何体（简化版3D门楼）
+      const doorGroup = new THREE.Group();
+      
+      // 门框
+      const frameGeometry = new THREE.BoxGeometry(2, 3, 0.3);
+      const frameMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x6B5B4F,
+        shininess: 30
+      });
+      const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+      doorGroup.add(frame);
+      
+      // 门扇
+      const doorGeometry = new THREE.BoxGeometry(1.6, 2.6, 0.1);
+      const doorMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x8B7355,
+        shininess: 20
+      });
+      const door = new THREE.Mesh(doorGeometry, doorMaterial);
+      door.position.z = 0.1;
+      doorGroup.add(door);
+      
+      // 门簪（装饰）
+      for(let i = 0; i < 4; i++){
+        const knobGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+        const knobMaterial = new THREE.MeshPhongMaterial({ 
+          color: 0xC9A86C,
+          shininess: 100
+        });
+        const knob = new THREE.Mesh(knobGeometry, knobMaterial);
+        knob.position.set(-0.5 + i * 0.33, 1.2, 0.2);
+        doorGroup.add(knob);
+      }
+      
+      scene.add(doorGroup);
+      
+      // 灯光
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
+      
+      camera.position.z = 5;
+      
+      // 动画
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener('mousemove', (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+      });
+      
+      function animate3D(){
+        requestAnimationFrame(animate3D);
+        
+        doorGroup.rotation.y += 0.005;
+        doorGroup.rotation.x = mouseY * 0.2;
+        doorGroup.rotation.z = mouseX * 0.1;
+        
+        renderer.render(scene, camera);
+      }
+      animate3D();
+      
+      window.addEventListener('resize', () => {
+        if(container.clientWidth > 0 && container.clientHeight > 0){
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+      });
+    }
+
+    // ==================== 路线规划算法 ====================
+    function planRoute(){
+      const themes = [];
+      if(document.getElementById('read').checked) themes.push('读门');
+      if(document.getElementById('push').checked) themes.push('推门');
+      if(document.getElementById('create').checked) themes.push('创门');
+      
+      const maxT = parseInt(document.getElementById('time').value);
+      const avoid = document.getElementById('avoid-res').checked;
+      
+      if(themes.length === 0){
+        alert('请至少选择一个主题');
+        return;
+      }
+      
+      let avail = nodesData.filter(n => themes.includes(n.theme) && (!avoid || n.interfere < 0.3));
+      if(avail.length === 0){
+        alert('无符合条件节点，请放宽筛选条件');
+        return;
+      }
+      
+      let route = [], cur = 'N1', total = 0;
+      let visited = new Set([cur]);
+      route.push(nodeMap[cur]);
+      
+      while(route.length <= avail.length){
+        let best = null, minT = 999;
+        for(let n of avail){
+          if(visited.has(n.id)) continue;
+          let wt = (edges[cur] && edges[cur][n.id]) ? edges[cur][n.id] : 6;
+          let sum = total + wt + n.stay;
+          if(sum <= maxT && wt < minT){
+            minT = wt;
+            best = n;
+          }
+        }
+        if(!best) break;
+        visited.add(best.id);
+        route.push(best);
+        total += minT + best.stay;
+        cur = best.id;
+      }
+      
+      // 渲染结果
+      let listHtml = '';
+      route.forEach((n, i) => {
+        let warn = n.interfere > 0.3 ? ' <span style="color:#c0392b;">⚠️</span>' : '';
+        listHtml += `
+          <div class="route-item">
+            <div class="route-number">${i+1}</div>
+            <div class="route-info">
+              <div class="route-name">${n.name}${warn}</div>
+              <div class="route-meta">${n.theme} · 停留${n.stay}分钟 · ${n.type}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('route-list').innerHTML = listHtml;
+      
+      // 评分
+      let cult = route.filter(n => n.type === '文化').length * 20;
+      let busi = route.filter(n => n.type === '商业').length * 15 + (total > 60 ? 10 : 0);
+      let intv = route.reduce((s, n) => s + n.interfere, 0) / route.length;
+      
+      document.getElementById('s-c').textContent = cult;
+      document.getElementById('s-b').textContent = busi;
+      document.getElementById('s-r').textContent = Math.round(intv * 100) + '%';
+      
+      // 显示结果
+      document.getElementById('result').classList.add('show');
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      // GSAP动画
+      gsap.from('.score-card', {
+        duration: 0.6,
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        ease: 'power3.out'
+      });
+      
+      gsap.from('.route-item', {
+        duration: 0.5,
+        x: -20,
+        opacity: 0,
+        stagger: 0.08,
+        ease: 'power2.out',
+        delay: 0.3
+      });
+    }
+  </script>
+</body>
+</html>
