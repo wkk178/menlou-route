@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D地图可视化 | 门楼层记·故事里</title>
+  
+  <!-- Mapbox GL JS -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.2.0/mapbox-gl-directions.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.2.0/mapbox-gl-directions.css' rel='stylesheet' />
+  
+  <style>
+    :root{
+      --door-gray: #6B5B4F;
+      --brick-green: #4A6B5A;
+      --accent-gold: #C9A86C;
+      --bg-cream: #F5F1E8;
+      --text-dark: #2C2420;
+      --white: #FFFFFF;
+    }
+    
+    *{margin: 0;padding: 0;box-sizing: border-box;}
+    
+    body{
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+    
+    /* 导航栏 */
+    .navbar{
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 50px;
+      background: rgba(245, 241, 232, 0.98);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo-container{
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo-placeholder{
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
+    }
+    
+    .brand-text h1{
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--door-gray);
+      letter-spacing: 2px;
+    }
+    
+    .brand-text p{
+      font-size: 12px;
+      color: var(--brick-green);
+      font-style: italic;
+    }
+    
+    .nav-links{
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-links a{
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: all 0.3s;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active{
+      background: var(--door-gray);
+      color: var(--white);
+    }
+    
+    /* 地图容器 */
+    .map-wrapper{
+      margin-top: 90px;
+      height: calc(100vh - 90px);
+      position: relative;
+    }
+    
+    #map{
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* 侧边控制面板 */
+    .map-controls{
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 350px;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);
+      z-index: 100;
+      max-height: calc(100vh - 130px);
+      overflow-y: auto;
+    }
+    
+    .control-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--bg-cream);
+    }
+    
+    .control-title{
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--door-gray);
+    }
+    
+    .view-modes{
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .view-btn{
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--bg-cream);
+      background: var(--white);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .view-btn.active,
+    .view-btn:hover{
+      background: var(--door-gray);
+      color: var(--white);
+      border-color: var(--door-gray);
+    }
+    
+    .route-info{
+      background: linear-gradient(135deg, var(--bg-cream), var(--white));
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 2px solid rgba(107, 91, 79, 0.1);
+    }
+    
+    .info-item{
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    
+    .info-label{
+      color: var(--text-dark);
+      opacity: 0.8;
+    }
+    
+    .info-value{
+      font-weight: 600;
+      color: var(--accent-gold);
+    }
+    
+    .waypoint-list{
+      margin-top: 15px;
+    }
+    
+    .waypoint-item{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--white);
+      border-radius: 8px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+    }
+    
+    .waypoint-item:hover{
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-left-color: var(--accent-gold);
+    }
+    
+    .waypoint-item.active{
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      color: var(--white);
+    }
+    
+    .waypoint-number{
+      width: 28px;
+      height: 28px;
+      background: var(--accent-gold);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    
+    .waypoint-item.active .waypoint-number{
+      background: var(--white);
+      color: var(--door-gray);
+    }
+    
+    .waypoint-content{
+      flex: 1;
+    }
+    
+    .waypoint-name{
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+    
+    .waypoint-desc{
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .map-legend{
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+    
+    .legend-title{
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--door-gray);
+      font-size: 14px;
+    }
+    
+    .legend-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+      font-size: 13px;
+    }
+    
+    .legend-color{
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .legend-color.culture{ background: #4A6B5A; }
+    .legend-color.business{ background: #C9A86C; }
+    .legend-color.route{ 
+      background: linear-gradient(90deg, #6B5B4F, #C9A86C);
+      height: 4px;
+      width: 24px;
+    }
+    
+    .map-interaction-hint{
+      position: absolute;
+      bottom: 20px;
+      right: 370px;
+      background: rgba(107, 91, 79, 0.9);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      z-index: 100;
+      animation: fadeInOut 3s ease-in-out;
+    }
+    
+    @keyframes fadeInOut{
+      0%, 100%{ opacity: 0; }
+      20%, 80%{ opacity: 1; }
+    }
+    
+    .loading-overlay{
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(245, 241, 232, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s;
+    }
+    
+    .loading-overlay.hidden{
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loader{
+      text-align: center;
+    }
+    
+    .loader-door{
+      width: 60px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 30px 30px 0 0;
+      margin: 0 auto 20px;
+      position: relative;
+      animation: doorOpen 2s ease-in-out infinite;
+    }
+    
+    .loader-door::before{
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+    }
+    
+    @keyframes doorOpen{
+      0%, 100%{ transform: perspective(200px) rotateY(0deg); }
+      50%{ transform: perspective(200px) rotateY(-30deg); }
+    }
+    
+    @media (max-width: 768px){
+      .navbar{padding: 15px 20px;}
+      .nav-links{gap: 15px;}
+      .nav-links a{padding: 6px 12px;font-size: 14px;}
+      .map-controls{
+        width: calc(100% - 40px);
+        right: 20px;
+        top: auto;
+        bottom: 20px;
+        max-height: 40vh;
+      }
+      .map-interaction-hint{display: none;}
+    }
+  </style>
+</head>
+<body>
+  <!-- 导航栏 -->
+  <nav class="navbar">
+    <div class="logo-container">
+      <div class="logo-placeholder">🏮</div>
+      <div class="brand-text">
+        <h1>门楼里</h1>
+        <p>推开一座门楼，走进一层时光</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">智能推荐</a>
+      <a href="map.html" class="active">3D地图</a>
+      <a href="route.html">我的路线</a>
+      <a href="about.html">项目介绍</a>
+    </div>
+  </nav>
+  
+  <!-- 地图容器 -->
+  <div class="map-wrapper">
+    <div id="map"></div>
+    
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loader">
+      <div class="loader">
+        <div class="loader-door"></div>
+        <div>加载3D地图中...</div>
+      </div>
+    </div>
+    
+    <!-- 侧边控制面板 -->
+    <div class="map-controls">
+      <div class="control-header">
+        <div class="control-title"> 路线详情</div>
+      </div>
+      
+      <div class="view-modes">
+        <button class="view-btn active" onclick="setViewMode('3d')">3D视角</button>
+        <button class="view-btn" onclick="setViewMode('satellite')">卫星图</button>
+        <button class="view-btn" onclick="setViewMode('street')">街道图</button>
+      </div>
+      
+      <div class="route-info" id="route-info">
+        <div class="info-item">
+          <span class="info-label">⏱ 预计时长</span>
+          <span class="info-value" id="total-time">90分钟</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">📍 站点数量</span>
+          <span class="info-value" id="total-points">5个</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">🚶 步行距离</span>
+          <span class="info-value" id="total-distance">1.2公里</span>
+        </div>
+      </div>
+      
+      <div style="font-weight: 600; margin-bottom: 10px; color: var(--door-gray);">
+        途经站点
+      </div>
+      <div class="waypoint-list" id="waypoint-list">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+    
+    <!-- 图例 -->
+    <div class="map-legend">
+      <div class="legend-title">图例说明</div>
+      <div class="legend-item">
+        <div class="legend-color culture"></div>
+        <span>文化景点</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color business"></div>
+        <span>商业体验</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color route"></div>
+        <span>推荐路线</span>
+      </div>
+    </div>
+    
+    <!-- 交互提示 -->
+    <div class="map-interaction-hint">
+      🖱 鼠标拖拽旋转 · 滚轮缩放 · 右键平移
+    </div>
+  </div>
+
+  <script>
+    // 设置Mapbox token（免费，注册可得）
+    // 访问 https://www.mapbox.com/ 注册获取token
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZGVtb3VzZXIiLCJhIjoiY2xyeHl6ZjB3MDFkZjJqcGx2ZzR0YjN3eSJ9.demo_token';
+    
+    // 节点数据（西四北三条实际坐标）
+    const nodesData = [
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9251,lng:116.3742},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9248,lng:116.3755},
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9253,lng:116.3768},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9245,lng:116.3760},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9250,lng:116.3775},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9255,lng:116.3750},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9247,lng:116.3780},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9252,lng:116.3785},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9243,lng:116.3770}
+    ];
+    
+    let map;
+    let markers = [];
+    let routeLine;
+    let currentRoute = [];
+    
+    // 初始化地图
+    function initMap(){
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [116.3760, 39.9250], // 西四北三条中心
+        zoom: 16.5,
+        pitch: 60, // 3D视角
+        bearing: -17.6,
+        antialias: true
+      });
+      
+      map.on('load', () => {
+        document.getElementById('loader').classList.add('hidden');
+        add3DBuildings();
+        loadRouteFromStorage();
+      });
+      
+      // 添加导航控制
+      map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+      
+      // 添加缩放控制
+      map.addControl(new mapboxgl.ScaleControl(), 'bottom-left');
+    }
+    
+    // 添加3D建筑层
+    function add3DBuildings(){
+      // 插入新图层在建筑标签之前
+      const layers = map.getStyle().layers;
+      const labelLayerId = layers.find(
+        (layer) => layer.type === 'symbol' && layer.layout['text-field']
+      ).id;
+      
+      map.addLayer(
+        {
+          'id': 'add-3d-buildings',
+          'source': 'composite',
+          'source-layer': 'building',
+          'filter': ['==', 'extrude', 'true'],
+          'type': 'fill-extrusion',
+          'minzoom': 15,
+          'paint': {
+            'fill-extrusion-color': '#d4cfc7',
+            'fill-extrusion-height': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'height']
+            ],
+            'fill-extrusion-base': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              15,
+              0,
+              15.05,
+              ['get', 'min_height']
+            ],
+            'fill-extrusion-opacity': 0.8
+          }
+        },
+        labelLayerId
+      );
+    }
+    
+    // 从localStorage加载路线
+    function loadRouteFromStorage(){
+      const answers = localStorage.getItem('routeAnswers');
+      if(answers){
+        const parsed = JSON.parse(answers);
+        generateRouteVisual(parsed);
+      } else {
+        // 默认路线
+        const defaultRoute = ['N1', 'N2', 'N5', 'N7', 'N8'];
+        currentRoute = defaultRoute.map(id => nodesData.find(n => n.id === id));
+        displayRoute(currentRoute);
+      }
+    }
+    
+    // 生成路线可视化
+    function generateRouteVisual(answers){
+      // 简化版路线生成逻辑
+      const duration = answers.duration || 90;
+      const avoidResident = answers.avoidResident || false;
+      
+      let selectedNodes = nodesData.filter(n => {
+        if(avoidResident && n.interfere > 0.3) return false;
+        return true;
+      });
+      
+      // 根据主题筛选
+      if(answers.theme === 'read'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '读门');
+      } else if(answers.theme === 'push'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '推门');
+      } else if(answers.theme === 'create'){
+        selectedNodes = selectedNodes.filter(n => n.theme === '创门');
+      }
+      
+      currentRoute = selectedNodes.slice(0, 5);
+      displayRoute(currentRoute);
+    }
+    
+    // 显示路线
+    function displayRoute(route){
+      // 清除旧标记
+      markers.forEach(m => m.remove());
+      markers = [];
+      
+      // 添加标记
+      route.forEach((node, index) => {
+        const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
+        
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.innerHTML = `
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: ${color};
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+          ">${index + 1}</div>
+        `;
+        
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([node.lng, node.lat])
+          .setPopup(
+            new mapboxgl.Popup({offset: 25})
+              .setHTML(`
+                <div style="padding: 10px; max-width: 200px;">
+                  <div style="font-weight: 600; margin-bottom: 5px; color: #6B5B4F;">${node.name}</div>
+                  <div style="font-size: 12px; color: #666;">
+                    ${node.theme} · 停留${node.stay}分钟<br>
+                    ${node.type === '文化' ? '📚 文化景点' : '🛍 商业体验'}
+                  </div>
+                </div>
+              `)
+          )
+          .addTo(map);
+        
+        markers.push(marker);
+      });
+      
+      // 绘制路线
+      drawRouteLine(route);
+      
+      // 更新侧边栏
+      updateSidebar(route);
+      
+      // 适配视野
+      fitBounds(route);
+    }
+    
+    // 绘制路线
+    function drawRouteLine(route){
+      const coordinates = route.map(n => [n.lng, n.lat]);
+      
+      if(routeLine){
+        map.removeLayer('route-line');
+        map.removeSource('route');
+      }
+      
+      map.addSource('route', {
+        'type': 'geojson',
+        'data': {
+          'type': 'Feature',
+          'properties': {},
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': coordinates
+          }
+        }
+      });
+      
+      map.addLayer({
+        'id': 'route-line',
+        'type': 'line',
+        'source': 'route',
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#6B5B4F',
+          'line-width': 5,
+          'line-opacity': 0.8
+        }
+      });
+      
+      // 添加动画点
+      animateRoutePoint(coordinates);
+    }
+    
+    // 路线动画
+    function animateRoutePoint(coordinates){
+      const point = {
+        'type': 'Feature',
+        'geometry': {
+          'type': 'Point',
+          'coordinates': coordinates[0]
+        }
+      };
+      
+      map.addSource('route-point', {
+        'type': 'geojson',
+        'data': point
+      });
+      
+      map.addLayer({
+        'id': 'route-point',
+        'type': 'circle',
+        'source': 'route-point',
+        'paint': {
+          'circle-radius': 8,
+          'circle-color': '#C9A86C',
+          'circle-opacity': 0.8,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff'
+        }
+      });
+      
+      // 沿路线移动
+      let index = 0;
+      setInterval(() => {
+        if(index >= coordinates.length - 1){
+          index = 0;
+        }
+        
+        const current = coordinates[index];
+        const next = coordinates[index + 1] || coordinates[0];
+        
+        const step = 0.02;
+        const lng = current[0] + (next[0] - current[0]) * step;
+        const lat = current[1] + (next[1] - current[1]) * step;
+        
+        map.getSource('route-point').setData({
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [lng, lat]
+          }
+        });
+        
+        index++;
+      }, 100);
+    }
+    
+    // 更新侧边栏
+    function updateSidebar(route){
+      const totalTime = route.reduce((sum, n) => sum + n.stay + 5, 0);
+      const distance = (route.length * 0.3).toFixed(1);
+      
+      document.getElementById('total-time').textContent = totalTime + '分钟';
+      document.getElementById('total-points').textContent = route.length + '个';
+      document.getElementById('total-distance').textContent = distance + '公里';
+      
+      const listHtml = route.map((node, index) => `
+        <div class="waypoint-item" onclick="focusOnPoint(${index})">
+          <div class="waypoint-number">${index + 1}</div>
+          <div class="waypoint-content">
+            <div class="waypoint-name">${node.name}</div>
+            <div class="waypoint-desc">${node.theme} · ${node.stay}分钟</div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('waypoint-list').innerHTML = listHtml;
+    }
+    
+    // 聚焦到特定点
+    function focusOnPoint(index){
+      if(currentRoute[index]){
+        const node = currentRoute[index];
+        map.flyTo({
+          center: [node.lng, node.lat],
+          zoom: 18,
+          pitch: 60,
+          duration: 1500
+        });
+        
+        document.querySelectorAll('.waypoint-item').forEach((item, i) => {
+          item.classList.toggle('active', i === index);
+        });
+      }
+    }
+    
+    // 适配视野
+    function fitBounds(route){
+      const bounds = new mapboxgl.LngLatBounds();
+      route.forEach(node => bounds.extend([node.lng, node.lat]));
+      map.fitBounds(bounds, {padding: 100, duration: 1500});
+    }
+    
+    // 切换视图模式
+    function setViewMode(mode){
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      if(mode === '3d'){
+        map.flyTo({pitch: 60, bearing: -17.6, duration: 1500});
+      } else if(mode === 'satellite'){
+        map.setStyle('mapbox://styles/mapbox/satellite-streets-v12');
+      } else if(mode === 'street'){
+        map.setStyle('mapbox://styles/mapbox/light-v11');
+      }
+    }
+    
+    // 页面加载
+    window.addEventListener('load', initMap);
+  </script>
+</body>
+</html>
