@@ -5,68 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>项目介绍 | 门楼层记·故事里</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <style>
-    :root{
-      --door-gray: #6B5B4F;
-      --brick-green: #4A6B5A;
-      --accent-gold: #C9A86C;
-      --bg-cream: #F5F1E8;
-      --text-dark: #2C2420;
-      --white: #FFFFFF;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg-cream);color:var(--text-dark);overflow-x:hidden;}
+    :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
+    *{margin: 0;padding: 0;box-sizing: border-box;}
+    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);}
     
-    /* 导航栏 */
-    .navbar{position:fixed;top:0;width:100%;padding:15px 50px;background:rgba(245,241,232,0.98);backdrop-filter:blur(12px);z-index:1000;box-shadow:0 2px 20px rgba(107,91,79,0.15);display:flex;justify-content:space-between;align-items:center;}
-    .logo-container{display:flex;align-items:center;gap:15px;}
-    .logo-placeholder{width:60px;height:60px;background:linear-gradient(135deg,var(--door-gray),var(--brick-green));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 4px 12px rgba(107,91,79,0.3);/* 替换Logo：<img src="your-logo.png" class="logo-img" style="width:100%;height:100%;object-fit:contain;border-radius:12px;"> */}
-    .brand-text h1{font-size:24px;font-weight:700;color:var(--door-gray);letter-spacing:2px;}
-    .brand-text p{font-size:12px;color:var(--brick-green);font-style:italic;}
-    .nav-links{display:flex;gap:30px;}
-    .nav-links a{text-decoration:none;color:var(--text-dark);font-weight:500;transition:all 0.3s;padding:8px 16px;border-radius:8px;}
-    .nav-links a:hover,.nav-links a.active{background:var(--door-gray);color:var(--white);}
-
-    /* 主内容 */
-    .main-content{margin-top:90px;}
+    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+    .logo-container{display: flex;align-items: center;gap: 15px;}
+    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+    .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
+    .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
+    .nav-links{display: flex;gap: 30px;}
+    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
+    .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    /* Hero */
-    .hero{height:60vh;background:linear-gradient(135deg,rgba(107,91,79,0.85),rgba(74,107,90,0.85)),url('https://images.unsplash.com/photo-1599571234909-29ed5d1321d6?auto=format&fit=crop&w=1600&q=80');background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--white);position:relative;}
-    .hero-content h1{font-size:48px;margin-bottom:15px;letter-spacing:4px;}
-    .hero-content p{font-size:20px;opacity:0.9;max-width:700px;margin:0 auto;}
-
-    /* 通用区块 */
-    .section{padding:80px 50px;max-width:1200px;margin:0 auto;}
-    .section-title{font-size:36px;color:var(--door-gray);text-align:center;margin-bottom:50px;position:relative;}
-    .section-title::after{content:'';display:block;width:60px;height:3px;background:var(--accent-gold);margin:15px auto 0;}
-
-    /* 痛点卡片 */
-    .pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:25px;}
-    .pain-card{background:var(--white);padding:30px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.06);border-top:4px solid var(--accent-gold);transition:transform 0.3s;}
-    .pain-card:hover{transform:translateY(-8px);}
-    .pain-card h3{color:var(--door-gray);margin-bottom:10px;font-size:20px;}
-    .pain-card p{font-size:15px;line-height:1.7;opacity:0.85;}
-
-    /* IP三层体验 */
-    .experience-timeline{position:relative;padding-left:40px;}
-    .experience-timeline::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--door-gray),var(--accent-gold));border-radius:4px;}
-    .exp-item{position:relative;margin-bottom:40px;background:var(--white);padding:30px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.05);}
-    .exp-marker{position:absolute;left:-33px;top:30px;width:24px;height:24px;background:var(--accent-gold);border:4px solid var(--bg-cream);border-radius:50%;}
-    .exp-item h3{color:var(--door-gray);font-size:22px;margin-bottom:8px;}
-    .exp-item .tag{display:inline-block;background:var(--brick-green);color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;margin-bottom:12px;}
-    .exp-item p{line-height:1.7;opacity:0.9;}
-
-    /* 页脚 */
-    .footer{background:var(--door-gray);color:var(--white);text-align:center;padding:40px 20px;margin-top:60px;}
-    .footer p{opacity:0.8;margin:5px 0;}
-
-    @media(max-width:768px){
-      .navbar{padding:15px 20px;}
-      .nav-links{gap:15px;}
-      .nav-links a{padding:6px 12px;font-size:14px;}
-      .section{padding:60px 20px;}
-      .hero-content h1{font-size:32px;}
+    .main-content{margin-top: 90px;}
+    .hero{height: 60vh;background: linear-gradient(135deg, rgba(107,91,79,0.85), rgba(74,107,90,0.85));display: flex;align-items: center;justify-content: center;text-align: center;color: var(--white);}
+    .hero-content h1{font-size: 48px;margin-bottom: 15px;letter-spacing: 4px;}
+    .hero-content p{font-size: 20px;opacity: 0.9;max-width: 700px;margin: 0 auto;}
+    
+    .section{padding: 80px 50px;max-width: 1200px;margin: 0 auto;}
+    .section-title{font-size: 36px;color: var(--door-gray);text-align: center;margin-bottom: 50px;position:relative;}
+    .section-title::after{content: '';display: block;width: 60px;height: 3px;background: var(--accent-gold);margin: 15px auto 0;}
+    
+    .pain-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));gap: 25px;}
+    .pain-card{background: var(--white);padding: 30px;border-radius: 16px;box-shadow: 0 6px 20px rgba(0,0,0,0.06);border-top: 4px solid var(--accent-gold);transition: transform 0.3s;}
+    .pain-card:hover{transform: translateY(-8px);}
+    .pain-card h3{color: var(--door-gray);margin-bottom: 10px;font-size: 20px;}
+    .pain-card p{font-size: 15px;line-height: 1.7;opacity: 0.85;}
+    
+    .experience-timeline{position: relative;padding-left: 40px;}
+    .experience-timeline::before{content: '';position: absolute;left: 15px;top: 0;bottom: 0;width: 4px;background: linear-gradient(180deg, var(--door-gray), var(--accent-gold));border-radius: 4px;}
+    .exp-item{position: relative;margin-bottom: 40px;background: var(--white);padding: 30px;border-radius: 16px;box-shadow: 0 4px 16px rgba(0,0,0,0.05);}
+    .exp-marker{position: absolute;left: -33px;top: 30px;width: 24px;height: 24px;background: var(--accent-gold);border: 4px solid var(--bg-cream);border-radius: 50%;}
+    .exp-item h3{color: var(--door-gray);font-size: 22px;margin-bottom: 8px;}
+    .exp-item .tag{display: inline-block;background: var(--brick-green);color: #fff;padding: 4px 12px;border-radius: 20px;font-size: 13px;margin-bottom: 12px;}
+    .exp-item p{line-height: 1.7;opacity: 0.9;}
+    
+    .footer{background: var(--door-gray);color: var(--white);text-align: center;padding: 40px 20px;margin-top: 60px;}
+    .footer p{opacity: 0.8;margin: 5px 0;}
+    
+    @media(max-width: 768px){
+      .navbar{padding: 15px 20px;}
+      .nav-links{gap: 15px;}
+      .nav-links a{padding: 6px 12px;font-size: 14px;}
+      .section{padding: 60px 20px;}
+      .hero-content h1{font-size: 32px;}
     }
   </style>
 </head>
@@ -82,7 +66,7 @@
     <div class="nav-links">
       <a href="index.html">首页</a>
       <a href="quiz.html">智能推荐</a>
-      <a href="map.html">3D地图</a>
+      <a href="map.html">地图</a>
       <a href="route.html">我的路线</a>
       <a href="about.html" class="active">项目介绍</a>
     </div>
@@ -102,24 +86,24 @@
         <div class="pain-card"><h3>🚪 有门楼，无解读</h3><p>六种门楼形制与精美砖雕散布胡同，缺乏系统讲解，游客认知浮于表面。</p></div>
         <div class="pain-card"><h3>🏡 有院落，无故事</h3><p>226个院落深藏居民记忆，人文故事与建筑空间脱节，未形成文化资产。</p></div>
         <div class="pain-card"><h3>📦 有空间，无运营</h3><p>公共空间功能单一，缺乏文旅业态与年轻化消费场景，难以持续造血。</p></div>
-        <div class="pain-card"><h3>🔄 有文化，无活化</h3><p>年轻人感兴趣但停留于“拍照打卡”，缺乏深度内容、可带走的文创与分享机制。</p></div>
+        <div class="pain-card"><h3>🔄 有文化，无活化</h3><p>年轻人感兴趣但停留于"拍照打卡"，缺乏深度内容、可带走的文创与分享机制。</p></div>
       </div>
     </section>
 
     <section class="section" style="background:var(--white);border-radius:20px;margin:0 20px;padding:60px 40px;">
-      <h2 class="section-title">核心IP：“门楼里”三层体验</h2>
+      <h2 class="section-title">核心IP："门楼里"三层体验</h2>
       <div class="experience-timeline">
         <div class="exp-item">
           <div class="exp-marker"></div>
           <span class="tag">读门·门楼探秘</span>
           <h3>认识建筑密码</h3>
-          <p>识别广亮大门、金柱大门、如意门等六种形制，解读门簪、砖雕纹样寓意，通过实景展与互动拼图读懂“门当户对”的等级美学。</p>
+          <p>识别广亮大门、金柱大门、如意门等六种形制，解读门簪、砖雕纹样寓意，通过实景展与互动拼图读懂"门当户对"的等级美学。</p>
         </div>
         <div class="exp-item">
           <div class="exp-marker"></div>
           <span class="tag">推门·院落寻访</span>
           <h3>聆听时光故事</h3>
-          <p>走进程砚秋故居等开放院落，听居民口述史，共饮“一院一茗”特调茶，翻阅《门楼里·故事集》，感受古巷真实生活肌理。</p>
+          <p>走进程砚秋故居等开放院落，听居民口述史，共饮"一院一茗"特调茶，翻阅《门楼里·故事集》，感受古巷真实生活肌理。</p>
         </div>
         <div class="exp-item">
           <div class="exp-marker"></div>
@@ -135,7 +119,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;">
         <div style="background:var(--white);padding:30px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.05);">
           <h3 style="color:var(--door-gray);margin-bottom:15px;">🤝 石老娘议事厅</h3>
-          <p style="line-height:1.7;opacity:0.9;">依托成熟基层协商平台，制定《夜市管理公约》，协调居民开放院落、主理人入驻、停车共享等议题，实现“民事民商”。</p>
+          <p style="line-height:1.7;opacity:0.9;">依托成熟基层协商平台，制定《夜市管理公约》，协调居民开放院落、主理人入驻、停车共享等议题，实现"民事民商"。</p>
         </div>
         <div style="background:var(--white);padding:30px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.05);">
           <h3 style="color:var(--door-gray);margin-bottom:15px;">💰 门楼公益金</h3>
@@ -147,11 +131,10 @@
 
   <footer class="footer">
     <p>© 2026 门楼层记·故事里 | 西四北三条社区文商活化计划</p>
-    <p>挑战杯“文商旅融合”专项赛道 · 让胡同文化在年轻世代中焕发新生</p>
+    <p>挑战杯"文商旅融合"专项赛道 · 让胡同文化在年轻世代中焕发新生</p>
   </footer>
 
   <script>
-    gsap.registerPlugin(ScrollTrigger);
     gsap.utils.toArray('.pain-card').forEach((card,i)=>{
       gsap.from(card,{scrollTrigger:{trigger:card,start:"top 85%"},y:40,opacity:0,duration:0.6,delay:i*0.1,ease:"power2.out"});
     });
