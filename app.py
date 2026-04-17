@@ -38,7 +38,7 @@ def save_user_data(record):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# 自动分析数据并更新权重（低成本"模型反馈"）
+# 自动分析数据并更新权重
 def update_weights_from_data():
     user_data = load_user_data()
     if len(user_data) < 5: return False
@@ -66,30 +66,23 @@ def update_weights_from_data():
     save_config(config)
     return True
 
-# ================= 节点数据（严格对照《门楼形制对照表》） =================
-def calc_coord(door):
-    east_lat, east_lng, east_door = 39.927887, 116.372587, 1
-    west_lat, west_lng, west_door = 39.927750, 116.366500, 56
-    ratio = (door - east_door) / (west_door - east_door)
-    lat = east_lat + (west_lat - east_lat) * ratio
-    lng = east_lng + (west_lng - east_lng) * ratio
-    return lat, lng
-
+# ================= 【真·终极修复】后端节点坐标与前端完美同步 =================
+# 彻底舍弃公式，使用与最新 map.html 完全一致的绝对物理坐标
 NODES = [
-    {"id":"N1","name":"隆长寺山门","door":"1号","theme":"读门","type":"文化","stay":15,"lat":calc_coord(1)[0],"lng":calc_coord(1)[1],"interfere":0.2,"tags":["architecture","history"],"desc":"明代圣祚隆长寺旧址（随墙门）"},
-    {"id":"N2","name":"广亮大门","door":"11号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(11)[0],"lng":calc_coord(11)[1],"interfere":0.25,"tags":["architecture"],"desc":"广亮大门，等级最高"},
-    {"id":"N3","name":"金柱大门","door":"13号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(13)[0],"lng":calc_coord(13)[1],"interfere":0.25,"tags":["architecture"],"desc":"金柱大门，等级次高"},
-    {"id":"N4","name":"广亮大门","door":"15号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(15)[0],"lng":calc_coord(15)[1],"interfere":0.25,"tags":["architecture"],"desc":"广亮大门，高级官宦宅门"},
-    {"id":"N5","name":"广亮大门","door":"27号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(27)[0],"lng":calc_coord(27)[1],"interfere":0.25,"tags":["architecture"],"desc":"广亮大门，保存完好"},
-    {"id":"N6","name":"广亮大门","door":"33号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(33)[0],"lng":calc_coord(33)[1],"interfere":0.25,"tags":["architecture"],"desc":"广亮大门，形制完整"},
-    {"id":"N7","name":"金柱大门","door":"35号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(35)[0],"lng":calc_coord(35)[1],"interfere":0.25,"tags":["architecture"],"desc":"金柱大门，砖雕精美"},
-    {"id":"N8","name":"程砚秋故居","door":"39号","theme":"推门","type":"文化","stay":20,"lat":calc_coord(39)[0],"lng":calc_coord(39)[1],"interfere":0.3,"tags":["history","photo"],"desc":"程砚秋居住21年（如意门）"},
-    {"id":"N9","name":"金柱大门","door":"44号","theme":"读门","type":"文化","stay":10,"lat":calc_coord(44)[0],"lng":calc_coord(44)[1],"interfere":0.25,"tags":["architecture"],"desc":"金柱大门，门楼形制完整"},
-    {"id":"N10","name":"开放院落","door":"45号","theme":"推门","type":"文化","stay":15,"lat":calc_coord(45)[0],"lng":calc_coord(45)[1],"interfere":0.4,"tags":["history"],"desc":"随墙门，原汁原味"},
-    {"id":"N11","name":"京剧体验馆","door":"17号","theme":"创门","type":"商业","stay":40,"lat":calc_coord(17)[0],"lng":calc_coord(17)[1],"interfere":0.15,"tags":["handcraft","photo"],"desc":"御霜雅集主题（西洋门）"},
-    {"id":"N12","name":"拾光茶铺","door":"21号","theme":"创门","type":"商业","stay":30,"lat":calc_coord(21)[0],"lng":calc_coord(21)[1],"interfere":0.1,"tags":["food","shopping"],"desc":"一院一茗特调茶（蛮子门）"},
-    {"id":"N13","name":"故事书店","door":"43号","theme":"创门","type":"商业","stay":25,"lat":calc_coord(43)[0],"lng":calc_coord(43)[1],"interfere":0.05,"tags":["shopping","history"],"desc":"门楼主题文创（蛮子门）"},
-    {"id":"N14","name":"胡同夜市","door":"50号","theme":"创门","type":"商业","stay":30,"lat":calc_coord(50)[0],"lng":calc_coord(50)[1],"interfere":0.35,"tags":["food","photo"],"desc":"胡同小吃摊位（如意门）"}
+    {"id":"N1","name":"隆长寺山门","door":"1号","theme":"读门","type":"文化","stay":15, "lat": 39.92803, "lng": 116.37250, "interfere":0.2,"tags":["architecture","history"],"desc":"明代圣祚隆长寺旧址（随墙门）"},
+    {"id":"N2","name":"广亮大门","door":"11号","theme":"读门","type":"文化","stay":10, "lat": 39.92806, "lng": 116.37126, "interfere":0.25,"tags":["architecture"],"desc":"广亮大门，等级最高"},
+    {"id":"N3","name":"金柱大门","door":"13号","theme":"读门","type":"文化","stay":10, "lat": 39.92807, "lng": 116.37102, "interfere":0.25,"tags":["architecture"],"desc":"金柱大门，等级次高"},
+    {"id":"N4","name":"广亮大门","door":"15号","theme":"读门","type":"文化","stay":10, "lat": 39.92807, "lng": 116.37077, "interfere":0.25,"tags":["architecture"],"desc":"广亮大门，高级官宦宅门"},
+    {"id":"N11","name":"京剧体验馆","door":"17号","theme":"创门","type":"商业","stay":40, "lat": 39.92808, "lng": 116.37052, "interfere":0.15,"tags":["handcraft","photo"],"desc":"御霜雅集主题（西洋门）"},
+    {"id":"N12","name":"拾光茶铺","door":"21号","theme":"创门","type":"商业","stay":30, "lat": 39.92809, "lng": 116.37003, "interfere":0.1,"tags":["food","shopping"],"desc":"一院一茗特调茶（蛮子门）"},
+    {"id":"N5","name":"广亮大门","door":"27号","theme":"读门","type":"文化","stay":10, "lat": 39.92811, "lng": 116.36928, "interfere":0.25,"tags":["architecture"],"desc":"广亮大门，保存完好"},
+    {"id":"N6","name":"广亮大门","door":"33号","theme":"读门","type":"文化","stay":10, "lat": 39.92813, "lng": 116.36854, "interfere":0.25,"tags":["architecture"],"desc":"广亮大门，形制完整"},
+    {"id":"N7","name":"金柱大门","door":"35号","theme":"读门","type":"文化","stay":10, "lat": 39.92814, "lng": 116.36829, "interfere":0.25,"tags":["architecture"],"desc":"金柱大门，砖雕精美"},
+    {"id":"N8","name":"程砚秋故居","door":"39号","theme":"推门","type":"文化","stay":20, "lat": 39.92815, "lng": 116.36780, "interfere":0.3,"tags":["history","photo"],"desc":"京剧大师程砚秋居住21年（如意门）"},
+    {"id":"N13","name":"故事书店","door":"43号","theme":"创门","type":"商业","stay":25, "lat": 39.92816, "lng": 116.36731, "interfere":0.05,"tags":["shopping","history"],"desc":"门楼主题文创（蛮子门）"},
+    {"id":"N10","name":"开放院落","door":"45号","theme":"推门","type":"文化","stay":15, "lat": 39.92817, "lng": 116.36706, "interfere":0.4,"tags":["history"],"desc":"随墙门，原汁原味生活气息"},
+    {"id":"N9","name":"金柱大门","door":"44号","theme":"读门","type":"文化","stay":10, "lat": 39.92827, "lng": 116.36706, "interfere":0.25,"tags":["architecture"],"desc":"金柱大门，门楼形制完整"},
+    {"id":"N14","name":"胡同夜市","door":"50号","theme":"创门","type":"商业","stay":30, "lat": 39.92829, "lng": 116.36632, "interfere":0.35,"tags":["food","photo"],"desc":"胡同小吃摊位（如意门）"}
 ]
 
 def calc_distance(lat1, lng1, lat2, lng2):
@@ -102,7 +95,7 @@ def calc_distance(lat1, lng1, lat2, lng2):
 
 @app.route('/')
 def index():
-    return jsonify({"message": "🚪 门楼层记·故事里 - 名主题活动策划方案"})
+    return jsonify({"message": "🚪 门楼层记·故事里 - 后端服务已启动"})
 
 @app.route('/api/nodes', methods=['GET'])
 def get_nodes():
@@ -175,9 +168,9 @@ def generate_route():
     }
     
     user_record = {
-        'timestamp': datetime.now().isoformat(),
-        'request': data,
-        'response': {"route_ids": [n['id'] for n in route], "totalTime": total_time}
+        "timestamp": datetime.now().isoformat(),
+        "request": data,
+        "response": {"route_ids": [n['id'] for n in route], "totalTime": total_time}
     }
     save_user_data(user_record)
     
