@@ -45,7 +45,7 @@
 ## 🛠️ 技术栈 
 - 前端交互：HTML5, CSS3, Vanilla JavaScript, GSAP Animations
 - 地图渲染：Leaflet.js + 高德地图瓦片服务 (Amap Tiles)
-- 算法引擎：Python 3.x, Flask RESTful API
+- 算法引擎：Python 3.12.4, Flask RESTful API
 - 数据驱动：无服务器轻量级 JSON 动态存取
 
 ---
