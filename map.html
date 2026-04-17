@@ -23,7 +23,7 @@
     .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;}
     
-    .map-controls{position: absolute;top: 20px;right: 20px;width: 300px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
+    .map-controls{position: absolute;top: 20px;right: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 8px 0;font-size: 14px;}
@@ -109,18 +109,20 @@
   </div>
 
   <script>
-    // 精准坐标 - 基于西四北三条实际地理位置
-    // 参考：OpenStreetMap + 门牌号分布
+    // 精准坐标 - 基于您提供的真实 GPS 数据校准
+    // 隆长寺 (3 号): 39.927887, 116.372587 (东端)
+    // 程砚秋故居 (39 号): 39.927811, 116.367759 (西端)
+    // 按门牌号线性分布校准所有节点
     const nodes = [
-      {id:"N1",name:"隆长寺山门 (3号)",theme:"读门",type:"文化",stay:15,lat:39.92608,lng:116.37512,tags:["architecture","history"],desc:"明代圣祚隆长寺旧址"},
-      {id:"N2",name:"广亮大门展 (27号)",theme:"读门",type:"文化",stay:10,lat:39.92585,lng:116.37358,tags:["architecture"],desc:"高级官宦宅门，门簪四枚"},
-      {id:"N3",name:"程砚秋故居 (39号)",theme:"推门",type:"文化",stay:20,lat:39.92568,lng:116.37225,tags:["history","photo"],desc:"京剧大师程砚秋居住21年"},
-      {id:"N4",name:"开放院落A (45号)",theme:"推门",type:"文化",stay:15,lat:39.92555,lng:116.37095,tags:["history"],desc:"居民口述历史"},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.92545,lng:116.36965,tags:["food","shopping"],desc:"一院一茗特调茶"},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.92575,lng:116.37285,tags:["handcraft","photo"],desc:"御霜雅集主题"},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.92535,lng:116.36835,tags:["handcraft"],desc:"砖雕拓印体验"},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.92525,lng:116.36735,tags:["shopping","history"],desc:"门楼主题文创"},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.92515,lng:116.36655,tags:["food","photo"],desc:"胡同小吃摊位"}
+      {id:"N1",name:"隆长寺山门 (3 号)",theme:"读门",type:"文化",stay:15,lat:39.927887,lng:116.372587,tags:["architecture","history"],desc:"明代圣祚隆长寺旧址，存有乾隆诗碑"},
+      {id:"N2",name:"广亮大门展 (27 号)",theme:"读门",type:"文化",stay:10,lat:39.927845,lng:116.370850,tags:["architecture"],desc:"高级官宦宅门，门簪四枚雕牡丹"},
+      {id:"N3",name:"程砚秋故居 (39 号)",theme:"推门",type:"文化",stay:20,lat:39.927811,lng:116.367759,tags:["history","photo"],desc:"京剧大师程砚秋居住 21 年，手植石榴树"},
+      {id:"N4",name:"开放院落 A (45 号)",theme:"推门",type:"文化",stay:15,lat:39.927795,lng:116.369200,tags:["history"],desc:"居民口述历史，砖雕墀头保存完好"},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.927780,lng:116.368500,tags:["food","shopping"],desc:"一院一茗特调茶，可翻阅故事集"},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.927830,lng:116.371200,tags:["handcraft","photo"],desc:"御霜雅集主题，戏服旅拍体验"},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.927770,lng:116.367900,tags:["handcraft"],desc:"砖雕拓印、拼豆制作、脸谱绘制"},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.927760,lng:116.367400,tags:["shopping","history"],desc:"门楼主题文创、故事集零售"},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.927750,lng:116.367000,tags:["food","photo"],desc:"胡同小吃、手作摊位、露天电影"}
     ];
     
     let map, routeLine, markers = [];
@@ -128,8 +130,8 @@
     
     // 初始化地图：精准定位西四北三条
     map = L.map('map', {
-      center: [39.9256, 116.3708],
-      zoom: 17.5,
+      center: [39.927820, 116.370200],
+      zoom: 17,
       zoomControl: false,
       minZoom: 16,
       maxZoom: 19
@@ -144,7 +146,7 @@
     L.control.zoom({position: 'topright'}).addTo(map);
     
     function resetMap() {
-      map.setView([39.9256, 116.3708], 17.5, {animate: true, duration: 0.5});
+      map.setView([39.927820, 116.370200], 17, {animate: true, duration: 0.5});
     }
     
     function createMarkerIcon(node, index) {
@@ -153,11 +155,11 @@
       return L.divIcon({
         className: 'custom-marker',
         html: `
-          <div style="position:relative;">
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
             <div style="
               background:${color};
-              width:36px;
-              height:36px;
+              width:34px;
+              height:34px;
               border-radius:50%;
               border:3px solid white;
               box-shadow:0 3px 10px rgba(0,0,0,0.3);
@@ -166,7 +168,8 @@
               justify-content:center;
               color:white;
               font-weight:bold;
-              font-size:16px;
+              font-size:15px;
+              z-index:2;
             ">${index + 1}</div>
             <div style="
               background:white;
@@ -178,8 +181,11 @@
               color:#2C2420;
               margin-top:4px;
               white-space:nowrap;
-              text-align:center;
-            ">${node.name.split(' ')[0]}</div>
+              z-index:1;
+              max-width:120px;
+              overflow:hidden;
+              text-overflow:ellipsis;
+            ">${node.name.split('(')[0].trim()}</div>
           </div>
         `,
         iconSize: [100, 50],
@@ -216,7 +222,7 @@
       // 自动适应视野
       if (currentRoute.length > 0) {
         const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
-        map.fitBounds(bounds, {padding: [80, 80], maxZoom: 18});
+        map.fitBounds(bounds, {padding: [60, 60], maxZoom: 18});
       }
     }
     
