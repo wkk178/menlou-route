@@ -17,41 +17,156 @@
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);overflow-x:hidden;}
     
-    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+    .navbar{
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 15px 50px;
+      background: rgba(245, 241, 232, 0.98);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
     .logo-container{display: flex;align-items: center;gap: 15px;}
-    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+    .logo-placeholder{
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
+    }
     .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
     .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
-    .nav-links{display: flex;gap: 30px;}
-    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
-    .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    .hero-section{margin-top: 90px;height: 70vh;background: linear-gradient(135deg, rgba(107,91,79,0.85) 0%, rgba(74,107,90,0.85) 100%);display: flex;align-items: center;justify-content: center;text-align: center;color: var(--white);position: relative;overflow: hidden;}
+    .nav-links{display: flex;gap: 30px;}
+    .nav-links a{
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: all 0.3s;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+    .nav-links a:hover,..nav-links a.active{background: var(--door-gray);color: var(--white);}
+    
+    .hero-section{
+      margin-top: 100px;
+      height: 70vh;
+      background: linear-gradient(rgba(107,91,79,0.7), rgba(74,107,90,0.7)),
+                  url('bg-hero.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+    
     .hero-content{position: relative;z-index: 2;padding: 40px;}
     .hero-title{font-size: 64px;font-weight: 700;margin-bottom: 20px;letter-spacing: 6px;text-shadow: 0 4px 12px rgba(0,0,0,0.3);}
     .hero-subtitle{font-size: 28px;font-style: italic;margin-bottom: 30px;opacity: 0.95;}
     .hero-desc{font-size: 18px;max-width: 800px;margin: 0 auto 40px;opacity: 0.9;line-height: 1.8;}
-    .cta-button{display: inline-block;padding: 16px 40px;background: var(--accent-gold);color: var(--white);text-decoration: none;border-radius: 30px;font-size: 18px;font-weight: 600;transition: all 0.3s;box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);}
+    
+    .cta-button{
+      display: inline-block;
+      padding: 16px 40px;
+      background: var(--accent-gold);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);
+    }
     .cta-button:hover{transform: translateY(-3px);box-shadow: 0 6px 24px rgba(201, 168, 108, 0.6);}
     
     .features-section{padding: 80px 50px;background: var(--white);}
     .section-title{text-align: center;font-size: 42px;color: var(--door-gray);margin-bottom: 60px;}
-    .features-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));gap: 30px;max-width: 1200px;margin: 0 auto;}
-    .feature-card{background: linear-gradient(135deg, var(--bg-cream), var(--white));border: 2px solid rgba(107, 91, 79, 0.1);border-radius: 20px;padding: 40px 30px;text-align: center;transition: all 0.3s;cursor: pointer;text-decoration: none;color: inherit;}
-    .feature-card:hover{transform: translateY(-10px);box-shadow: 0 12px 32px rgba(107, 91, 79, 0.2);border-color: var(--accent-gold);}
+    
+    .features-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .feature-card{
+      background: linear-gradient(135deg, var(--bg-cream), var(--white));
+      border: 2px solid rgba(107, 91, 79, 0.1);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .feature-card:hover{
+      transform: translateY(-10px);
+      box-shadow: 0 12px 32px rgba(107, 91, 79, 0.2);
+      border-color: var(--accent-gold);
+    }
     .feature-icon{font-size: 64px;margin-bottom: 20px;}
     .feature-title{font-size: 24px;color: var(--door-gray);margin-bottom: 15px;font-weight: 600;}
     .feature-desc{font-size: 15px;color: var(--text-dark);opacity: 0.8;line-height: 1.6;}
     
-    .footer{background: var(--door-gray);color: var(--white);text-align: center;padding: 30px;font-size: 14px;}
+    .footer{
+      background: var(--door-gray);
+      color: var(--white);
+      text-align: center;
+      padding: 30px;
+      font-size: 14px;
+      background-image: linear-gradient(rgba(107,91,79,0.9), rgba(107,91,79,0.9)), url('bg-hero.jpg');
+      background-size: cover;
+      background-position: center;
+    }
     
+    /* ========== 移动端适配修复 ========== */
     @media (max-width: 768px){
-      .navbar{padding: 15px 20px;}
-      .nav-links{gap: 15px;}
-      .nav-links a{padding: 6px 12px;font-size: 14px;}
-      .hero-title{font-size: 36px;}
-      .hero-subtitle{font-size: 20px;}
-      .features-section{padding: 60px 20px;}
+      .navbar{
+        padding: 12px 15px;
+      }
+      .logo-placeholder{
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+      }
+      .brand-text h1{font-size: 18px;}
+      .brand-text p{font-size: 10px;}
+      .nav-links{
+        gap: 8px;
+      }
+      .nav-links a{
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+      .hero-section{
+        margin-top: 90px;
+        height: 60vh;
+        background-attachment: scroll;
+      }
+      .hero-title{font-size: 32px;letter-spacing: 3px;}
+      .hero-subtitle{font-size: 18px;}
+      .hero-desc{font-size: 14px;}
+      .features-section{padding: 40px 20px;}
+      .section-title{font-size: 28px;}
+      .feature-icon{font-size: 48px;}
+      .feature-title{font-size: 18px;}
+      .feature-desc{font-size: 13px;}
     }
   </style>
 </head>
@@ -67,7 +182,7 @@
     <div class="nav-links">
       <a href="index.html" class="active">首页</a>
       <a href="quiz.html">智能推荐</a>
-      <a href="map.html">3D地图</a>
+      <a href="map.html">地图</a>
       <a href="route.html">我的路线</a>
       <a href="about.html">项目介绍</a>
     </div>
@@ -105,7 +220,7 @@
   
   <footer class="footer">
     <p>© 2026 门楼层记·故事里 | 西四北三条社区文商活化计划</p>
-    <p> 让胡同文化在年轻世代中焕发新生</p>
+    <p>挑战杯参赛项目 | 让胡同文化在年轻世代中焕发新生</p>
   </footer>
   
   <script>
