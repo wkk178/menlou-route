@@ -1,0 +1,23 @@
+{
+  "theme_weights": {
+    "读门": 40,
+    "推门": 40,
+    "创门": 40,
+    "mixed": 15
+  },
+  "tag_weights": {
+    "architecture": 12,
+    "history": 12,
+    "photo": 12,
+    "handcraft": 12,
+    "food": 12,
+    "shopping": 12
+  },
+  "profile_weights": {
+    "family": 10,
+    "romantic": 10,
+    "independent": 8,
+    "social": 5
+  },
+  "last_updated": "2026-04-17T00:00:00"
+}
