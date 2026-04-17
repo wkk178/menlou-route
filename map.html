@@ -114,24 +114,21 @@
   </div>
 
   <script>
-    // ================= 【真·终极修复】基于截图像素特征点反推的绝对打桩 =================
-    // 以截图中的 "程砚秋故居(39号)" 和 "隆长寺(1号)" 为绝对物理锚点计算出
+
     const allNodes = [
-      // 完美对准"圣祚隆长寺"棕色图标右侧路口
-      {id:"N1",name:"隆长寺山门",door:"3号",theme:"读门",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, tags:["architecture","history"],desc:"明代圣祚隆长寺旧址（随墙门）",interfere:0.2},
-      {id:"N2",name:"广亮大门",door:"11号",theme:"读门",type:"文化",stay:10, lat: 39.92806, lng: 116.37126, tags:["architecture"],desc:"广亮大门，等级最高",interfere:0.25},
-      {id:"N3",name:"金柱大门",door:"13号",theme:"读门",type:"文化",stay:10, lat: 39.92807, lng: 116.37102, tags:["architecture"],desc:"金柱大门，等级次高",interfere:0.25},
-      {id:"N4",name:"广亮大门",door:"15号",theme:"读门",type:"文化",stay:10, lat: 39.92807, lng: 116.37077, tags:["architecture"],desc:"广亮大门，高级官宦宅门",interfere:0.25},
+      {id:"N1",name:"隆长寺旧址",door:"1号",theme:"读门",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, tags:["architecture","history"],desc:"明代圣祚隆长寺旧址（随墙门）",interfere:0.2},
+      {id:"N2",name:"11号广亮大门",door:"11号",theme:"读门",type:"文化",stay:10, lat: 39.92806, lng: 116.37126, tags:["architecture"],desc:"广亮大门，旧时高级官宦的宅门形制",interfere:0.25},
+      {id:"N3",name:"13号金柱大门",door:"13号",theme:"读门",type:"文化",stay:10, lat: 39.92807, lng: 116.37102, tags:["architecture"],desc:"金柱大门，等级仅次于广亮大门",interfere:0.25},
+      {id:"N4",name:"15号广亮大门",door:"15号",theme:"读门",type:"文化",stay:10, lat: 39.92807, lng: 116.37077, tags:["architecture"],desc:"广亮大门",interfere:0.25},
       {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40, lat: 39.92808, lng: 116.37052, tags:["handcraft","photo"],desc:"御霜雅集主题（西洋门）",interfere:0.15},
       {id:"N12",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30, lat: 39.92809, lng: 116.37003, tags:["food","shopping"],desc:"一院一茗特调茶（蛮子门）",interfere:0.1},
-      {id:"N5",name:"广亮大门",door:"27号",theme:"读门",type:"文化",stay:10, lat: 39.92811, lng: 116.36928, tags:["architecture"],desc:"广亮大门，保存完好",interfere:0.25},
-      {id:"N6",name:"广亮大门",door:"33号",theme:"读门",type:"文化",stay:10, lat: 39.92813, lng: 116.36854, tags:["architecture"],desc:"广亮大门，形制完整",interfere:0.25},
-      {id:"N7",name:"金柱大门",door:"35号",theme:"读门",type:"文化",stay:10, lat: 39.92814, lng: 116.36829, tags:["architecture"],desc:"金柱大门，砖雕精美",interfere:0.25},
+      {id:"N5",name:"27号广亮大门",door:"27号",theme:"读门",type:"文化",stay:10, lat: 39.92811, lng: 116.36928, tags:["architecture"],desc:"广亮大门",interfere:0.25},
+      {id:"N6",name:"33号广亮大门",door:"33号",theme:"读门",type:"文化",stay:10, lat: 39.92813, lng: 116.36854, tags:["architecture"],desc:"广亮大门",interfere:0.25},
+      {id:"N7",name:"35号金柱大门",door:"35号",theme:"读门",type:"文化",stay:10, lat: 39.92814, lng: 116.36829, tags:["architecture"],desc:"金柱大门，附有砖雕",interfere:0.25},
       {id:"N8",name:"程砚秋故居",door:"39号",theme:"推门",type:"文化",stay:20, lat: 39.92815, lng: 116.36780, tags:["history","photo"],desc:"京剧大师程砚秋居住21年（如意门）",interfere:0.3},
       {id:"N13",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25, lat: 39.92816, lng: 116.36731, tags:["shopping","history"],desc:"门楼主题文创（蛮子门）",interfere:0.05},
-      {id:"N10",name:"开放院落",door:"45号",theme:"推门",type:"文化",stay:15, lat: 39.92817, lng: 116.36706, tags:["history"],desc:"随墙门，原汁原味生活气息",interfere:0.4},
-      // 北侧双号：定位微偏北，置于路北侧
-      {id:"N9",name:"金柱大门",door:"44号",theme:"读门",type:"文化",stay:10, lat: 39.92827, lng: 116.36706, tags:["architecture"],desc:"金柱大门，门楼形制完整",interfere:0.25},
+      {id:"N10",name:"45号居民院落",door:"45号",theme:"推门",type:"文化",stay:15, lat: 39.92817, lng: 116.36706, tags:["history"],desc:"随墙门，体验胡同居民原真生活",interfere:0.4},
+      {id:"N9",name:"44号金柱大门",door:"44号",theme:"读门",type:"文化",stay:10, lat: 39.92827, lng: 116.36706, tags:["architecture"],desc:"北侧双号院落代表",interfere:0.25},
       {id:"N14",name:"胡同夜市",door:"50号",theme:"创门",type:"商业",stay:30, lat: 39.92829, lng: 116.36632, tags:["food","photo"],desc:"胡同小吃摊位（如意门）",interfere:0.35}
     ];
     
@@ -140,7 +137,6 @@
     
     // ================= 地图初始化 =================
     try {
-      // 地图居中对齐到中轴线
       map = L.map('map', {
         center: [39.92810, 116.3695], 
         zoom: 18,
@@ -149,7 +145,6 @@
         maxZoom: 19
       });
       
-      // 保持高德地图
       L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
         attribution: '高德地图',
         maxZoom: 19
