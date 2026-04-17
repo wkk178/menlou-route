@@ -19,31 +19,86 @@
     .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    .main-content{margin-top: 90px;min-height: calc(100vh - 90px);padding: 60px 50px;}
+    .main-content{margin-top: 100px;min-height: calc(100vh - 100px);padding: 60px 50px;}
     .page-header{text-align: center;margin-bottom: 50px;}
     .page-title{font-size: 42px;color: var(--door-gray);margin-bottom: 15px;}
     .page-subtitle{font-size: 18px;color: var(--brick-green);}
     
-    .quiz-container{max-width: 900px;margin: 0 auto;background: var(--white);border-radius: 20px;padding: 50px 40px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.15);}
+    .quiz-container{
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 20px;
+      padding: 50px 40px;
+      box-shadow: 0 8px 32px rgba(107, 91, 79, 0.15);
+      position: relative;
+      min-height: 600px;
+    }
+    
     .quiz-progress{height: 6px;background: rgba(107, 91, 79, 0.1);border-radius: 3px;margin-bottom: 40px;overflow: hidden;}
     .progress-bar{height: 100%;background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));width: 0%;transition: width 0.5s ease;}
     
-    .question-card{display: none;animation: slideIn 0.5s ease;}
-    .question-card.active{display: block;}
-    @keyframes slideIn{from{opacity: 0;transform: translateX(20px);}to{opacity: 1;transform: translateX(0);}}
+    /* ========== 修复Bug：选项显示问题 ========== */
+    .question-card{
+      position: absolute;
+      top: 180px;
+      left: 40px;
+      right: 40px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(30px);
+      transition: all 0.5s ease;
+      pointer-events: none;
+    }
+    
+    .question-card.active{
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
     
     .question-text{font-size: 24px;font-weight: 600;color: var(--door-gray);margin-bottom: 30px;display: flex;align-items: center;gap: 15px;}
     .question-number{background: var(--accent-gold);color: var(--white);width: 40px;height: 40px;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 18px;}
     
-    .options-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));gap: 20px;margin-bottom: 40px;}
-    .option-card{background: var(--bg-cream);border: 3px solid transparent;border-radius: 16px;padding: 25px;cursor: pointer;transition: all 0.3s;display: flex;align-items: center;gap: 20px;}
-    .option-card:hover{transform: translateY(-5px);box-shadow: 0 8px 24px rgba(0,0,0,0.1);border-color: var(--accent-gold);}
+    .options-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .option-card{
+      background: var(--bg-cream);
+      border: 3px solid transparent;
+      border-radius: 16px;
+      padding: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      user-select: none;
+    }
+    .option-card:hover{transform: translateY(-3px);box-shadow: 0 8px 24px rgba(0,0,0,0.08);border-color: var(--accent-gold);}
     .option-card.selected{background: linear-gradient(135deg, var(--door-gray), var(--brick-green));color: var(--white);border-color: var(--accent-gold);}
     .option-icon{font-size: 40px;}
     .option-text{font-weight: 600;font-size: 17px;margin-bottom: 5px;}
     .option-desc{font-size: 14px;opacity: 0.8;}
     
-    .quiz-navigation{display: flex;justify-content: space-between;gap: 20px;margin-top: 40px;}
+    .quiz-navigation{
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 40px;
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      right: 40px;
+    }
+    
     .btn{padding: 16px 40px;border: none;border-radius: 12px;font-size: 16px;font-weight: 600;cursor: pointer;transition: all 0.3s;text-decoration: none;display: inline-block;}
     .btn-secondary{background: rgba(107, 91, 79, 0.1);color: var(--door-gray);}
     .btn-secondary:hover{background: rgba(107, 91, 79, 0.2);}
@@ -51,14 +106,21 @@
     .btn-primary:hover{transform: translateY(-2px);box-shadow: 0 6px 24px rgba(107, 91, 79, 0.4);}
     .btn:disabled{opacity: 0.5;cursor: not-allowed;transform: none !important;}
     
+    /* ========== 移动端适配 ========== */
     @media (max-width: 768px){
-      .navbar{padding: 15px 20px;}
-      .nav-links{gap: 15px;}
-      .nav-links a{padding: 6px 12px;font-size: 14px;}
-      .main-content{padding: 40px 20px;}
-      .page-title{font-size: 32px;}
-      .quiz-container{padding: 30px 20px;}
+      .navbar{padding: 12px 15px;}
+      .logo-placeholder{width: 45px;height: 45px;font-size: 24px;}
+      .brand-text h1{font-size: 18px;}
+      .nav-links{gap: 8px;}
+      .nav-links a{padding: 6px 10px;font-size: 13px;}
+      .main-content{margin-top: 90px;padding: 30px 20px;}
+      .page-title{font-size: 28px;}
+      .quiz-container{padding: 30px 20px;min-height: 500px;}
+      .question-card{top: 150px;left: 20px;right: 20px;}
+      .question-text{font-size: 20px;}
       .options-grid{grid-template-columns: 1fr;}
+      .option-card{padding: 20px;}
+      .quiz-navigation{position: static;margin-top: 30px;}
     }
   </style>
 </head>
@@ -144,7 +206,7 @@
       <div class="quiz-navigation">
         <button class="btn btn-secondary" id="prev-btn" onclick="changeQuestion(-1)" disabled>← 上一题</button>
         <button class="btn btn-primary" id="next-btn" onclick="changeQuestion(1)" disabled>下一题 →</button>
-        <a href="map.html" class="btn btn-primary" id="submit-btn" style="display:none;">✨ 查看我的路线</a>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitQuiz()" style="display:none;">✨ 查看我的路线</button>
       </div>
     </div>
   </div>
@@ -155,7 +217,8 @@
     let userAnswers = {theme: null,duration: null,profile: null,tags: [],avoidResident: null};
     
     document.querySelectorAll('.option-card').forEach(card => {
-      card.addEventListener('click', function(){
+      card.addEventListener('click', function(e){
+        e.stopPropagation();
         const questionNum = this.closest('.question-card').dataset.question;
         if(questionNum !== '4'){
           this.closest('.options-grid').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
@@ -192,6 +255,7 @@
         nextBtn.style.display = 'none';
         const hasAll = userAnswers.theme && userAnswers.duration && userAnswers.profile && userAnswers.tags.length > 0 && userAnswers.avoidResident !== null;
         submitBtn.style.display = hasAll ? 'inline-block' : 'none';
+        submitBtn.disabled = !hasAll;
       }
       prevBtn.disabled = currentQuestion === 1;
       const progress = (currentQuestion / totalQuestions) * 100;
@@ -206,7 +270,41 @@
       const nextCard = document.querySelector(`.question-card[data-question="${currentQuestion}"]`);
       nextCard.classList.add('active');
       updateButtons();
-      gsap.from(nextCard, {duration: 0.5, x: 20, opacity: 0, ease: 'power2.out'});
+      gsap.from(nextCard, {duration: 0.5, x: direction * 20, opacity: 0, ease: 'power2.out'});
+    }
+    
+    async function submitQuiz(){
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = "🔄 生成中...";
+      btn.disabled = true;
+      
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/generate-route', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(userAnswers)
+        });
+        
+        if(!response.ok) throw new Error('后端请求失败');
+        
+        const data = await response.json();
+        localStorage.setItem('routeData', JSON.stringify(data));
+        window.location.href = 'map.html';
+      } catch (error) {
+        console.error(error);
+        alert('⚠️ 路线生成失败，请确保后端服务已运行\n\n如果后端未启动，将使用本地模拟数据');
+        localStorage.setItem('routeData', JSON.stringify({
+          route: [
+            {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9258,lng:116.3725},
+            {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9255,lng:116.3695},
+            {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9257,lng:116.3688}
+          ],
+          totalTime: 90,
+          distance: 1.2,
+          scores: {culture: 80, business: 20, resident: 85}
+        }));
+        window.location.href = 'map.html';
+      }
     }
   </script>
 </body>
