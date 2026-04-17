@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>交互式导览图 | 门楼层记·故事里</title>
+  <title>西四北三条智能导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -23,7 +23,7 @@
     .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;}
     
-    .map-controls{position: absolute;top: 20px;right: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
+    .map-controls{position: absolute;top: 20px;right: 20px;width: 340px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 8px 0;font-size: 14px;}
@@ -110,10 +110,14 @@
   </div>
 
   <script>
-    // 精准坐标计算 - 基于两个GPS锚点线性插值
-    const EAST_ANCHOR = {lat: 39.927887, lng: 116.372587, door: 3};   // 隆长寺 (东端)
-    const WEST_ANCHOR = {lat: 39.927784, lng: 116.367239, door: 56}; // 西口 (西端)
+    // ================= 核心配置 =================
+    // 锚点：基于您提供的 GPS 和文档校准
+    // 东端：隆长寺 (3号)
+    const EAST_ANCHOR = {lat: 39.927887, lng: 116.372587, door: 3};
+    // 西端：西口 (56号附近)
+    const WEST_ANCHOR = {lat: 39.927784, lng: 116.367239, door: 56};
     
+    // 线性插值计算坐标
     function calcCoordByDoor(doorNum) {
       const ratio = (doorNum - EAST_ANCHOR.door) / (WEST_ANCHOR.door - EAST_ANCHOR.door);
       const lat = EAST_ANCHOR.lat + (WEST_ANCHOR.lat - EAST_ANCHOR.lat) * ratio;
@@ -121,50 +125,55 @@
       return {lat, lng};
     }
     
-    // 完整节点数据（严格对照《门牌号与门楼形制对照表》）
+    // ================= 节点数据 (严格依据《门楼形制对照表》) =================
     const allNodes = [
+      // --- 文化景点 (读门/推门) ---
       {id:"N1",name:"隆长寺山门",door:"3号",theme:"读门",type:"文化",stay:15,...calcCoordByDoor(3),tags:["architecture","history"],desc:"明代圣祚隆长寺旧址，存有乾隆诗碑",interfere:0.2},
-      {id:"N2",name:"广亮大门展",door:"11号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(11),tags:["architecture"],desc:"广亮大门，门簪四枚雕牡丹",interfere:0.25},
+      {id:"N2",name:"广亮大门",door:"11号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(11),tags:["architecture"],desc:"广亮大门，等级最高，门簪四枚",interfere:0.25},
       {id:"N3",name:"金柱大门",door:"13号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(13),tags:["architecture"],desc:"金柱大门，等级仅次于广亮大门",interfere:0.25},
       {id:"N4",name:"广亮大门",door:"15号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(15),tags:["architecture"],desc:"广亮大门，高级官宦宅门",interfere:0.25},
-      {id:"N5",name:"广亮大门",door:"27号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(27),tags:["architecture"],desc:"广亮大门，对照表重要门楼",interfere:0.25},
-      {id:"N6",name:"程砚秋故居",door:"39号",theme:"推门",type:"文化",stay:20,...calcCoordByDoor(39),tags:["history","photo"],desc:"京剧大师程砚秋居住21年",interfere:0.3},
-      {id:"N7",name:"广亮大门",door:"33号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(33),tags:["architecture"],desc:"广亮大门，保存完好",interfere:0.25},
-      {id:"N8",name:"金柱大门",door:"35号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(35),tags:["architecture"],desc:"金柱大门，砖雕精美",interfere:0.25},
+      {id:"N5",name:"广亮大门",door:"27号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(27),tags:["architecture"],desc:"广亮大门，保存完好",interfere:0.25},
+      {id:"N6",name:"广亮大门",door:"33号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(33),tags:["architecture"],desc:"广亮大门，形制完整",interfere:0.25},
+      {id:"N7",name:"金柱大门",door:"35号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(35),tags:["architecture"],desc:"金柱大门，砖雕精美",interfere:0.25},
+      {id:"N8",name:"程砚秋故居",door:"39号",theme:"推门",type:"文化",stay:20,...calcCoordByDoor(39),tags:["history","photo"],desc:"京剧大师程砚秋居住21年 (如意门)",interfere:0.3},
       {id:"N9",name:"金柱大门",door:"44号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(44),tags:["architecture"],desc:"金柱大门，门楼形制完整",interfere:0.25},
-      {id:"N10",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(21),tags:["food","shopping"],desc:"一院一茗特调茶",interfere:0.1},
-      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40,...calcCoordByDoor(17),tags:["handcraft","photo"],desc:"御霜雅集主题",interfere:0.15},
-      {id:"N12",name:"手作工坊",door:"45号",theme:"创门",type:"商业",stay:35,...calcCoordByDoor(45),tags:["handcraft"],desc:"砖雕拓印体验",interfere:0.1},
-      {id:"N13",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25,...calcCoordByDoor(43),tags:["shopping","history"],desc:"门楼主题文创",interfere:0.05},
-      {id:"N14",name:"胡同夜市",door:"50号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(50),tags:["food","photo"],desc:"胡同小吃摊位",interfere:0.35}
+      {id:"N10",name:"开放院落",door:"45号",theme:"推门",type:"文化",stay:15,...calcCoordByDoor(45),tags:["history"],desc:"随墙门，保留原汁原味生活气息",interfere:0.4},
+      
+      // --- 商业体验 (创门) ---
+      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40,...calcCoordByDoor(17),tags:["handcraft","photo"],desc:"御霜雅集主题，戏服旅拍",interfere:0.15},
+      {id:"N12",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(21),tags:["food","shopping"],desc:"一院一茗特调茶",interfere:0.1},
+      {id:"N13",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25,...calcCoordByDoor(43),tags:["shopping","history"],desc:"门楼主题文创、故事集",interfere:0.05},
+      {id:"N14",name:"胡同夜市",door:"50号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(50),tags:["food","photo"],desc:"胡同小吃、手作摊位",interfere:0.35}
     ];
     
     let map, routeLine, markers = [];
     let currentRoute = [];
     
-    // 初始化地图：高清瓦片源
+    // ================= 地图初始化 =================
+    // 强制中心点：西四北三条正中
     map = L.map('map', {
       center: [39.927835, 116.369913],
       zoom: 17.5,
       zoomControl: false,
       minZoom: 16,
-      maxZoom: 19,
+      maxZoom: 20,
       attributionControl: false
     });
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap & CARTO',
-      subdomains: 'abcd',
-      maxZoom: 19
+    // 使用高德地图矢量瓦片 (风格最接近高德导航)
+    // style=7 是矢量地图，style=6 是卫星图+路网
+    L.tileLayer('https://wprd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', {
+      subdomains: ['1','2','3','4'],
+      maxZoom: 21
     }).addTo(map);
     
     L.control.zoom({position: 'topright'}).addTo(map);
-    L.control.attribution({position: 'bottomright', prefix: ''}).addTo(map);
     
     function resetMap() {
       map.setView([39.927835, 116.369913], 17.5, {animate: true, duration: 0.5});
     }
     
+    // ================= 标记点生成 =================
     function createMarkerIcon(node, index, isRoute = false) {
       const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
       const borderColor = isRoute ? '#c0392b' : color;
@@ -212,6 +221,7 @@
       });
     }
     
+    // ================= 路线加载与渲染 =================
     function loadRoute() {
       const data = localStorage.getItem('routeData');
       let routeData = null;
@@ -219,16 +229,18 @@
         try { routeData = JSON.parse(data); } catch(e) { console.warn("使用默认路线"); }
       }
       if (!routeData || !routeData.route) {
+        // 默认路线：涵盖东西两端核心门楼
         routeData = { 
-          route: [allNodes[0], allNodes[4], allNodes[6], allNodes[5], allNodes[9], allNodes[12]], 
+          route: [allNodes[0], allNodes[1], allNodes[3], allNodes[4], allNodes[7], allNodes[8]], 
           totalTime: 110, 
           distance: 0.65, 
-          scores: {culture: 75, business: 25, resident: 85} 
+          scores: {culture: 80, business: 20, resident: 85} 
         };
       }
       currentRoute = routeData.route;
       renderRoute(currentRoute);
       updateInfo(routeData);
+      
       if (currentRoute.length > 0) {
         const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
         map.fitBounds(bounds, {padding: [80, 80], maxZoom: 18});
@@ -303,6 +315,7 @@
       }
     }
     
+    // 启动
     loadRoute();
   </script>
 </body>
