@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D地图可视化 | 门楼层记·故事里</title>
+  <title>交互式地图 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
@@ -20,10 +20,23 @@
     .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    .map-wrapper{margin-top: 90px;height: calc(100vh - 90px);position: relative;}
+    .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
     #map{width: 100%;height: 100%;}
     
-    .map-controls{position: absolute;top: 20px;right: 20px;width: 350px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 25px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 100;max-height: calc(100vh - 130px);overflow-y: auto;}
+    .map-controls{
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 350px;
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);
+      z-index: 100;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+    }
+    
     .control-header{display: flex;justify-content: space-between;align-items: center;margin-bottom: 20px;padding-bottom: 15px;border-bottom: 2px solid var(--bg-cream);}
     .control-title{font-size: 20px;font-weight: 600;color: var(--door-gray);}
     
@@ -58,10 +71,21 @@
     @keyframes doorOpen{0%, 100%{transform: perspective(200px) rotateY(0deg);}50%{transform: perspective(200px) rotateY(-30deg);}}
     
     @media (max-width: 768px){
-      .navbar{padding: 15px 20px;}
-      .nav-links{gap: 15px;}
-      .nav-links a{padding: 6px 12px;font-size: 14px;}
-      .map-controls{width: calc(100% - 40px);right: 20px;top: auto;bottom: 20px;max-height: 40vh;}
+      .navbar{padding: 12px 15px;}
+      .logo-placeholder{width: 45px;height: 45px;font-size: 24px;}
+      .brand-text h1{font-size: 18px;}
+      .nav-links{gap: 8px;}
+      .nav-links a{padding: 6px 10px;font-size: 13px;}
+      .map-wrapper{margin-top: 90px;height: calc(100vh - 90px);}
+      .map-controls{
+        width: calc(100% - 40px);
+        right: 20px;
+        left: 20px;
+        top: auto;
+        bottom: 20px;
+        max-height: 40vh;
+      }
+      .map-legend{bottom: auto;top: 20px;left: 20px;}
     }
   </style>
 </head>
@@ -126,16 +150,17 @@
   </div>
 
   <script>
+    // ========== 校正后的西四北三条坐标 ==========
     const nodesData = [
-      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9253,lng:116.3745,interfere:0.2,tags:["architecture","history","photo"]},
-      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9248,lng:116.3758,interfere:0.3,tags:["history","photo"]},
-      {id:"N3",name:"广亮大门实景展",theme:"读门",type:"文化",stay:10,lat:39.9256,lng:116.3762,interfere:0.25,tags:["architecture","photo"]},
-      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9244,lng:116.3765,interfere:0.4,tags:["history"]},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9250,lng:116.3772,interfere:0.1,tags:["food","shopping"]},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9255,lng:116.3752,interfere:0.15,tags:["handcraft","photo","shopping"]},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9247,lng:116.3778,interfere:0.1,tags:["handcraft","shopping"]},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9252,lng:116.3785,interfere:0.05,tags:["shopping","history"]},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9242,lng:116.3770,interfere:0.35,tags:["food","shopping","photo"]}
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9258,lng:116.3725,interfere:0.2,tags:["architecture","history","photo"]},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9255,lng:116.3695,interfere:0.3,tags:["history","photo"]},
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9260,lng:116.3710,interfere:0.25,tags:["architecture","photo"]},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9253,lng:116.3705,interfere:0.4,tags:["history"]},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9257,lng:116.3688,interfere:0.1,tags:["food","shopping"]},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9259,lng:116.3718,interfere:0.15,tags:["handcraft","photo","shopping"]},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9254,lng:116.3680,interfere:0.1,tags:["handcraft","shopping"]},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9256,lng:116.3672,interfere:0.05,tags:["shopping","history"]},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9252,lng:116.3665,interfere:0.35,tags:["food","shopping","photo"]}
     ];
     
     let map, markers = [], routeLine;
@@ -143,8 +168,8 @@
     
     function initMap(){
       map = L.map('map', {
-        center: [39.9250, 116.3760],
-        zoom: 16,
+        center: [39.9256, 116.3700],
+        zoom: 17,
         zoomControl: false
       });
       
