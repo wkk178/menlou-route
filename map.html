@@ -115,9 +115,9 @@
 
   <script>
     // ================= 核心配置（严格对照《门楼形制对照表》） =================
-    // 东端锚点：3号（隆长寺山门，随墙门）
-    const EAST_ANCHOR = {lat: 39.927887, lng: 116.372587, door: 3};
-    // 西端锚点：56号（西洋门，西四北三条西口）
+    // 东端锚点：1号（随墙门）- 根据文档，1号是随墙门，位于最东端
+    const EAST_ANCHOR = {lat: 39.927887, lng: 116.372587, door: 1};
+    // 西端锚点：56号（西洋门）- 根据文档，56号是西洋门，位于最西端
     const WEST_ANCHOR = {lat: 39.927750, lng: 116.366500, door: 56};
     
     // 按门牌号线性插值计算坐标（严格沿西四北三条东西走向）
@@ -130,8 +130,8 @@
     
     // ================= 节点数据（依据对照表精准映射） =================
     const allNodes = [
-      // 文化景点 - 读门（广亮大门、金柱大门）
-      {id:"N1",name:"隆长寺山门",door:"3号",theme:"读门",type:"文化",stay:15,...calcCoordByDoor(3),tags:["architecture","history"],desc:"明代圣祚隆长寺旧址（随墙门）",interfere:0.2},
+      // 文化景点 - 读门（广亮大门、金柱大门、重要门楼）
+      {id:"N1",name:"隆长寺山门",door:"1号",theme:"读门",type:"文化",stay:15,...calcCoordByDoor(1),tags:["architecture","history"],desc:"明代圣祚隆长寺旧址（随墙门）",interfere:0.2},
       {id:"N2",name:"广亮大门",door:"11号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(11),tags:["architecture"],desc:"广亮大门，等级最高，门簪四枚",interfere:0.25},
       {id:"N3",name:"金柱大门",door:"13号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(13),tags:["architecture"],desc:"金柱大门，等级仅次于广亮大门",interfere:0.25},
       {id:"N4",name:"广亮大门",door:"15号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(15),tags:["architecture"],desc:"广亮大门，高级官宦宅门",interfere:0.25},
@@ -143,7 +143,7 @@
       {id:"N10",name:"开放院落",door:"45号",theme:"推门",type:"文化",stay:15,...calcCoordByDoor(45),tags:["history"],desc:"随墙门，原汁原味生活气息",interfere:0.4},
       
       // 商业体验 - 创门
-      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40,...calcCoordByDoor(17),tags:["handcraft","photo"],desc:"御霜雅集主题，戏服旅拍",interfere:0.15},
+      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40,...calcCoordByDoor(17),tags:["handcraft","photo"],desc:"御霜雅集主题，戏服旅拍（西洋门）",interfere:0.15},
       {id:"N12",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(21),tags:["food","shopping"],desc:"一院一茗特调茶（蛮子门）",interfere:0.1},
       {id:"N13",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25,...calcCoordByDoor(43),tags:["shopping","history"],desc:"门楼主题文创（蛮子门）",interfere:0.05},
       {id:"N14",name:"胡同夜市",door:"50号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(50),tags:["food","photo"],desc:"胡同小吃摊位（如意门）",interfere:0.35}
@@ -152,22 +152,25 @@
     let map, routeLine, markers = [];
     let currentRoute = [];
     
-    // ================= 地图初始化（高德矢量瓦片 - 中国最准确） =================
+    // ================= 地图初始化（使用稳定地图源） =================
     try {
       map = L.map('map', {
         center: [39.927818, 116.369543], // 西四北三条中心坐标
         zoom: 17.5,
         zoomControl: false,
         minZoom: 16,
-        maxZoom: 21
+        maxZoom: 19
       });
       
-      // 高德矢量瓦片（中国街道数据最准确，无偏移）
-      L.tileLayer('https://webrd0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', {
-        subdomains: ['1','2','3','4'],
-        maxZoom: 21
+      // CartoDB Voyager（稳定、清晰、支持中文）
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
       }).addTo(map).on('load', function() {
         document.getElementById('loading').style.display = 'none';
+      }).on('error', function() {
+        document.getElementById('loading').innerHTML = '地图加载失败，请检查网络连接';
       });
       
       L.control.zoom({position: 'topright'}).addTo(map);
