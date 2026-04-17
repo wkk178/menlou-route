@@ -73,7 +73,7 @@ def update_weights_from_data():
     return True
 
 
-# ================= 【严谨版】节点数据：去除虚假修饰，采用"门牌号+形制"确保真实 =================
+
 NODES = [
     {"id": "N1", "name": "隆长寺旧址", "door": "1号", "theme": "读门", "type": "文化", "stay": 15, "lat": 39.92803,
      "lng": 116.37250, "interfere": 0.2, "tags": ["architecture", "history"], "desc": "明代圣祚隆长寺旧址（随墙门）"},
