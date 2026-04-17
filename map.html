@@ -23,11 +23,12 @@
     .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;}
     
+    /* 侧边控制面板 */
     .map-controls{
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 320px;
+      width: 300px;
       background: rgba(255, 255, 255, 0.98);
       border-radius: 16px;
       padding: 20px;
@@ -39,8 +40,8 @@
     
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     
-    .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
-    .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 14px;}
+    .info-box{background: var(--bg-cream);padding: 12px;border-radius: 10px;margin-bottom: 15px;}
+    .info-row{display: flex;justify-content: space-between;margin: 6px 0;font-size: 13px;}
     .info-val{font-weight: bold;color: var(--brick-green);}
     
     .stop-list{list-style: none;}
@@ -49,6 +50,34 @@
     .stop-num{width: 24px;height: 24px;background: var(--door-gray);color: white;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 12px;font-weight: bold;}
     .stop-info h5{font-size: 14px;margin-bottom: 2px;}
     .stop-info p{font-size: 11px;color: #666;}
+    
+    /* 指南针 */
+    .compass{
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255,255,255,0.95);
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #c0392b;
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .compass::before{
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 18px;
+      background: #333;
+      top: 8px;
+    }
     
     .legend{position: absolute;bottom: 30px;left: 20px;background: white;padding: 10px 15px;border-radius: 8px;box-shadow: 0 4px 12px rgba(0,0,0,0.1);z-index: 1000;font-size: 12px;}
     .legend-item{display: flex;align-items: center;gap: 8px;margin: 4px 0;}
@@ -61,7 +90,8 @@
       .nav-links{gap: 5px;}
       .nav-links a{padding: 6px 8px;font-size: 12px;}
       .map-wrapper{margin-top: 90px;height: calc(100vh - 90px);}
-      .map-controls{width: 90%;right: 5%;top: auto;bottom: 20px;max-height: 40vh;}
+      .map-controls{width: 90%;right: 5%;top: auto;bottom: 20px;max-height: 35vh;}
+      .compass{width: 40px;height: 40px;font-size: 14px;top: 15px;left: 15px;}
     }
   </style>
 </head>
@@ -85,8 +115,8 @@
   
   <div class="map-wrapper">
     <div id="map"></div>
+    <div class="compass">N</div>
     
-    <!-- 右侧控制面板 -->
     <div class="map-controls">
       <h3 class="control-title">📍 路线详情</h3>
       <div class="info-box">
@@ -95,9 +125,7 @@
         <div class="info-row"><span>📊 文化指数</span><span class="info-val" id="r-score">--</span></div>
       </div>
       <h4 style="font-size:14px;margin-bottom:10px;color:#666;">途经站点</h4>
-      <ul class="stop-list" id="stop-list">
-        <!-- 动态生成 -->
-      </ul>
+      <ul class="stop-list" id="stop-list"></ul>
     </div>
     
     <div class="legend">
@@ -107,29 +135,30 @@
   </div>
 
   <script>
-    // 节点数据：严格对应西四北三条及周边
+    // 严格对齐西四北三条实际地理走向（西起西四北大街，东至赵登禹路）
     const nodes = [
-      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9262,lng:116.3735,tags:["architecture","history"]},
-      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9256,lng:116.3695,tags:["history","photo"]}, // 39号
-      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9259,lng:116.3715,tags:["architecture"]}, // 27号附近
-      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9257,lng:116.3700,tags:["history"]},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9255,lng:116.3685,tags:["food","shopping"]},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9260,lng:116.3725,tags:["handcraft","photo"]},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9254,lng:116.3675,tags:["handcraft"]},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9253,lng:116.3665,tags:["shopping","history"]},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9252,lng:116.3655,tags:["food","photo"]}
+      {id:"N1",name:"隆长寺山门 (3号)",theme:"读门",type:"文化",stay:15,lat:39.9259,lng:116.3748,tags:["architecture","history"]},
+      {id:"N2",name:"广亮大门展 (27号)",theme:"读门",type:"文化",stay:10,lat:39.9257,lng:116.3732,tags:["architecture"]},
+      {id:"N3",name:"程砚秋故居 (39号)",theme:"推门",type:"文化",stay:20,lat:39.9256,lng:116.3718,tags:["history","photo"]},
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9255,lng:116.3705,tags:["history"]},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9254,lng:116.3692,tags:["food","shopping"]},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9257,lng:116.3725,tags:["handcraft","photo"]},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9253,lng:116.3680,tags:["handcraft"]},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9252,lng:116.3670,tags:["shopping","history"]},
+      {id:"N9",name:"胡同夜市 (近赵登禹路)",theme:"创门",type:"商业",stay:30,lat:39.9251,lng:116.3662,tags:["food","photo"]}
     ];
     
     let map, routeLine, markers = [];
     
-    // 初始化地图
+    // 初始化地图：锁定西四北三条范围
     map = L.map('map', {
-      center: [39.9256, 116.3700], // 中心点设在西四北三条中间
-      zoom: 17, // 放大级别，只看胡同
+      center: [39.9255, 116.3705],
+      zoom: 17.5,
       zoomControl: false,
-      // 限制拖动范围，确保只围绕西四北三条
-      maxBounds: [[39.9240, 116.3640], [39.9275, 116.3760]],
-      maxBoundsViscosity: 0.8
+      // 严格限制拖动边界，确保只围绕胡同
+      maxBounds: [[39.9245, 116.3650], [39.9265, 116.3760]],
+      maxBoundsViscosity: 1.0,
+      smoothWheelZoom: true
     });
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -139,27 +168,25 @@
     
     L.control.zoom({position: 'topright'}).addTo(map);
     
-    // 指南针插件 (简单实现)
-    const compassDiv = L.divIcon({
-      html: '<div style="width:30px;height:30px;background:white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-weight:bold;color:red;font-size:12px;">N</div>',
-      className: 'compass',
-      iconSize: [30, 30]
-    });
-    L.marker([39.9270, 116.3750], {icon: compassDiv, interactive: false}).addTo(map);
-    
     function loadRoute() {
       const data = localStorage.getItem('routeData');
       let routeData = null;
       
       if (data) {
-        routeData = JSON.parse(data);
-      } else {
-        // 默认路线
+        try {
+          routeData = JSON.parse(data);
+        } catch(e) {
+          console.warn("数据解析失败，使用默认路线");
+        }
+      }
+      
+      // 默认路线：沿胡同从西向东合理分布
+      if (!routeData || !routeData.route) {
         routeData = {
-          route: [nodes[0], nodes[2], nodes[1], nodes[4], nodes[7]],
+          route: [nodes[0], nodes[1], nodes[2], nodes[4], nodes[7]],
           totalTime: 100,
-          distance: 1.2,
-          scores: {culture: 80, business: 20, resident: 85}
+          distance: 0.9,
+          scores: {culture: 75, business: 25, resident: 85}
         };
       }
       
@@ -168,7 +195,6 @@
     }
     
     function renderRoute(routeNodes) {
-      // 清除旧标记
       markers.forEach(m => map.removeLayer(m));
       markers = [];
       if (routeLine) map.removeLayer(routeLine);
@@ -178,7 +204,6 @@
       listEl.innerHTML = '';
       
       routeNodes.forEach((node, i) => {
-        // 颜色区分
         const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
         
         const icon = L.divIcon({
@@ -193,7 +218,6 @@
         markers.push(marker);
         latlngs.push([node.lat, node.lng]);
         
-        // 生成列表
         listEl.innerHTML += `
           <li class="stop-item" onclick="focusStop(${i})">
             <div class="stop-num">${i+1}</div>
@@ -205,18 +229,19 @@
         `;
       });
       
-      // 绘制连线
+      // 绘制路线：沿胡同走向平滑连接
       if (latlngs.length > 1) {
         routeLine = L.polyline(latlngs, {
           color: '#6B5B4F',
-          weight: 4,
-          opacity: 0.8,
-          dashArray: '10, 10',
-          lineCap: 'round'
+          weight: 5,
+          opacity: 0.9,
+          dashArray: '12, 8',
+          lineCap: 'round',
+          lineJoin: 'round'
         }).addTo(map);
         
-        // 自动缩放适应路线
-        map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
+        // 自动适应视野，保留边距
+        map.fitBounds(routeLine.getBounds(), {padding: [60, 60], maxZoom: 18});
       }
     }
     
@@ -231,10 +256,12 @@
       if (marker) {
         map.setView(marker.getLatLng(), 18);
         marker.openPopup();
+        document.querySelectorAll('.stop-item').forEach((el, i) => {
+          el.style.background = i === index ? '#f0ebe3' : 'white';
+        });
       }
     }
     
-    // 页面加载完成后执行
     loadRoute();
   </script>
 </body>
