@@ -21,71 +21,47 @@
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
     .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
-    #map{width: 100%;height: 100%;}
+    #map{width: 100%;height: 100%;z-index: 1;}
     
     .map-controls{
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 350px;
+      width: 320px;
       background: rgba(255, 255, 255, 0.98);
       border-radius: 16px;
-      padding: 25px;
+      padding: 20px;
       box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);
-      z-index: 100;
+      z-index: 1000;
       max-height: calc(100vh - 140px);
       overflow-y: auto;
     }
     
-    .control-header{display: flex;justify-content: space-between;align-items: center;margin-bottom: 20px;padding-bottom: 15px;border-bottom: 2px solid var(--bg-cream);}
-    .control-title{font-size: 20px;font-weight: 600;color: var(--door-gray);}
+    .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     
-    .route-info{background: linear-gradient(135deg, var(--bg-cream), var(--white));border-radius: 12px;padding: 20px;margin-bottom: 20px;border: 2px solid rgba(107, 91, 79, 0.1);}
-    .info-item{display: flex;justify-content: space-between;margin: 10px 0;font-size: 14px;}
-    .info-label{color: var(--text-dark);opacity: 0.8;}
-    .info-value{font-weight: 600;color: var(--accent-gold);}
+    .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
+    .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 14px;}
+    .info-val{font-weight: bold;color: var(--brick-green);}
     
-    .waypoint-list{margin-top: 15px;}
-    .waypoint-item{display: flex;align-items: center;gap: 12px;padding: 12px;background: var(--white);border-radius: 8px;margin: 8px 0;cursor: pointer;transition: all 0.3s;border-left: 4px solid transparent;}
-    .waypoint-item:hover{transform: translateX(5px);box-shadow: 0 4px 12px rgba(0,0,0,0.1);border-left-color: var(--accent-gold);}
-    .waypoint-item.active{background: linear-gradient(135deg, var(--door-gray), var(--brick-green));color: var(--white);}
-    .waypoint-number{width: 28px;height: 28px;background: var(--accent-gold);color: var(--white);border-radius: 50%;display: flex;align-items: center;justify-content: center;font-weight: 600;font-size: 14px;flex-shrink: 0;}
-    .waypoint-item.active .waypoint-number{background: var(--white);color: var(--door-gray);}
-    .waypoint-content{flex: 1;}
-    .waypoint-name{font-weight: 600;font-size: 14px;margin-bottom: 3px;}
-    .waypoint-desc{font-size: 12px;opacity: 0.8;}
+    .stop-list{list-style: none;}
+    .stop-item{display: flex;align-items: center;gap: 10px;padding: 10px;margin-bottom: 8px;background: white;border-radius: 8px;border-left: 4px solid var(--accent-gold);cursor: pointer;transition: 0.2s;}
+    .stop-item:hover{transform: translateX(5px);box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+    .stop-num{width: 24px;height: 24px;background: var(--door-gray);color: white;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 12px;font-weight: bold;}
+    .stop-info h5{font-size: 14px;margin-bottom: 2px;}
+    .stop-info p{font-size: 11px;color: #666;}
     
-    .map-legend{position: absolute;bottom: 20px;left: 20px;background: rgba(255, 255, 255, 0.95);padding: 15px 20px;border-radius: 12px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 100;}
-    .legend-title{font-weight: 600;margin-bottom: 10px;color: var(--door-gray);font-size: 14px;}
-    .legend-item{display: flex;align-items: center;gap: 10px;margin: 6px 0;font-size: 13px;}
-    .legend-color{width: 16px;height: 16px;border-radius: 4px;}
-    .legend-color.culture{background: #4A6B5A;}
-    .legend-color.business{background: #C9A86C;}
-    .legend-color.route{background: linear-gradient(90deg, #6B5B4F, #C9A86C);height: 4px;width: 24px;}
-    
-    .loading-overlay{position: absolute;top: 0;left: 0;width: 100%;height: 100%;background: rgba(245, 241, 232, 0.95);display: flex;align-items: center;justify-content: center;z-index: 1000;transition: opacity 0.5s;}
-    .loading-overlay.hidden{opacity: 0;pointer-events: none;}
-    .loader{text-align: center;}
-    .loader-door{width: 60px;height: 80px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 30px 30px 0 0;margin: 0 auto 20px;position: relative;animation: doorOpen 2s ease-in-out infinite;}
-    .loader-door::before{content: '';position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 10px;height: 10px;background: var(--accent-gold);border-radius: 50%;}
-    @keyframes doorOpen{0%, 100%{transform: perspective(200px) rotateY(0deg);}50%{transform: perspective(200px) rotateY(-30deg);}}
+    .legend{position: absolute;bottom: 30px;left: 20px;background: white;padding: 10px 15px;border-radius: 8px;box-shadow: 0 4px 12px rgba(0,0,0,0.1);z-index: 1000;font-size: 12px;}
+    .legend-item{display: flex;align-items: center;gap: 8px;margin: 4px 0;}
+    .dot{width: 12px;height: 12px;border-radius: 50%;}
     
     @media (max-width: 768px){
       .navbar{padding: 12px 15px;}
-      .logo-placeholder{width: 45px;height: 45px;font-size: 24px;}
+      .logo-placeholder{width: 40px;height: 40px;font-size: 20px;}
       .brand-text h1{font-size: 18px;}
-      .nav-links{gap: 8px;}
-      .nav-links a{padding: 6px 10px;font-size: 13px;}
+      .nav-links{gap: 5px;}
+      .nav-links a{padding: 6px 8px;font-size: 12px;}
       .map-wrapper{margin-top: 90px;height: calc(100vh - 90px);}
-      .map-controls{
-        width: calc(100% - 40px);
-        right: 20px;
-        left: 20px;
-        top: auto;
-        bottom: 20px;
-        max-height: 40vh;
-      }
-      .map-legend{bottom: auto;top: 20px;left: 20px;}
+      .map-controls{width: 90%;right: 5%;top: auto;bottom: 20px;max-height: 40vh;}
     }
   </style>
 </head>
@@ -110,163 +86,156 @@
   <div class="map-wrapper">
     <div id="map"></div>
     
-    <div class="loading-overlay" id="loader">
-      <div class="loader">
-        <div class="loader-door"></div>
-        <div>加载地图中...</div>
-      </div>
-    </div>
-    
+    <!-- 右侧控制面板 -->
     <div class="map-controls">
-      <div class="control-header">
-        <div class="control-title">📍 路线详情</div>
+      <h3 class="control-title">📍 路线详情</h3>
+      <div class="info-box">
+        <div class="info-row"><span>⏱ 预计时长</span><span class="info-val" id="r-time">--</span></div>
+        <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
+        <div class="info-row"><span>📊 文化指数</span><span class="info-val" id="r-score">--</span></div>
       </div>
-      
-      <div class="route-info" id="route-info">
-        <div class="info-item">
-          <span class="info-label">⏱ 预计时长</span>
-          <span class="info-value" id="total-time">90分钟</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">📍 站点数量</span>
-          <span class="info-value" id="total-points">5个</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">🚶 步行距离</span>
-          <span class="info-value" id="total-distance">1.2公里</span>
-        </div>
-      </div>
-      
-      <div style="font-weight: 600; margin-bottom: 10px; color: var(--door-gray);">途经站点</div>
-      <div class="waypoint-list" id="waypoint-list"></div>
+      <h4 style="font-size:14px;margin-bottom:10px;color:#666;">途经站点</h4>
+      <ul class="stop-list" id="stop-list">
+        <!-- 动态生成 -->
+      </ul>
     </div>
     
-    <div class="map-legend">
-      <div class="legend-title">图例说明</div>
-      <div class="legend-item"><div class="legend-color culture"></div><span>文化景点</span></div>
-      <div class="legend-item"><div class="legend-color business"></div><span>商业体验</span></div>
-      <div class="legend-item"><div class="legend-color route"></div><span>推荐路线</span></div>
+    <div class="legend">
+      <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>文化景点 (读门/推门)</span></div>
+      <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业体验 (创门)</span></div>
     </div>
   </div>
 
   <script>
-    // ========== 校正后的西四北三条坐标 ==========
-    const nodesData = [
-      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9258,lng:116.3725,interfere:0.2,tags:["architecture","history","photo"]},
-      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9255,lng:116.3695,interfere:0.3,tags:["history","photo"]},
-      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9260,lng:116.3710,interfere:0.25,tags:["architecture","photo"]},
-      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9253,lng:116.3705,interfere:0.4,tags:["history"]},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9257,lng:116.3688,interfere:0.1,tags:["food","shopping"]},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9259,lng:116.3718,interfere:0.15,tags:["handcraft","photo","shopping"]},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9254,lng:116.3680,interfere:0.1,tags:["handcraft","shopping"]},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9256,lng:116.3672,interfere:0.05,tags:["shopping","history"]},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9252,lng:116.3665,interfere:0.35,tags:["food","shopping","photo"]}
+    // 节点数据：严格对应西四北三条及周边
+    const nodes = [
+      {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9262,lng:116.3735,tags:["architecture","history"]},
+      {id:"N2",name:"程砚秋故居",theme:"推门",type:"文化",stay:20,lat:39.9256,lng:116.3695,tags:["history","photo"]}, // 39号
+      {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9259,lng:116.3715,tags:["architecture"]}, // 27号附近
+      {id:"N4",name:"开放院落A",theme:"推门",type:"文化",stay:15,lat:39.9257,lng:116.3700,tags:["history"]},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9255,lng:116.3685,tags:["food","shopping"]},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.9260,lng:116.3725,tags:["handcraft","photo"]},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.9254,lng:116.3675,tags:["handcraft"]},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.9253,lng:116.3665,tags:["shopping","history"]},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.9252,lng:116.3655,tags:["food","photo"]}
     ];
     
-    let map, markers = [], routeLine;
-    let currentRoute = [];
+    let map, routeLine, markers = [];
     
-    function initMap(){
-      map = L.map('map', {
-        center: [39.9256, 116.3700],
-        zoom: 17,
-        zoomControl: false
-      });
-      
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-      }).addTo(map);
-      
-      L.control.zoom({position: 'bottomright'}).addTo(map);
-      
-      document.getElementById('loader').classList.add('hidden');
-      loadRouteFromStorage();
-    }
+    // 初始化地图
+    map = L.map('map', {
+      center: [39.9256, 116.3700], // 中心点设在西四北三条中间
+      zoom: 17, // 放大级别，只看胡同
+      zoomControl: false,
+      // 限制拖动范围，确保只围绕西四北三条
+      maxBounds: [[39.9240, 116.3640], [39.9275, 116.3760]],
+      maxBoundsViscosity: 0.8
+    });
     
-    function loadRouteFromStorage(){
-      const dataStr = localStorage.getItem('routeData');
-      if(dataStr){
-        const data = JSON.parse(dataStr);
-        if(data.route && data.route.length > 0){
-          currentRoute = data.route;
-          document.getElementById('total-time').textContent = data.totalTime + '分钟';
-          document.getElementById('total-points').textContent = currentRoute.length + '个';
-          document.getElementById('total-distance').textContent = data.distance + '公里';
-          displayRoute(currentRoute);
-          return;
-        }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(map);
+    
+    L.control.zoom({position: 'topright'}).addTo(map);
+    
+    // 指南针插件 (简单实现)
+    const compassDiv = L.divIcon({
+      html: '<div style="width:30px;height:30px;background:white;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-weight:bold;color:red;font-size:12px;">N</div>',
+      className: 'compass',
+      iconSize: [30, 30]
+    });
+    L.marker([39.9270, 116.3750], {icon: compassDiv, interactive: false}).addTo(map);
+    
+    function loadRoute() {
+      const data = localStorage.getItem('routeData');
+      let routeData = null;
+      
+      if (data) {
+        routeData = JSON.parse(data);
+      } else {
+        // 默认路线
+        routeData = {
+          route: [nodes[0], nodes[2], nodes[1], nodes[4], nodes[7]],
+          totalTime: 100,
+          distance: 1.2,
+          scores: {culture: 80, business: 20, resident: 85}
+        };
       }
-      const defaultRoute = ['N1', 'N2', 'N5', 'N7', 'N8'];
-      currentRoute = defaultRoute.map(id => nodesData.find(n => n.id === id));
-      displayRoute(currentRoute);
+      
+      renderRoute(routeData.route);
+      updateInfo(routeData);
     }
     
-    function displayRoute(route){
+    function renderRoute(routeNodes) {
+      // 清除旧标记
       markers.forEach(m => map.removeLayer(m));
       markers = [];
-      if(routeLine) map.removeLayer(routeLine);
+      if (routeLine) map.removeLayer(routeLine);
       
-      var latlngs = [];
+      const latlngs = [];
+      const listEl = document.getElementById('stop-list');
+      listEl.innerHTML = '';
       
-      route.forEach((node, index) => {
+      routeNodes.forEach((node, i) => {
+        // 颜色区分
         const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
         
-        var customIcon = L.divIcon({
-          className: 'custom-marker',
-          html: `<div style="width: 32px;height: 32px;background: ${color};border: 3px solid white;border-radius: 50%;display: flex;align-items: center;justify-content: center;color: white;font-weight: bold;box-shadow: 0 2px 8px rgba(0,0,0,0.3);cursor: pointer;font-size: 14px;">${index + 1}</div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16]
+        const icon = L.divIcon({
+          className: 'custom-div-icon',
+          html: `<div style='background-color:${color};width:28px;height:28px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;'>${i+1}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
         });
         
-        var marker = L.marker([node.lat, node.lng], {icon: customIcon})
-          .addTo(map)
-          .bindPopup(`<div style="padding: 10px; max-width: 200px;"><div style="font-weight: 600; margin-bottom: 5px; color: #6B5B4F;">${node.name}</div><div style="font-size: 12px; color: #666;">${node.theme} · 停留${node.stay}分钟<br>${node.type === '文化' ? '📚 文化景点' : '🛍 商业体验'}</div></div>`);
-        
+        const marker = L.marker([node.lat, node.lng], {icon: icon}).addTo(map);
+        marker.bindPopup(`<b>${node.name}</b><br>${node.theme} | ${node.stay}分钟`);
         markers.push(marker);
         latlngs.push([node.lat, node.lng]);
+        
+        // 生成列表
+        listEl.innerHTML += `
+          <li class="stop-item" onclick="focusStop(${i})">
+            <div class="stop-num">${i+1}</div>
+            <div class="stop-info">
+              <h5>${node.name}</h5>
+              <p>${node.theme} · ${node.stay}分钟</p>
+            </div>
+          </li>
+        `;
       });
       
-      if(latlngs.length > 1){
+      // 绘制连线
+      if (latlngs.length > 1) {
         routeLine = L.polyline(latlngs, {
           color: '#6B5B4F',
-          weight: 5,
+          weight: 4,
           opacity: 0.8,
-          lineCap: 'round',
-          lineJoin: 'round',
-          dashArray: '10, 5'
+          dashArray: '10, 10',
+          lineCap: 'round'
         }).addTo(map);
-      }
-      
-      updateSidebar(route);
-      if(latlngs.length > 0) map.fitBounds(latlngs, {padding: [50, 50]});
-    }
-    
-    function updateSidebar(route){
-      const listHtml = route.map((node, index) => `
-        <div class="waypoint-item" onclick="focusOnPoint(${index})">
-          <div class="waypoint-number">${index + 1}</div>
-          <div class="waypoint-content">
-            <div class="waypoint-name">${node.name}</div>
-            <div class="waypoint-desc">${node.theme} · ${node.stay}分钟</div>
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('waypoint-list').innerHTML = listHtml;
-    }
-    
-    function focusOnPoint(index){
-      if(currentRoute[index]){
-        const node = currentRoute[index];
-        map.setView([node.lat, node.lng], 18);
-        markers[index].openPopup();
-        document.querySelectorAll('.waypoint-item').forEach((item, i) => {
-          item.classList.toggle('active', i === index);
-        });
+        
+        // 自动缩放适应路线
+        map.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
       }
     }
     
-    window.addEventListener('load', initMap);
+    function updateInfo(data) {
+      document.getElementById('r-time').textContent = data.totalTime + '分钟';
+      document.getElementById('r-dist').textContent = data.distance + '公里';
+      document.getElementById('r-score').textContent = (data.scores.culture || 80) + '%';
+    }
+    
+    function focusStop(index) {
+      const marker = markers[index];
+      if (marker) {
+        map.setView(marker.getLatLng(), 18);
+        marker.openPopup();
+      }
+    }
+    
+    // 页面加载完成后执行
+    loadRoute();
   </script>
 </body>
 </html>
