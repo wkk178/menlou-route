@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>交互式导览图 | 门楼层记·故事里</title>
+  <title>西四北三条智能导览 | 门楼层记·故事里</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
@@ -18,13 +20,10 @@
     .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;overflow: hidden;}
+    .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
+    #map{width: 100%;height: 100%;z-index: 1;}
     
-    /* SVG导览图容器 */
-    #alley-svg{width: 100%;height: 100%;background: radial-gradient(circle at center, #faf8f5 0%, #f0ebe3 100%);}
-    
-    /* 侧边控制面板 */
-    .map-controls{position: absolute;top: 20px;right: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 100;max-height: calc(100vh - 140px);overflow-y: auto;}
+    .map-controls{position: absolute;top: 20px;right: 20px;width: 340px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 8px 0;font-size: 14px;}
@@ -38,22 +37,17 @@
     .stop-info h5{font-size: 15px;margin-bottom: 3px;font-weight: 600;}
     .stop-info p{font-size: 12px;color: #666;}
     
-    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 12px 16px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 100;font-size: 12px;}
+    .compass{position: absolute;top: 20px;left: 20px;width: 60px;height: 60px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;display: flex;align-items: center;justify-content: center;cursor: pointer;transition: 0.3s;}
+    .compass:hover{transform: scale(1.1);}
+    .compass-inner{width: 50px;height: 50px;position: relative;}
+    .compass-n{position: absolute;top: 0;left: 50%;transform: translateX(-50%);font-weight: bold;color: #c0392b;font-size: 14px;}
+    .compass-s{position: absolute;bottom: 0;left: 50%;transform: translateX(-50%);color: #666;font-size: 10px;}
+    .compass-arrow{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 0;height: 0;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 20px solid #c0392b;}
+    .compass-arrow::after{content: '';position: absolute;top: 6px;left: -4px;width: 0;height: 0;border-left: 4px solid transparent;border-right: 4px solid transparent;border-bottom: 10px solid white;}
+    
+    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 12px 16px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;font-size: 12px;}
     .legend-item{display: flex;align-items: center;gap: 8px;margin: 5px 0;}
     .dot{width: 14px;height: 14px;border-radius: 50%;}
-    
-    /* SVG元素样式 */
-    .alley-path{fill: none;stroke: #d4cfc7;stroke-width: 24;stroke-linecap: round;}
-    .alley-line{fill: none;stroke: #e8e4dc;stroke-width: 2;stroke-dasharray: 6,4;}
-    .node-circle{fill: var(--door-gray);stroke: white;stroke-width: 3;cursor: pointer;transition: 0.3s;}
-    .node-circle.culture{fill: var(--brick-green);}
-    .node-circle.business{fill: var(--accent-gold);}
-    .node-circle:hover{transform: scale(1.2);stroke-width: 4;}
-    .node-label{font-size: 12px;font-weight: 600;fill: #2C2420;pointer-events: none;text-anchor: middle;}
-    .node-door{font-size: 10px;fill: #666;pointer-events: none;text-anchor: middle;}
-    .route-path{fill: none;stroke: #6B5B4F;stroke-width: 4;stroke-linecap: round;stroke-linejoin: round;stroke-dasharray: 8,6;opacity: 0.9;}
-    .direction-arrow{fill: #6B5B4F;}
-    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.9);border-radius: 50%;box-shadow: 0 2px 8px rgba(0,0,0,0.1);display: flex;align-items: center;justify-content: center;font-weight: bold;color: #c0392b;z-index: 100;}
     
     @media (max-width: 768px){
       .navbar{padding: 12px 15px;}
@@ -63,6 +57,8 @@
       .nav-links a{padding: 6px 8px;font-size: 12px;}
       .map-wrapper{margin-top: 90px;height: calc(100vh - 90px);}
       .map-controls{width: 90%;right: 5%;top: auto;bottom: 20px;max-height: 40vh;}
+      .compass{width: 50px;height: 50px;top: 15px;left: 15px;}
+      .compass-inner{width: 40px;height: 40px;}
     }
   </style>
 </head>
@@ -85,112 +81,143 @@
   </nav>
   
   <div class="map-wrapper">
-    <!-- SVG导览图 -->
-    <svg id="alley-svg" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/>
-        </filter>
-      </defs>
-      
-      <!-- 胡同基底路径 -->
-      <path id="alley-bg" class="alley-path" d="M 120 200 Q 300 180 500 210 T 880 190" />
-      <path id="alley-center" class="alley-line" d="M 120 200 Q 300 180 500 210 T 880 190" />
-      
-      <!-- 路线层 -->
-      <g id="route-layer"></g>
-      
-      <!-- 节点层 -->
-      <g id="nodes-layer"></g>
-    </svg>
+    <div id="map"></div>
     
-    <div class="compass">N</div>
+    <div class="compass" onclick="resetMap()" title="点击复位地图">
+      <div class="compass-inner">
+        <div class="compass-n">N</div>
+        <div class="compass-s">S</div>
+        <div class="compass-arrow"></div>
+      </div>
+    </div>
     
     <div class="map-controls">
-      <h3 class="control-title">📍 路线详情</h3>
+      <h3 class="control-title">📍 智能路线规划</h3>
       <div class="info-box">
         <div class="info-row"><span>⏱ 预计时长</span><span class="info-val" id="r-time">--</span></div>
         <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
         <div class="info-row"><span>📊 文化指数</span><span class="info-val" id="r-score">--</span></div>
       </div>
-      <h4 style="font-size:14px;margin-bottom:12px;color:#666;font-weight:600;">途经站点</h4>
+      <h4 style="font-size:14px;margin-bottom:12px;color:#666;font-weight:600;">途经门楼</h4>
       <ul class="stop-list" id="stop-list"></ul>
     </div>
     
     <div class="legend">
       <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>文化景点 (读门/推门)</span></div>
       <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业体验 (创门)</span></div>
+      <div class="legend-item"><div class="dot" style="background:#6B5B4F;"></div><span>推荐路线</span></div>
     </div>
   </div>
 
   <script>
-    // 节点数据：X坐标严格按门牌号比例映射 (东120 -> 西880)
-    // 依据您提供的《门牌号与门楼形制对照表》精准排布
-    const nodes = [
-      {id:"N1",name:"隆长寺山门",door:"3号",theme:"读门",type:"文化",stay:15,x:140,y:200,tags:["architecture","history"],desc:"明代圣祚隆长寺旧址"},
-      {id:"N2",name:"广亮大门展",door:"27号",theme:"读门",type:"文化",stay:10,x:360,y:192,tags:["architecture"],desc:"高级官宦宅门，门簪四枚"},
-      {id:"N3",name:"程砚秋故居",door:"39号",theme:"推门",type:"文化",stay:20,x:500,y:208,tags:["history","photo"],desc:"程砚秋先生居住21年"},
-      {id:"N4",name:"开放院落A",door:"45号",theme:"推门",type:"文化",stay:15,x:580,y:202,tags:["history"],desc:"居民口述历史，随墙门"},
-      {id:"N5",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30,x:300,y:196,tags:["food","shopping"],desc:"一院一茗特调茶"},
-      {id:"N6",name:"京剧体验馆",door:"15号",theme:"创门",type:"商业",stay:40,x:220,y:188,tags:["handcraft","photo"],desc:"御霜雅集主题"},
-      {id:"N7",name:"手作工坊",door:"50号",theme:"创门",type:"商业",stay:35,x:640,y:205,tags:["handcraft"],desc:"砖雕拓印体验"},
-      {id:"N8",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25,x:540,y:206,tags:["shopping","history"],desc:"门楼主题文创"},
-      {id:"N9",name:"胡同夜市",door:"54号",theme:"创门",type:"商业",stay:30,x:700,y:201,tags:["food","photo"],desc:"胡同小吃摊位"}
+    // 精准坐标计算 - 基于两个GPS锚点
+    const EAST_ANCHOR = {lat: 39.927887, lng: 116.372587, door: 3, name: "隆长寺"}; // 东端
+    const WEST_ANCHOR = {lat: 39.927784, lng: 116.367239, door: 56, name: "西口"};   // 西端
+    
+    // 根据门牌号线性插值计算坐标
+    function calcCoordByDoor(doorNum) {
+      const ratio = (doorNum - EAST_ANCHOR.door) / (WEST_ANCHOR.door - EAST_ANCHOR.door);
+      const lat = EAST_ANCHOR.lat + (WEST_ANCHOR.lat - EAST_ANCHOR.lat) * ratio;
+      const lng = EAST_ANCHOR.lng + (WEST_ANCHOR.lng - EAST_ANCHOR.lng) * ratio;
+      return {lat, lng};
+    }
+    
+    // 完整节点数据（根据对照表）
+    const allNodes = [
+      {id:"N1",name:"隆长寺山门",door:"3号",theme:"读门",type:"文化",stay:15,...calcCoordByDoor(3),tags:["architecture","history"],desc:"明代圣祚隆长寺旧址，存有乾隆诗碑",interfere:0.2},
+      {id:"N2",name:"广亮大门展",door:"11号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(11),tags:["architecture"],desc:"广亮大门，门簪四枚雕牡丹",interfere:0.25},
+      {id:"N3",name:"金柱大门",door:"13号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(13),tags:["architecture"],desc:"金柱大门，等级仅次于广亮大门",interfere:0.25},
+      {id:"N4",name:"广亮大门",door:"15号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(15),tags:["architecture"],desc:"广亮大门，高级官宦宅门",interfere:0.25},
+      {id:"N5",name:"广亮大门",door:"27号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(27),tags:["architecture"],desc:"广亮大门，对照表重要门楼",interfere:0.25},
+      {id:"N6",name:"程砚秋故居",door:"39号",theme:"推门",type:"文化",stay:20,...calcCoordByDoor(39),tags:["history","photo"],desc:"京剧大师程砚秋居住21年",interfere:0.3},
+      {id:"N7",name:"广亮大门",door:"33号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(33),tags:["architecture"],desc:"广亮大门，保存完好",interfere:0.25},
+      {id:"N8",name:"金柱大门",door:"35号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(35),tags:["architecture"],desc:"金柱大门，砖雕精美",interfere:0.25},
+      {id:"N9",name:"金柱大门",door:"44号",theme:"读门",type:"文化",stay:10,...calcCoordByDoor(44),tags:["architecture"],desc:"金柱大门，门楼形制完整",interfere:0.25},
+      {id:"N10",name:"拾光茶铺",door:"21号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(21),tags:["food","shopping"],desc:"一院一茗特调茶",interfere:0.1},
+      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门",type:"商业",stay:40,...calcCoordByDoor(17),tags:["handcraft","photo"],desc:"御霜雅集主题",interfere:0.15},
+      {id:"N12",name:"手作工坊",door:"45号",theme:"创门",type:"商业",stay:35,...calcCoordByDoor(45),tags:["handcraft"],desc:"砖雕拓印体验",interfere:0.1},
+      {id:"N13",name:"故事书店",door:"43号",theme:"创门",type:"商业",stay:25,...calcCoordByDoor(43),tags:["shopping","history"],desc:"门楼主题文创",interfere:0.05},
+      {id:"N14",name:"胡同夜市",door:"50号",theme:"创门",type:"商业",stay:30,...calcCoordByDoor(50),tags:["food","photo"],desc:"胡同小吃摊位",interfere:0.35}
     ];
     
+    let map, routeLine, markers = [];
     let currentRoute = [];
-    let routePathEl = null;
     
-    // 初始化SVG导览图
-    function initMap() {
-      const nodesLayer = document.getElementById('nodes-layer');
-      const routeLayer = document.getElementById('route-layer');
+    // 使用高德地图风格的瓦片源
+    map = L.map('map', {
+      center: [39.927835, 116.369913],
+      zoom: 17.5,
+      zoomControl: false,
+      minZoom: 16,
+      maxZoom: 19,
+      attributionControl: false
+    });
+    
+    // 高德地图风格瓦片（CartoDB Positron - 清晰简洁）
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+    
+    L.control.zoom({position: 'topright'}).addTo(map);
+    L.control.attribution({position: 'bottomright', prefix: ''}).addTo(map);
+    
+    function resetMap() {
+      map.setView([39.927835, 116.369913], 17.5, {animate: true, duration: 0.5});
+    }
+    
+    function createMarkerIcon(node, index, isRoute = false) {
+      const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
+      const borderColor = isRoute ? '#c0392b' : color;
       
-      // 绘制节点
-      nodes.forEach(node => {
-        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute('class', 'node-group');
-        g.setAttribute('data-id', node.id);
-        g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
-        g.style.cursor = 'pointer';
-        
-        // 圆形标记
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute('r', '14');
-        circle.setAttribute('class', `node-circle ${node.type === '文化' ? 'culture' : 'business'}`);
-        circle.setAttribute('filter', 'url(#shadow)');
-        
-        // 门牌号
-        const doorText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        doorText.setAttribute('y', '30');
-        doorText.setAttribute('class', 'node-door');
-        doorText.textContent = node.door;
-        
-        // 名称标签
-        const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        nameText.setAttribute('y', '-22');
-        nameText.setAttribute('class', 'node-label');
-        nameText.textContent = node.name;
-        
-        g.appendChild(circle);
-        g.appendChild(nameText);
-        g.appendChild(doorText);
-        
-        // 点击事件
-        g.addEventListener('click', () => focusNode(node.id));
-        g.addEventListener('mouseenter', () => {
-          circle.setAttribute('r', '16');
-          circle.setAttribute('stroke-width', '4');
-        });
-        g.addEventListener('mouseleave', () => {
-          circle.setAttribute('r', '14');
-          circle.setAttribute('stroke-width', '3');
-        });
-        
-        nodesLayer.appendChild(g);
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+            <div style="
+              background:${color};
+              width:${isRoute ? '36px' : '28px'};
+              height:${isRoute ? '36px' : '28px'};
+              border-radius:50%;
+              border:${isRoute ? '4px' : '3px'} solid ${borderColor};
+              box-shadow:0 3px 10px rgba(0,0,0,0.3);
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              color:white;
+              font-weight:bold;
+              font-size:${isRoute ? '16px' : '12px'};
+              z-index:2;
+              transition: all 0.3s;
+            ">${isRoute ? index+1 : ''}</div>
+            <div style="
+              background:white;
+              padding:3px 8px;
+              border-radius:8px;
+              box-shadow:0 2px 6px rgba(0,0,0,0.15);
+              font-size:11px;
+              font-weight:600;
+              color:#2C2420;
+              margin-top:3px;
+              white-space:nowrap;
+              z-index:1;
+              max-width:120px;
+              overflow:hidden;
+              text-overflow:ellipsis;
+            ">${node.name}</div>
+            <div style="
+              font-size:10px;
+              color:#666;
+              margin-top:1px;
+              font-weight:500;
+            ">${node.door}</div>
+          </div>
+        `,
+        iconSize: [100, 60],
+        iconAnchor: [50, 30],
+        popupAnchor: [0, -30]
       });
-      
-      loadRoute();
     }
     
     function loadRoute() {
@@ -200,95 +227,77 @@
         try { routeData = JSON.parse(data); } catch(e) { console.warn("使用默认路线"); }
       }
       if (!routeData || !routeData.route) {
-        routeData = { route: [nodes[0], nodes[2], nodes[1], nodes[4], nodes[7]], totalTime: 100, distance: 0.85, scores: {culture: 75, business: 25, resident: 85} };
+        // 默认路线：从东到西，包含重要门楼
+        routeData = { 
+          route: [allNodes[0], allNodes[4], allNodes[6], allNodes[5], allNodes[9], allNodes[12]], 
+          totalTime: 110, 
+          distance: 0.65, 
+          scores: {culture: 75, business: 25, resident: 85} 
+        };
       }
       currentRoute = routeData.route;
       renderRoute(currentRoute);
       updateInfo(routeData);
+      
+      // 自动适应视野
+      if (currentRoute.length > 0) {
+        const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
+        map.fitBounds(bounds, {padding: [80, 80], maxZoom: 18});
+      }
     }
     
     function renderRoute(routeNodes) {
-      const routeLayer = document.getElementById('route-layer');
-      routeLayer.innerHTML = '';
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      if (routeLine) map.removeLayer(routeLine);
       
-      if (routeNodes.length < 2) return;
-      
-      // 生成路线路径数据
-      let d = `M ${routeNodes[0].x} ${routeNodes[0].y}`;
-      for (let i = 1; i < routeNodes.length; i++) {
-        d += ` L ${routeNodes[i].x} ${routeNodes[i].y}`;
-      }
-      
-      // 绘制路线
-      routePathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      routePathEl.setAttribute('d', d);
-      routePathEl.setAttribute('class', 'route-path');
-      routeLayer.appendChild(routePathEl);
-      
-      // 绘制方向箭头
-      for (let i = 0; i < routeNodes.length - 1; i++) {
-        const midX = (routeNodes[i].x + routeNodes[i+1].x) / 2;
-        const midY = (routeNodes[i].y + routeNodes[i+1].y) / 2;
-        const arrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-        const angle = Math.atan2(routeNodes[i+1].y - routeNodes[i].y, routeNodes[i+1].x - routeNodes[i].x);
-        const size = 6;
-        const pts = [
-          `${midX + size*Math.cos(angle)},${midY + size*Math.sin(angle)}`,
-          `${midX - size*Math.cos(angle-0.5)},${midY - size*Math.sin(angle-0.5)}`,
-          `${midX - size*Math.cos(angle+0.5)},${midY - size*Math.sin(angle+0.5)}`
-        ].join(' ');
-        arrow.setAttribute('points', pts);
-        arrow.setAttribute('class', 'direction-arrow');
-        routeLayer.appendChild(arrow);
-      }
-      
-      // 高亮路线上的节点
-      document.querySelectorAll('.node-group').forEach(g => {
-        const id = g.getAttribute('data-id');
-        const circle = g.querySelector('circle');
-        if (routeNodes.find(n => n.id === id)) {
-          circle.setAttribute('stroke', '#fff');
-          circle.setAttribute('stroke-width', '4');
-        } else {
-          circle.setAttribute('opacity', '0.4');
-        }
-      });
-      
-      // 更新侧边栏
-      updateSidebar(routeNodes);
-    }
-    
-    function updateSidebar(routeNodes) {
+      const latlngs = [];
       const listEl = document.getElementById('stop-list');
       listEl.innerHTML = '';
+      
       routeNodes.forEach((node, i) => {
+        const isRoute = true;
+        const icon = createMarkerIcon(node, i, isRoute);
+        const marker = L.marker([node.lat, node.lng], {icon: icon}).addTo(map);
+        
+        marker.bindPopup(`
+          <div style="padding:8px;min-width:200px;">
+            <div style="font-weight:bold;font-size:16px;margin-bottom:8px;color:#6B5B4F;">${node.name}（${node.door}）</div>
+            <div style="font-size:13px;margin-bottom:6px;">
+              <span style="background:#f0ebe3;padding:3px 10px;border-radius:12px;margin-right:5px;font-weight:500;">${node.theme}</span>
+              <span style="background:#f0ebe3;padding:3px 10px;border-radius:12px;font-weight:500;">${node.type}</span>
+            </div>
+            <div style="font-size:12px;color:#666;margin-bottom:6px;">⏱ 建议停留：${node.stay}分钟</div>
+            <div style="font-size:13px;line-height:1.6;color:#333;">${node.desc || ''}</div>
+            <div style="margin-top:8px;">
+              ${(node.tags || []).map(t => `<span style="background:#e8e4dc;padding:2px 8px;border-radius:6px;font-size:11px;margin-right:4px;display:inline-block;margin-bottom:3px;">${t}</span>`).join('')}
+            </div>
+          </div>
+        `, {maxWidth: 280});
+        
+        markers.push(marker);
+        latlngs.push([node.lat, node.lng]);
+        
         listEl.innerHTML += `
-          <li class="stop-item" onclick="focusNode('${node.id}')">
+          <li class="stop-item" onclick="focusStop(${i})">
             <div class="stop-num">${i+1}</div>
             <div class="stop-info">
-              <h5>${node.name} (${node.door})</h5>
+              <h5>${node.name}（${node.door}）</h5>
               <p>${node.theme} · ${node.stay}分钟</p>
             </div>
           </li>
         `;
       });
-    }
-    
-    function focusNode(id) {
-      const node = nodes.find(n => n.id === id);
-      if (!node) return;
       
-      // 高亮侧边栏
-      document.querySelectorAll('.stop-item').forEach(el => el.classList.remove('active'));
-      const items = document.querySelectorAll('.stop-item');
-      const index = currentRoute.findIndex(n => n.id === id);
-      if (index !== -1 && items[index]) items[index].classList.add('active');
-      
-      // 节点跳动动画
-      const g = document.querySelector(`.node-group[data-id="${id}"]`);
-      if (g) {
-        g.style.transform = `translate(${node.x}px, ${node.y}px) scale(1.3)`;
-        setTimeout(() => g.style.transform = `translate(${node.x}px, ${node.y}px) scale(1)`, 300);
+      if (latlngs.length > 1) {
+        routeLine = L.polyline(latlngs, {
+          color: '#6B5B4F',
+          weight: 5,
+          opacity: 0.9,
+          dashArray: '12, 8',
+          lineCap: 'round',
+          lineJoin: 'round'
+        }).addTo(map);
       }
     }
     
@@ -298,8 +307,19 @@
       document.getElementById('r-score').textContent = (data.scores.culture || 80) + '%';
     }
     
-    // 启动
-    window.addEventListener('load', initMap);
+    function focusStop(index) {
+      const marker = markers[index];
+      if (marker) {
+        map.setView(marker.getLatLng(), 18, {animate: true, duration: 0.5});
+        marker.openPopup();
+        document.querySelectorAll('.stop-item').forEach((el, i) => {
+          el.classList.toggle('active', i === index);
+        });
+      }
+    }
+    
+    // 页面加载
+    loadRoute();
   </script>
 </body>
 </html>
