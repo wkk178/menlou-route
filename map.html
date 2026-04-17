@@ -23,7 +23,7 @@
     .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;}
     
-    .map-controls{position: absolute;top: 20px;right: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
+    .map-controls{position: absolute;top: 20px;right: 20px;width: 300px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 8px 0;font-size: 14px;}
@@ -109,120 +109,76 @@
   </div>
 
   <script>
-    // 精准坐标 - 基于您提供的真实 GPS 数据校准
-    // 隆长寺 (3 号): 39.927887, 116.372587 (东端)
-    // 程砚秋故居 (39 号): 39.927811, 116.367759 (西端)
-    // 按门牌号线性分布校准所有节点
+    // 严格基于门牌号分布与您提供的GPS锚点校准
     const nodes = [
-      {id:"N1",name:"隆长寺山门 (3 号)",theme:"读门",type:"文化",stay:15,lat:39.927887,lng:116.372587,tags:["architecture","history"],desc:"明代圣祚隆长寺旧址，存有乾隆诗碑"},
-      {id:"N2",name:"广亮大门展 (27 号)",theme:"读门",type:"文化",stay:10,lat:39.927845,lng:116.370850,tags:["architecture"],desc:"高级官宦宅门，门簪四枚雕牡丹"},
-      {id:"N3",name:"程砚秋故居 (39 号)",theme:"推门",type:"文化",stay:20,lat:39.927811,lng:116.367759,tags:["history","photo"],desc:"京剧大师程砚秋居住 21 年，手植石榴树"},
-      {id:"N4",name:"开放院落 A (45 号)",theme:"推门",type:"文化",stay:15,lat:39.927795,lng:116.369200,tags:["history"],desc:"居民口述历史，砖雕墀头保存完好"},
-      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.927780,lng:116.368500,tags:["food","shopping"],desc:"一院一茗特调茶，可翻阅故事集"},
-      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.927830,lng:116.371200,tags:["handcraft","photo"],desc:"御霜雅集主题，戏服旅拍体验"},
-      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.927770,lng:116.367900,tags:["handcraft"],desc:"砖雕拓印、拼豆制作、脸谱绘制"},
-      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.927760,lng:116.367400,tags:["shopping","history"],desc:"门楼主题文创、故事集零售"},
-      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.927750,lng:116.367000,tags:["food","photo"],desc:"胡同小吃、手作摊位、露天电影"}
+      {id:"N1",name:"隆长寺山门 (3号)",theme:"读门",type:"文化",stay:15,lat:39.927887,lng:116.372587,tags:["architecture","history"],desc:"明代圣祚隆长寺旧址"},
+      {id:"N2",name:"广亮大门展 (27号)",theme:"读门",type:"文化",stay:10,lat:39.927852,lng:116.371150,tags:["architecture"],desc:"高级官宦宅门，门簪四枚"},
+      {id:"N3",name:"程砚秋故居 (39号)",theme:"推门",type:"文化",stay:20,lat:39.927811,lng:116.367759,tags:["history","photo"],desc:"京剧大师程砚秋居住21年"},
+      {id:"N4",name:"开放院落A (45号)",theme:"推门",type:"文化",stay:15,lat:39.927798,lng:116.366920,tags:["history"],desc:"居民口述历史"},
+      {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.927865,lng:116.370450,tags:["food","shopping"],desc:"一院一茗特调茶"},
+      {id:"N6",name:"京剧体验馆",theme:"创门",type:"商业",stay:40,lat:39.927840,lng:116.369600,tags:["handcraft","photo"],desc:"御霜雅集主题"},
+      {id:"N7",name:"手作工坊",theme:"创门",type:"商业",stay:35,lat:39.927785,lng:116.368800,tags:["handcraft"],desc:"砖雕拓印体验"},
+      {id:"N8",name:"故事书店",theme:"创门",type:"商业",stay:25,lat:39.927775,lng:116.367900,tags:["shopping","history"],desc:"门楼主题文创"},
+      {id:"N9",name:"胡同夜市",theme:"创门",type:"商业",stay:30,lat:39.927760,lng:116.366400,tags:["food","photo"],desc:"胡同小吃摊位"}
     ];
     
     let map, routeLine, markers = [];
     let currentRoute = [];
     
-    // 初始化地图：精准定位西四北三条
+    // 初始化地图：精准锁定西四北三条核心段
     map = L.map('map', {
-      center: [39.927820, 116.370200],
-      zoom: 17,
+      center: [39.927825, 116.369800],
+      zoom: 17.5,
       zoomControl: false,
       minZoom: 16,
-      maxZoom: 19
+      maxZoom: 19,
+      attributionControl: false
     });
     
-    // 使用高清地图源
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
+    // 使用高对比度地图源，清晰显示胡同肌理
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap & CARTO',
+      subdomains: 'abcd',
       maxZoom: 19
     }).addTo(map);
     
     L.control.zoom({position: 'topright'}).addTo(map);
+    L.control.attribution({position: 'bottomright', prefix: ''}).addTo(map);
     
     function resetMap() {
-      map.setView([39.927820, 116.370200], 17, {animate: true, duration: 0.5});
+      map.setView([39.927825, 116.369800], 17.5, {animate: true, duration: 0.5});
     }
     
     function createMarkerIcon(node, index) {
       const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
-      
       return L.divIcon({
         className: 'custom-marker',
         html: `
           <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-            <div style="
-              background:${color};
-              width:34px;
-              height:34px;
-              border-radius:50%;
-              border:3px solid white;
-              box-shadow:0 3px 10px rgba(0,0,0,0.3);
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              color:white;
-              font-weight:bold;
-              font-size:15px;
-              z-index:2;
-            ">${index + 1}</div>
-            <div style="
-              background:white;
-              padding:3px 8px;
-              border-radius:8px;
-              box-shadow:0 2px 6px rgba(0,0,0,0.15);
-              font-size:12px;
-              font-weight:600;
-              color:#2C2420;
-              margin-top:4px;
-              white-space:nowrap;
-              z-index:1;
-              max-width:120px;
-              overflow:hidden;
-              text-overflow:ellipsis;
-            ">${node.name.split('(')[0].trim()}</div>
+            <div style="background:${color};width:32px;height:32px;border-radius:50%;border:3px solid white;box-shadow:0 3px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;z-index:2;">${index+1}</div>
+            <div style="background:white;padding:2px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);font-size:11px;font-weight:600;color:#2C2420;margin-top:3px;white-space:nowrap;z-index:1;max-width:110px;overflow:hidden;text-overflow:ellipsis;">${node.name.split('(')[0].trim()}</div>
           </div>
         `,
-        iconSize: [100, 50],
-        iconAnchor: [50, 25],
-        popupAnchor: [0, -25]
+        iconSize: [90, 45],
+        iconAnchor: [45, 22],
+        popupAnchor: [0, -22]
       });
     }
     
     function loadRoute() {
       const data = localStorage.getItem('routeData');
       let routeData = null;
-      
       if (data) {
-        try {
-          routeData = JSON.parse(data);
-        } catch(e) {
-          console.warn("使用默认路线");
-        }
+        try { routeData = JSON.parse(data); } catch(e) { console.warn("使用默认路线"); }
       }
-      
       if (!routeData || !routeData.route) {
-        routeData = {
-          route: [nodes[0], nodes[2], nodes[1], nodes[4], nodes[7]],
-          totalTime: 100,
-          distance: 0.9,
-          scores: {culture: 75, business: 25, resident: 85}
-        };
+        routeData = { route: [nodes[0], nodes[2], nodes[1], nodes[4], nodes[7]], totalTime: 100, distance: 0.85, scores: {culture: 75, business: 25, resident: 85} };
       }
-      
       currentRoute = routeData.route;
       renderRoute(currentRoute);
       updateInfo(routeData);
-      
-      // 自动适应视野
       if (currentRoute.length > 0) {
-        const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
-        map.fitBounds(bounds, {padding: [60, 60], maxZoom: 18});
+        map.fitBounds(L.latLngBounds(currentRoute.map(n => [n.lat, n.lng])), {padding: [50, 50], maxZoom: 18});
       }
     }
     
@@ -238,42 +194,14 @@
       routeNodes.forEach((node, i) => {
         const icon = createMarkerIcon(node, i);
         const marker = L.marker([node.lat, node.lng], {icon: icon}).addTo(map);
-        
-        marker.bindPopup(`
-          <div style="padding:5px;min-width:180px;">
-            <div style="font-weight:bold;font-size:15px;margin-bottom:6px;color:#6B5B4F;">${node.name}</div>
-            <div style="font-size:12px;margin-bottom:4px;">
-              <span style="background:#f0ebe3;padding:2px 6px;border-radius:8px;margin-right:3px;">${node.theme}</span>
-              <span style="background:#f0ebe3;padding:2px 6px;border-radius:8px;">${node.type}</span>
-            </div>
-            <div style="font-size:11px;color:#666;">⏱ ${node.stay}分钟</div>
-            <div style="font-size:12px;line-height:1.4;margin-top:5px;">${node.desc || ''}</div>
-          </div>
-        `, {maxWidth: 220});
-        
+        marker.bindPopup(`<div style="padding:5px;min-width:160px;"><b>${node.name}</b><br><span style="font-size:12px;color:#666;">${node.theme} | ${node.stay}分钟</span><br><span style="font-size:12px;">${node.desc||''}</span></div>`, {maxWidth: 200});
         markers.push(marker);
         latlngs.push([node.lat, node.lng]);
-        
-        listEl.innerHTML += `
-          <li class="stop-item" onclick="focusStop(${i})">
-            <div class="stop-num">${i+1}</div>
-            <div class="stop-info">
-              <h5>${node.name}</h5>
-              <p>${node.theme} · ${node.stay}分钟</p>
-            </div>
-          </li>
-        `;
+        listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.theme} · ${node.stay}分钟</p></div></li>`;
       });
       
       if (latlngs.length > 1) {
-        routeLine = L.polyline(latlngs, {
-          color: '#6B5B4F',
-          weight: 4,
-          opacity: 0.85,
-          dashArray: '10, 8',
-          lineCap: 'round',
-          lineJoin: 'round'
-        }).addTo(map);
+        routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 4, opacity: 0.85, dashArray: '10, 8', lineCap: 'round', lineJoin: 'round'}).addTo(map);
       }
     }
     
@@ -288,9 +216,7 @@
       if (marker) {
         map.setView(marker.getLatLng(), 18, {animate: true, duration: 0.5});
         marker.openPopup();
-        document.querySelectorAll('.stop-item').forEach((el, i) => {
-          el.classList.toggle('active', i === index);
-        });
+        document.querySelectorAll('.stop-item').forEach((el, i) => el.classList.toggle('active', i === index));
       }
     }
     
