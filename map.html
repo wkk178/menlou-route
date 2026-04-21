@@ -1,251 +1,256 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>西四北三条智能导览 | 门楼层记·故事里</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
-        *{margin: 0;padding: 0;box-sizing: border-box;}
-        body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);}
-        
-        /* 导航栏样式保持原样 */
-        .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
-        .logo-container{display: flex;align-items: center;gap: 15px;}
-        .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
-        .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
-        .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
-        .nav-links{display: flex;gap: 30px;}
-        .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
-        .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
-        
-        /* 地图及UI布局保持原样 */
-        .map-wrapper{margin-top: 100px;height: calc(100vh - 100px);position: relative;}
-        #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0;}
-        
-        .map-controls{position: absolute;top: 20px;right: 20px;width: 340px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
-        .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
-        .info-box{background: var(--bg-cream);padding: 15px;border-radius: 10px;margin-bottom: 15px;}
-        .info-row{display: flex;justify-content: space-between;margin: 8px 0;font-size: 14px;}
-        .info-val{font-weight: bold;color: var(--brick-green);}
-        
-        /* 列表项样式 */
-        .stop-list{list-style: none;}
-        .stop-item{display: flex;align-items: center;gap: 10px;padding: 12px;margin-bottom: 8px;background: white;border-radius: 10px;border-left: 4px solid var(--accent-gold);cursor: pointer;transition: 0.2s;}
-        .stop-item:hover{transform: translateX(5px);box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
-        .stop-item.active{background: var(--bg-cream);border-left-color: var(--door-gray);}
-        .stop-num{width: 28px;height: 28px;background: var(--door-gray);color: white;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 13px;font-weight: bold;flex-shrink: 0;}
-        .stop-item.active .stop-num{background: var(--accent-gold);}
-        .stop-info h5{font-size: 15px;margin-bottom: 3px;font-weight: 600;}
-        .stop-info p{font-size: 12px;color: #666;}
-        
-        /* 罗盘与图例保持原样 */
-        .compass{position: absolute;top: 20px;left: 20px;width: 60px;height: 60px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;display: flex;align-items: center;justify-content: center;cursor: pointer;transition: 0.3s;}
-        .compass-inner{width: 50px;height: 50px;position: relative;}
-        .compass-n{position: absolute;top: 0;left: 50%;transform: translateX(-50%);font-weight: bold;color: #c0392b;font-size: 14px;}
-        .compass-arrow{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 0;height: 0;border-left: 8px solid transparent;border-right: 8px solid transparent;border-bottom: 20px solid #c0392b;}
-        
-        .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 12px 16px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;font-size: 12px;}
-        .legend-item{display: flex;align-items: center;gap: 8px;margin: 5px 0;}
-        .dot{width: 14px;height: 14px;border-radius: 50%;}
-        
-        .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);text-align: center;z-index: 1000;background: rgba(255,255,255,0.9);padding: 30px;border-radius: 12px;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字导览 | 门楼层记·故事里</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
+    *{margin: 0;padding: 0;box-sizing: border-box;}
+    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden;}
+    
+    /* 导航栏 */
+    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+    .logo-container{display: flex;align-items: center;gap: 15px;}
+    .logo-placeholder{width: 50px;height: 50px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 10px;display: flex;align-items: center;justify-content: center;font-size: 28px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+    .brand-text h1{font-size: 20px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
+    .nav-links{display: flex;gap: 20px;}
+    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;padding: 8px 16px;border-radius: 8px;transition: 0.3s;}
+    .nav-links a:hover, .nav-links a.active{background: var(--door-gray);color: var(--white);}
+    
+    /* 地图容器 */
+    .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
+    #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0;}
+    
+    /* 侧边控制面板 */
+    .map-controls{position: absolute;top: 20px;right: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 140px);overflow-y: auto;}
+    .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
+    .info-box{background: var(--bg-cream);padding: 12px;border-radius: 10px;margin-bottom: 15px;}
+    .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 13px;}
+    .info-val{font-weight: bold;color: var(--brick-green);}
+    
+    /* 路线列表样式 */
+    .stop-list{list-style: none;}
+    .stop-item{display: flex;align-items: center;gap: 10px;padding: 10px;margin-bottom: 8px;background: white;border-radius: 8px;border-left: 4px solid var(--accent-gold);cursor: pointer;transition: 0.2s;box-shadow: 0 2px 6px rgba(0,0,0,0.05);}
+    .stop-item:hover{transform: translateX(5px);box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
+    .stop-item.active{background: var(--bg-cream);border-left-color: var(--door-gray);}
+    .stop-num{width: 24px;height: 24px;background: var(--door-gray);color: white;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 12px;font-weight: bold;flex-shrink: 0;}
+    .stop-item.active .stop-num{background: var(--accent-gold);}
+    .stop-info h5{font-size: 14px;margin-bottom: 2px;font-weight: 600;}
+    .stop-info p{font-size: 11px;color: #666;}
+    
+    /* 罗盘与图例 */
+    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;display: flex;align-items: center;justify-content: center;cursor: pointer;transition: 0.3s;}
+    .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
 
-        @media (max-width: 768px){
-            .map-controls{width: 90%;right: 5%;top: auto;bottom: 20px;max-height: 40vh;}
-        }
-    </style>
+    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;font-size: 11px;}
+    .legend-item{display: flex;align-items: center;gap: 6px;margin: 4px 0;}
+    .dot{width: 12px;height: 12px;border-radius: 50%;}
+    
+    .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;box-shadow: 0 4px 20px rgba(0,0,0,0.1);}
+
+    @media (max-width: 768px){
+      .navbar{padding: 10px 20px;}
+      .map-controls{width: 90%; right: 5%; bottom: 20px; top: auto; max-height: 35vh;}
+      .nav-links{display: none;}
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo-container">
-            <div class="logo-placeholder">🏮</div>
-            <div class="brand-text">
-                <h1>门楼里</h1>
-                <p>层记西四·阅见古今</p>
-            </div>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">首页</a>
-            <a href="quiz.html">智能推荐</a>
-            <a href="map.html" class="active">地图</a>
-            <a href="route.html">我的路线</a>
-            <a href="about.html">项目介绍</a>
-        </div>
-    </nav>
-    
-    <div class="map-wrapper">
-        <div id="map">
-            <div class="loading" id="loading">正在加载数字门楼地图...</div>
-        </div>
-        
-        <div class="compass" onclick="resetMap()" title="点击复位地图">
-            <div class="compass-inner">
-                <div class="compass-n">N</div>
-                <div class="compass-arrow"></div>
-            </div>
-        </div>
-        
-        <div class="map-controls">
-            <h3 class="control-title">📍 活态导览动线</h3>
-            <div class="info-box">
-                <div class="info-row"><span>⏱ 漫步时长</span><span class="info-val" id="r-time">--</span></div>
-                <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
-                <div class="info-row"><span>📊 文化厚度</span><span class="info-val" id="r-score">--</span></div>
-            </div>
-            <h4 style="font-size:14px;margin-bottom:12px;color:#666;font-weight:600;">当前路径节点</h4>
-            <ul class="stop-list" id="stop-list"></ul>
-        </div>
-        
-        <div class="legend">
-            <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>读门·寻古 (建筑地层)</span></div>
-            <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>创门·共生 (商业体验)</span></div>
-            <div class="legend-item"><div class="dot" style="background:#6B5B4F;"></div><span>导览建议路径</span></div>
-        </div>
+  <nav class="navbar">
+    <div class="logo-container">
+      <div class="logo-placeholder">🏮</div>
+      <div class="brand-text"><h1>门楼里</h1></div>
     </div>
+    <div class="nav-links">
+      <a href="index.html">首页</a>
+      <a href="quiz.html">智能推荐</a>
+      <a href="map.html" class="active">地图</a>
+      <a href="gate-3d.html">3D展厅</a>
+      <a href="route.html">我的路线</a>
+    </div>
+  </nav>
+  
+  <div class="map-wrapper">
+    <div id="map">
+      <div class="loading" id="loading">正在对标号牌分布修正位置...</div>
+    </div>
+    
+    <div class="compass" onclick="resetMap()" title="复位视野">
+        <div class="compass-arrow"></div>
+    </div>
+    
+    <div class="map-controls">
+      <h3 class="control-title">📍 “寻古·阅生活”漫步路线</h3>
+      <div class="info-box">
+        <div class="info-row"><span>⏱ 预计停留总计</span><span class="info-val" id="r-time">--</span></div>
+        <div class="info-row"><span>🚶 步行动线距离</span><span class="info-val" id="r-dist">--</span></div>
+        <div class="info-row"><span>📊 文化深度指数</span><span class="info-val" id="r-score">--</span></div>
+      </div>
+      <ul class="stop-list" id="stop-list"></ul>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>寻古轴 (三条)</span></div>
+        <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业活化 (大街西侧)</span></div>
+        <div class="legend-item"><div class="dot" style="border: 2px dashed #6B5B4F; width:12px; height:2px; border-radius:0;"></div><span>漫步连接线</span></div>
+    </div>
+  </div>
 
-    <script>
-        // 核心节点：对齐企划书中的西四北三条/四条/五条文化轴
-        const allNodes = [
-            {id:"N1",name:"圣祚隆长寺旧址",door:"3号",theme:"读门·寻古",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, desc:"明代遗址，现存山门及乾隆诗碑（形制：随墙门）", tags:["architecture","history"]},
-            {id:"N11",name:"马福祥宅",door:"11号",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92806, lng: 116.37126, desc:"高级官宦宅门代表（形制：广亮大门）", tags:["architecture"]},
-            {id:"N17",name:"御霜雅集",door:"17号",theme:"创门·共生",type:"商业",stay:40, lat: 39.92808, lng: 116.37052, desc:"京剧主题文化活化空间（形制：西洋门）", tags:["art"]},
-            {id:"N39",name:"程砚秋故居",door:"39号",theme:"阅巷·生活",type:"文化",stay:20, lat: 39.92815, lng: 116.36780, desc:"京剧艺术大师居住21年之所（形制：如意门）", tags:["history"]},
-            {id:"L5_13",name:"声音采集点",door:"五条13号",theme:"阅巷·生活",type:"文化",stay:15, lat: 39.92950, lng: 116.37050, desc:"老街声痕采集点，听见胡同烟火气", tags:["sound"]},
-            {id:"B1",name:"无问西东精酿",door:"西四北大街",theme:"创门·共生",type:"商业",stay:45, lat: 39.92850, lng: 116.37350, desc:"新商业与老街区融合的典范", tags:["food"]}
-        ];
-        
-        let map, routeLine, markers = [];
-        let currentRoute = [];
-        
-        // ================= 地图初始化 =================
-        try {
-            map = L.map('map', {
-                center: [39.92810, 116.3695], 
-                zoom: 17,
-                zoomControl: false,
-                minZoom: 15,
-                maxZoom: 19
-            });
-            
-            L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
-                attribution: '高德地图',
-                maxZoom: 19
-            }).addTo(map).on('load', () => {
-                document.getElementById('loading').style.display = 'none';
-            });
-            
-            L.control.zoom({position: 'topright'}).addTo(map);
-        } catch (e) {
-            document.getElementById('loading').innerHTML = '地图初始化失败，请检查网络';
-        }
-        
-        function resetMap() {
-            if (currentRoute.length > 0) {
-                const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
-                map.fitBounds(bounds, {padding: [80, 80]});
-            } else {
-                map.setView([39.92810, 116.3695], 17);
-            }
-        }
+  <script>
+    /**
+     * 【位置校准】根据号牌分布图北145-181号精确调整：
+     * 三条入口：北145号/147号附近 (纬度 ~39.92805)
+     * 无问西东：北155号，位于三条入口以南 (纬度 ~39.92765)
+     * 经度统一：116.3729 确保在大街西侧（路西）
+     */
+    const allNodes = [
+      {id:"B1",name:"无问西东精酿",door:"北155号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92765, lng: 116.37295, desc:"位于大街西侧北155号。门楼特调精酿首站，文商融合样板。"},
+      {id:"N1",name:"圣祚隆长寺旧址",door:"3号院",theme:"读门·寻古",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, desc:"【随墙门】明代山门遗存，存有乾隆诗碑。"},
+      {id:"N2",name:"马福祥宅",door:"11号院",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92806, lng: 116.37126, desc:"【广亮大门】高级官宦宅门代表，牡丹砖雕精美。"},
+      {id:"N3",name:"13号金柱大门",door:"13号院",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92807, lng: 116.37102, desc:"【金柱大门】等级仅次于广亮，保留完整建筑规制。"},
+      {id:"N11",name:"御霜雅集",door:"17号院",theme:"创门·共生",type:"商业",stay:40, lat: 39.92808, lng: 116.37052, desc:"【西洋门】京剧文化活化空间，深度文化体验点。"},
+      {id:"N39",name:"程砚秋故居",door:"39号院",theme:"读门·寻古",type:"文化",stay:20, lat: 39.92815, lng: 116.36780, desc:"【如意门】京剧大师程砚秋先生居住21年之处。"},
+      {id:"L4",name:"四条生活漫步",door:"四条中段",theme:"阅巷·生活",type:"生活",stay:15, lat: 39.92880, lng: 116.36880, desc:"感受胡同原生居住肌理，聆听邻里烟火。"},
+      {id:"L5",name:"傅增湘故居",door:"五条13号院",theme:"阅巷·生活",type:"文化",stay:15, lat: 39.92950, lng: 116.37050, desc:"藏书大师故居，老北京声音采集点（鸽哨）。"}
+    ];
 
-        // 复杂的 DivIcon 生成逻辑（完全保留并增强）
-        function createMarkerIcon(node, index, isRoute = false) {
-            const color = node.type === '文化' ? '#4A6B5A' : '#C9A86C';
-            return L.divIcon({
-                className: 'custom-marker',
-                html: `
-                    <div style="display:flex;flex-direction:column;align-items:center;">
-                        <div style="background:${color};width:32px;height:32px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;z-index:2;">
-                            ${isRoute ? index + 1 : ''}
-                        </div>
-                        <div style="background:white;padding:2px 8px;border-radius:6px;box-shadow:0 2px 4px rgba(0,0,0,0.2);font-size:11px;margin-top:2px;font-weight:bold;white-space:nowrap;">
-                            ${node.name}
-                        </div>
-                    </div>
-                `,
-                iconSize: [80, 50],
-                iconAnchor: [40, 25]
-            });
-        }
-        
-        function loadRoute() {
-            const data = localStorage.getItem('routeData');
-            let routeData = data ? JSON.parse(data) : {
-                route: [allNodes[0], allNodes[1], allNodes[2], allNodes[3], allNodes[5]],
-                totalTime: 120,
-                distance: 0.85,
-                scores: {culture: 95}
-            };
-            
-            currentRoute = routeData.route;
-            renderRoute(currentRoute);
-            updateInfo(routeData);
-            
-            if (currentRoute.length > 0) {
-                const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
-                map.fitBounds(bounds, {padding: [50, 50]});
-            }
-        }
-        
-        function renderRoute(routeNodes) {
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-            if (routeLine) map.removeLayer(routeLine);
-            
-            const latlngs = [];
-            const listEl = document.getElementById('stop-list');
-            listEl.innerHTML = '';
-            
-            routeNodes.forEach((node, i) => {
-                const marker = L.marker([node.lat, node.lng], {icon: createMarkerIcon(node, i, true)}).addTo(map);
-                marker.bindPopup(`
-                    <div style="padding:5px; min-width:180px;">
-                        <h3 style="color:var(--door-gray);">${node.name}</h3>
-                        <p style="font-size:12px;color:#666;margin:5px 0;">形制：${node.door}</p>
-                        <p style="font-size:13px;line-height:1.4;">${node.desc}</p>
-                        <button onclick="window.location.href='model-viewer.html?id=${node.id}'" style="width:100%;margin-top:10px;padding:8px;background:var(--door-gray);color:white;border:none;border-radius:4px;cursor:pointer;">查看 3D 数字化档案</button>
-                    </div>
-                `);
-                markers.push(marker);
-                latlngs.push([node.lat, node.lng]);
-                
-                listEl.innerHTML += `
-                    <li class="stop-item" onclick="focusStop(${i})">
-                        <div class="stop-num">${i+1}</div>
-                        <div class="stop-info">
-                            <h5>${node.name}（${node.door}）</h5>
-                            <p>${node.theme} · 建议${node.stay}分钟</p>
-                        </div>
-                    </li>
-                `;
-            });
-            
-            if (latlngs.length > 1) {
-                routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 4, opacity: 0.8, dashArray: '8, 8'}).addTo(map);
-            }
-        }
-        
-        function updateInfo(data) {
-            document.getElementById('r-time').textContent = data.totalTime + '分钟';
-            document.getElementById('r-dist').textContent = data.distance + '公里';
-            document.getElementById('r-score').textContent = (data.scores.culture || 85) + '%';
-        }
-        
-        function focusStop(index) {
-            const marker = markers[index];
-            if (marker) {
-                map.setView(marker.getLatLng(), 18, {animate: true});
-                marker.openPopup();
-                document.querySelectorAll('.stop-item').forEach((el, i) => el.classList.toggle('active', i === index));
-            }
-        }
-        
-        window.addEventListener('load', () => {
-            setTimeout(() => { map.invalidateSize(); loadRoute(); }, 400);
+    let map, routeLine, markers = [];
+    let currentRoute = [];
+
+    function initMap() {
+        map = L.map('map', {
+            center: [39.92840, 116.3710],
+            zoom: 17,
+            zoomControl: false,
+            minZoom: 15,
+            maxZoom: 19
         });
-    </script>
+
+        // 引入高德地图底图
+        L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+            attribution: '高德地图'
+        }).addTo(map);
+
+        L.control.zoom({ position: 'topright' }).addTo(map);
+        document.getElementById('loading').style.display = 'none';
+        
+        loadRoute();
+    }
+
+    function resetMap() {
+        if (currentRoute.length > 0) {
+            const bounds = L.latLngBounds(currentRoute.map(n => [n.lat, n.lng]));
+            map.fitBounds(bounds, { padding: [50, 50] });
+        } else {
+            map.setView([39.92840, 116.3710], 17);
+        }
+    }
+
+    function createMarkerIcon(node, index) {
+        const color = node.type === '商业' ? '#C9A86C' : '#4A6B5A';
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                    <div style="background:${color};width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;">
+                        ${index + 1}
+                    </div>
+                    <div style="background:white;padding:2px 6px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);font-size:10px;margin-top:2px;font-weight:bold;white-space:nowrap;">
+                        ${node.name}
+                    </div>
+                </div>
+            `,
+            iconSize: [80, 50],
+            iconAnchor: [40, 25]
+        });
+    }
+
+    function loadRoute() {
+        const savedData = localStorage.getItem('routeData');
+        let routeData = savedData ? JSON.parse(savedData) : {
+            route: allNodes, 
+            totalTime: 180,
+            distance: 1.5,
+            scores: { culture: 95 }
+        };
+
+        currentRoute = routeData.route;
+        renderMapContent(currentRoute, routeData);
+    }
+
+    function renderMapContent(nodes, data) {
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+        if (routeLine) map.removeLayer(routeLine);
+
+        const latlngs = [];
+        const listEl = document.getElementById('stop-list');
+        listEl.innerHTML = '';
+
+        nodes.forEach((node, i) => {
+            const marker = L.marker([node.lat, node.lng], { icon: createMarkerIcon(node, i) }).addTo(map);
+            
+            marker.bindPopup(`
+                <div style="min-width:220px; font-family:sans-serif;">
+                    <h3 style="color:var(--door-gray); margin-bottom:5px;">${node.name}</h3>
+                    <p style="font-size:12px; color:#666; margin-bottom:8px;">门楼/门头编号：${node.door}</p>
+                    <div style="background:#f9f5ef; padding:10px; border-radius:6px; font-size:13px; color:#333; margin-bottom:10px; line-height:1.5;">
+                        ${node.desc}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--brick-green); font-weight:600; margin-bottom:12px;">
+                        <span>⏱ 建议停留: ${node.stay}分钟</span>
+                    </div>
+                    <button onclick="window.location.href='gate-3d.html?id=${node.id}'" style="width:100%; padding:10px; background:var(--door-gray); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">查看 3D 数字化档案</button>
+                </div>
+            `);
+            markers.push(marker);
+            latlngs.push([node.lat, node.lng]);
+
+            listEl.innerHTML += `
+                <li class="stop-item" onclick="focusStop(${i})">
+                    <div class="stop-num">${i+1}</div>
+                    <div class="stop-info">
+                        <h5>${node.name}</h5>
+                        <p>${node.theme} · ${node.stay}min</p>
+                    </div>
+                </li>
+            `;
+        });
+
+        // 绘制逻辑动线
+        if (latlngs.length > 1) {
+            routeLine = L.polyline(latlngs, {
+                color: '#6B5B4F',
+                weight: 5,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }).addTo(map);
+        }
+
+        document.getElementById('r-time').textContent = data.totalTime + '分钟';
+        document.getElementById('r-dist').textContent = data.distance + '公里';
+        document.getElementById('r-score').textContent = (data.scores.culture || 90) + '%';
+
+        if (latlngs.length > 0) {
+            map.fitBounds(L.latLngBounds(latlngs), { padding: [60, 60] });
+        }
+    }
+
+    function focusStop(index) {
+        const marker = markers[index];
+        if (marker) {
+            map.setView(marker.getLatLng(), 18, { animate: true });
+            marker.openPopup();
+            document.querySelectorAll('.stop-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+    }
+
+    window.addEventListener('load', initMap);
+  </script>
 </body>
 </html>
