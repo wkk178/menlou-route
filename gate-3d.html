@@ -4,13 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3D展厅 | 门楼层记</title>
+  
+  <!-- 引入谷歌 3D 模型渲染引擎 -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);display: flex;flex-direction: column;height: 100vh;}
     
-    /* 统一导航栏样式 - 对标 index.html */
+    /* 统一导航栏样式 */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
     .logo-container{display: flex;align-items: center;gap: 15px;}
     .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
@@ -20,13 +23,18 @@
     .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
 
-    .main-content{margin-top: 100px; flex-grow: 1; display: flex; flex-direction: column;}
-    model-viewer { width: 100%; flex-grow: 1; background: radial-gradient(#ffffff, #e2ddd3); }
+    .main-content{margin-top: 90px; flex-grow: 1; display: flex; flex-direction: column;}
+    
+    /* 3D 视图区域样式 */
+    model-viewer { width: 100%; flex-grow: 1; background: radial-gradient(#ffffff, #e2ddd3); outline: none; }
+    
     .info-card{background: white; padding: 25px; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); z-index: 10;}
-    .gate-title{color: var(--door-gray); margin-bottom: 10px; font-size: 24px;}
+    .gate-title{color: var(--door-gray); margin-bottom: 10px; font-size: 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;}
+    .demo-badge{font-size: 12px; background: var(--accent-gold); color: white; padding: 4px 10px; border-radius: 12px; font-weight: normal; letter-spacing: 1px;}
     
     @media (max-width: 768px){
-      .navbar{padding: 12px 15px;}
+      .navbar{padding: 12px 15px; height: 70px;}
+      .main-content{margin-top: 70px;}
       .logo-placeholder{width: 45px;height: 45px;font-size: 24px;}
       .brand-text h1{font-size: 18px;}
       .nav-links{gap: 5px;}
@@ -36,7 +44,7 @@
 </head>
 <body>
   <nav class="navbar">
-    <div class="logo-container">
+    <div class="logo-container" onclick="window.location.href='index.html'">
       <div class="logo-placeholder">🏮</div>
       <div class="brand-text">
         <h1>门楼里</h1>
@@ -55,29 +63,40 @@
 
   <div class="main-content">
     <!-- 3D 核心组件 -->
-    <model-viewer id="gate-viewer" src="" auto-rotate camera-controls shadow-intensity="1" ar loading="eager"></model-viewer>
+    <model-viewer id="gate-viewer" src="" auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto"></model-viewer>
     
     <div class="info-card">
-      <h2 id="m-title" class="gate-title">请从数字导览地图进入</h2>
-      <p id="m-desc" style="color:#666; line-height:1.6;"></p>
-      <button onclick="window.location.href='map.html'" style="width:100%; margin-top:20px; padding:15px; border:none; background:var(--door-gray); color:white; border-radius:12px; cursor:pointer; font-weight:bold;">返回地图选择门楼</button>
+      <h2 class="gate-title">
+        <span id="m-title">加载中...</span>
+        <span class="demo-badge">技术原型展示</span>
+      </h2>
+      <p id="m-desc" style="color:#666; line-height:1.6; font-size: 14px; margin-top: 5px;"></p>
+      <button onclick="window.location.href='map.html'" style="width:100%; margin-top:20px; padding:15px; border:none; background:var(--door-gray); color:white; border-radius:12px; cursor:pointer; font-weight:bold; font-size: 16px; transition: 0.2s;" onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">返回数字导览</button>
     </div>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const db = {
-      "B1": { title: "无问西东 (北155号)", desc: "门楼文化的商业转译点。通过 3D 展示现代精酿空间与传统门楼结构的共生美学。" },
-      "N1": { title: "圣祚隆长寺山门", desc: "明代山门。随墙门形制，内置乾隆诗碑的数字化复原展示。" },
-      "N2": { title: "马福祥宅 11 号院", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的牡丹砖雕。" }
-    };
-    if(db[id]) {
-      document.getElementById('m-title').innerText = db[id].title;
-      document.getElementById('m-desc').innerText = db[id].desc;
-      // 在此处填入你的 .glb 模型链接
-      // document.getElementById('gate-viewer').src = `models/${id.toLowerCase()}.glb`;
+    let id = params.get('id');
+
+    if (!id) {
+      id = "DEFAULT"; 
     }
+
+    const db = {
+      "B1": { title: "无问西东精酿 (概念演示)", desc: "门楼文化的商业转译点。通过 3D 技术展现现代商业空间与传统建筑结构的共生美学。" },
+      "N1": { title: "圣祚隆长寺山门 (概念演示)", desc: "明代山门。通过数字化技术复原展示，探索历史遗迹在数字空间的永续保存。" },
+      "N2": { title: "马福祥宅 11 号院 (概念演示)", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的砖雕结构布局。" },
+      "DEFAULT": { title: "典型胡同院落形制 (概念演示)", desc: "本模型为西四北三条典型四合院及门楼的 3D 数字孪生原型。您可以通过单指滑动旋转、双指缩放，全方位探索传统建筑的榫卯结构与空间布局。" }
+    };
+
+    let displayInfo = db[id] ? db[id] : db["DEFAULT"];
+    
+    document.getElementById('m-title').innerText = displayInfo.title;
+    document.getElementById('m-desc').innerText = displayInfo.desc;
+    
+    document.getElementById('gate-viewer').src = `demo.glb`;
+    
   </script>
 </body>
 </html>
