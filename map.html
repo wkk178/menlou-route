@@ -11,14 +11,37 @@
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden;}
     
-    /* 导航栏 */
+    /* --- 统一导航栏样式 (同步 index.html) --- */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
     .logo-container{display: flex;align-items: center;gap: 15px;}
-    .logo-placeholder{width: 50px;height: 50px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 10px;display: flex;align-items: center;justify-content: center;font-size: 28px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
-    .brand-text h1{font-size: 20px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
-    .nav-links{display: flex;gap: 20px;}
-    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;padding: 8px 16px;border-radius: 8px;transition: 0.3s;}
-    .nav-links a:hover, .nav-links a.active{background: var(--door-gray);color: var(--white);}
+    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+    .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;line-height: 1.2;}
+    .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
+
+    .nav-links{display: flex;gap: 15px;align-items: center;}
+    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;font-size: 15px;text-align: center;display: flex;align-items: center;justify-content: center;}
+    .nav-links a:hover{background: rgba(107, 91, 79, 0.1);}
+    .nav-links a.active{background: var(--door-gray);color: var(--white);}
+    
+    /* 移动端特殊样式 - 实现图四纵向矩形效果 */
+    @media (max-width: 768px){
+        .navbar{padding: 10px 15px;}
+        .logo-placeholder{width: 45px;height: 45px;font-size: 24px;border-radius: 8px;}
+        .brand-text h1{font-size: 18px;}
+        .brand-text p{font-size: 10px;}
+        .nav-links{gap: 4px;}
+        .nav-links a{
+            padding: 10px 5px;
+            font-size: 12px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            line-height: 1.2;
+            min-width: 32px;
+        }
+    }
+    /* --- 导航栏结束 --- */
     
     /* 地图容器 */
     .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
@@ -52,9 +75,7 @@
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;box-shadow: 0 4px 20px rgba(0,0,0,0.1);}
 
     @media (max-width: 768px){
-      .navbar{padding: 10px 20px;}
       .map-controls{width: 90%; right: 5%; bottom: 20px; top: auto; max-height: 35vh;}
-      .nav-links{display: none;}
     }
   </style>
 </head>
@@ -62,15 +83,18 @@
   <nav class="navbar">
     <div class="logo-container">
       <div class="logo-placeholder">🏮</div>
-      <div class="brand-text"><h1>门楼里</h1></div>
+      <div class="brand-text">
+        <h1>门楼里</h1>
+        <p>层记西四，阅见古今</p>
+      </div>
     </div>
     <div class="nav-links">
-            <a href="index.html">首页</a>
-            <a href="quiz.html">智能推荐</a>
-            <a href="map.html"class="active">数字导览</a>
-            <a href="gate-3d.html">3D展厅</a>
-            <a href="route.html" >我的路线</a> 
-            <a href="about.html">项目介绍</a>
+        <a href="index.html">首页</a>
+        <a href="quiz.html">智能推荐</a>
+        <a href="map.html" class="active">数字导览</a>
+        <a href="gate-3d.html">3D展厅</a>
+        <a href="route.html">我的路线</a> 
+        <a href="about.html">项目介绍</a>
     </div>
   </nav>
   
@@ -101,12 +125,6 @@
   </div>
 
   <script>
-    /**
-     * 【位置校准】根据号牌分布图北145-181号精确调整：
-     * 三条入口：北145号/147号附近 (纬度 ~39.92805)
-     * 无问西东：北155号，位于三条入口以南 (纬度 ~39.92765)
-     * 经度统一：116.3729 确保在大街西侧（路西）
-     */
     const allNodes = [
       {id:"B1",name:"无问西东精酿",door:"北155号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92765, lng: 116.37295, desc:"位于大街西侧北155号。门楼特调精酿首站，文商融合样板。"},
       {id:"N1",name:"圣祚隆长寺旧址",door:"3号院",theme:"读门·寻古",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, desc:"【随墙门】明代山门遗存，存有乾隆诗碑。"},
@@ -129,15 +147,11 @@
             minZoom: 15,
             maxZoom: 19
         });
-
-        // 引入高德地图底图
         L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
             attribution: '高德地图'
         }).addTo(map);
-
         L.control.zoom({ position: 'topright' }).addTo(map);
         document.getElementById('loading').style.display = 'none';
-        
         loadRoute();
     }
 
@@ -177,7 +191,6 @@
             distance: 1.5,
             scores: { culture: 95 }
         };
-
         currentRoute = routeData.route;
         renderMapContent(currentRoute, routeData);
     }
@@ -186,14 +199,11 @@
         markers.forEach(m => map.removeLayer(m));
         markers = [];
         if (routeLine) map.removeLayer(routeLine);
-
         const latlngs = [];
         const listEl = document.getElementById('stop-list');
         listEl.innerHTML = '';
-
         nodes.forEach((node, i) => {
             const marker = L.marker([node.lat, node.lng], { icon: createMarkerIcon(node, i) }).addTo(map);
-            
             marker.bindPopup(`
                 <div style="min-width:220px; font-family:sans-serif;">
                     <h3 style="color:var(--door-gray); margin-bottom:5px;">${node.name}</h3>
@@ -209,7 +219,6 @@
             `);
             markers.push(marker);
             latlngs.push([node.lat, node.lng]);
-
             listEl.innerHTML += `
                 <li class="stop-item" onclick="focusStop(${i})">
                     <div class="stop-num">${i+1}</div>
@@ -220,8 +229,6 @@
                 </li>
             `;
         });
-
-        // 绘制逻辑动线
         if (latlngs.length > 1) {
             routeLine = L.polyline(latlngs, {
                 color: '#6B5B4F',
@@ -230,11 +237,9 @@
                 dashArray: '10, 10'
             }).addTo(map);
         }
-
         document.getElementById('r-time').textContent = data.totalTime + '分钟';
         document.getElementById('r-dist').textContent = data.distance + '公里';
         document.getElementById('r-score').textContent = (data.scores.culture || 90) + '%';
-
         if (latlngs.length > 0) {
             map.fitBounds(L.latLngBounds(latlngs), { padding: [60, 60] });
         }
@@ -250,7 +255,6 @@
             });
         }
     }
-
     window.addEventListener('load', initMap);
   </script>
 </body>
