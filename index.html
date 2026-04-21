@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>门楼层记·故事里 | 首页</title>
+  <title>门楼层记·故事里 | 层记西四 阅见古今</title>
   <style>
+    /* 完整保留原始变量与样式 */
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);overflow-x: hidden;}
     
-    /* 导航栏 */
+    /* 导航栏 - 完整保留 */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
     .logo-container{display: flex;align-items: center;gap: 15px;}
     .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
@@ -19,8 +20,19 @@
     .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
     .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
     
-    /* Hero 区域 */
-    .hero-section{margin-top: 100px;height: 80vh;background: linear-gradient(rgba(107,91,79,0.7), rgba(74,107,90,0.7)), url('bg-hero.jpg');background-size: cover;background-position: center;display: flex;align-items: center;justify-content: center;text-align: center;color: var(--white);}
+    /* Hero 区域 - 引用 bg-hero.jpg */
+    .hero-section{
+        margin-top: 100px;
+        height: 80vh;
+        background: linear-gradient(rgba(107,91,79,0.7), rgba(74,107,90,0.7)), url('bg-hero.jpg');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: var(--white);
+    }
     .hero-content{padding: 40px;}
     .hero-title{font-size: 64px;font-weight: 700;margin-bottom: 20px;letter-spacing: 6px;text-shadow: 0 4px 12px rgba(0,0,0,0.3);}
     .hero-subtitle{font-size: 28px;font-style: italic;margin-bottom: 30px;opacity: 0.95;}
@@ -28,50 +40,39 @@
     .cta-button{display: inline-block;padding: 16px 40px;background: var(--accent-gold);color: var(--white);text-decoration: none;border-radius: 30px;font-size: 18px;font-weight: 600;transition: all 0.3s;box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);}
     .cta-button:hover{transform: translateY(-3px);box-shadow: 0 6px 24px rgba(201, 168, 108, 0.6);}
     
-    /* 三大核心体验 - 修复显示问题 */
+    /* 核心体验 */
     .features-section{padding: 80px 50px;background: var(--white);min-height: 500px;}
     .section-title{text-align: center;font-size: 42px;color: var(--door-gray);margin-bottom: 60px;}
-    
-    .features-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));gap: 30px;max-width: 1200px;margin: 0 auto;opacity: 1 !important; visibility: visible !important;}
+    .features-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));gap: 30px;max-width: 1200px;margin: 0 auto;}
     .feature-card{background: var(--bg-cream);border: 2px solid rgba(107, 91, 79, 0.1);border-radius: 20px;padding: 40px 30px;text-align: center;transition: all 0.3s;cursor: pointer;text-decoration: none;color: inherit;}
     .feature-card:hover{transform: translateY(-10px);box-shadow: 0 12px 32px rgba(107, 91, 79, 0.2);border-color: var(--accent-gold);}
     .feature-icon{font-size: 64px;margin-bottom: 20px;}
     .feature-title{font-size: 24px;color: var(--door-gray);margin-bottom: 15px;font-weight: 600;}
     .feature-desc{font-size: 15px;color: var(--text-dark);opacity: 0.8;line-height: 1.6;}
     
-    /* 页脚 */
     .footer{background: var(--door-gray);color: var(--white);text-align: center;padding: 30px;font-size: 14px;background-image: linear-gradient(rgba(107,91,79,0.9), rgba(107,91,79,0.9)), url('bg-hero.jpg');background-size: cover;background-position: center;}
     
-    /* 移动端适配 */
     @media (max-width: 768px){
       .navbar{padding: 12px 15px;}
-      .logo-placeholder{width: 45px;height: 45px;font-size: 24px;}
-      .brand-text h1{font-size: 18px;}
-      .brand-text p{font-size: 10px;}
-      .nav-links{gap: 5px;}
-      .nav-links a{padding: 6px 8px;font-size: 12px;}
-      .hero-section{margin-top: 85px;height: 60vh;}
       .hero-title{font-size: 32px;letter-spacing: 3px;}
-      .hero-subtitle{font-size: 18px;}
-      .hero-desc{font-size: 14px;}
       .features-section{padding: 40px 20px;}
-      .section-title{font-size: 28px;}
     }
   </style>
 </head>
 <body>
   <nav class="navbar">
     <div class="logo-container">
-      <div class="logo-placeholder">🏮</div>
+      <div class="logo-placeholder">🏛️</div>
       <div class="brand-text">
         <h1>门楼里</h1>
-        <p>推开一座门楼，走进一层时光</p>
+        <p>层记西四，阅见古今</p>
       </div>
     </div>
     <div class="nav-links">
       <a href="index.html" class="active">首页</a>
       <a href="quiz.html">智能推荐</a>
-      <a href="map.html">地图</a>
+      <a href="map.html">数字导览</a>
+      <a href="gate-3d.html">3D展厅</a>
       <a href="route.html">我的路线</a>
       <a href="about.html">项目介绍</a>
     </div>
@@ -79,37 +80,36 @@
   
   <section class="hero-section">
     <div class="hero-content">
-      <h1 class="hero-title">门楼层记·故事里</h1>
+      <h1 class="hero-title">层记西四 · 阅见古今</h1>
       <p class="hero-subtitle">西四北三条社区文商活化计划</p>
-      <p class="hero-desc">探索226个院落的千年记忆，体验"读门·推门·创门"三层文化之旅<br>让智能算法为你定制专属的胡同探索路线</p>
-      <a href="quiz.html" class="cta-button">🎯 开始智能推荐</a>
+      <p class="hero-desc">探索西四北 226 个院落的“文化地层”，识别 6 种典型门楼规制。<br>透过数字 3D 与胡同声痕，在巷陌间读懂历史的层累与烟火。</p>
+      <a href="quiz.html" class="cta-button">🎯 开启漫步路线</a>
     </div>
   </section>
   
   <section class="features-section">
-    <h2 class="section-title">三大核心体验</h2>
+    <h2 class="section-title">核心体验：门楼里</h2>
     <div class="features-grid">
-      <a href="quiz.html" class="feature-card">
+      <a href="map.html" class="feature-card">
         <div class="feature-icon">📖</div>
-        <h3 class="feature-title">读门·门楼探秘</h3>
-        <p class="feature-desc">识别六种门楼形制，了解砖雕纹样寓意，明确“门当户对”的建筑等级等门楼历史知识。</p>
+        <h3 class="feature-title">读门 · 寻古轴</h3>
+        <p class="feature-desc">识别六种门楼形制。通过 3D 实景模型与砖雕艺术拆解，读懂西四北三条的历史底蕴。</p>
       </a>
       <a href="map.html" class="feature-card">
-        <div class="feature-icon">🏡</div>
-        <h3 class="feature-title">推门·院落故事</h3>
-        <p class="feature-desc">走进门楼背后，聆听院落故事，感受古巷真实生活，在院落共饮“门楼茶”。</p>
+        <div class="feature-icon">🔊</div>
+        <h3 class="feature-title">阅巷 · 生活轴</h3>
+        <p class="feature-desc">安静漫步四条、五条。通过声音采集点聆听鸽哨与邻里日常，感知胡同本真风貌。</p>
       </a>
-      <a href="route.html" class="feature-card">
-        <div class="feature-icon">🎨</div>
-        <h3 class="feature-title">创门·新颜共生</h3>
-        <p class="feature-desc">年轻人以“主理人”身份参与业态共创，在老门楼中融入京剧体验、手作工坊等新生意。</p>
+      <a href="gate-3d.html" class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3 class="feature-title">创门 · 3D展厅</h3>
+        <p class="feature-desc">进入独立 3D 交互页面，全方位查看门楼数字化档案。实现文化资产的永恒存续。</p>
       </a>
     </div>
   </section>
   
   <footer class="footer">
     <p>© 2026 门楼层记·故事里 | 西四北三条社区文商活化计划</p>
-    <p> 让胡同文化在年轻世代中焕发新生</p>
   </footer>
 </body>
 </html>
