@@ -3,144 +3,225 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>项目介绍 | 门楼层记·故事里</title>
+  <title>关于项目 | 门楼层记</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <style>
-    :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
-    *{margin: 0;padding: 0;box-sizing: border-box;}
-    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);}
+    :root {
+      --door-gray: #6B5B4F;
+      --brick-green: #4A6B5A;
+      --accent-gold: #C9A86C;
+      --bg-cream: #F5F1E8;
+      --text-dark: #2C2420;
+      --white: #FFFFFF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-dark);
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      position: fixed; top: 0; width: 100%; padding: 15px 50px;
+      background: rgba(245, 241, 232, 0.95); backdrop-filter: blur(12px);
+      z-index: 1000; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 20px rgba(107, 91, 79, 0.05);
+    }
+    .logo { font-weight: 700; color: var(--door-gray); letter-spacing: 2px; font-size: 20px; text-decoration: none;}
+    .nav-links a { text-decoration: none; color: var(--text-dark); margin-left: 30px; font-size: 14px; transition: 0.3s; }
+    .nav-links a:hover { color: var(--accent-gold); }
+
+    /* Hero 区域 */
+    .hero {
+      height: 65vh;
+      background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('bg-hero.jpg');
+      background-size: cover; background-position: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; color: var(--white);
+    }
+    .hero h1 { font-size: 52px; letter-spacing: 12px; margin-bottom: 20px; font-weight: 300; text-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .hero p { font-size: 20px; letter-spacing: 5px; opacity: 0.95; font-style: italic; }
+
+    /* 核心内容区 */
+    .section { max-width: 960px; margin: 0 auto; padding: 100px 30px; }
     
-    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
-    .logo-container{display: flex;align-items: center;gap: 15px;}
-    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
-    .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
-    .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
-    .nav-links{display: flex;gap: 30px;}
-    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
-    .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
-    
-    .main-content{margin-top: 90px;}
-    .hero{height: 60vh;background: linear-gradient(135deg, rgba(107,91,79,0.85), rgba(74,107,90,0.85));display: flex;align-items: center;justify-content: center;text-align: center;color: var(--white);}
-    .hero-content h1{font-size: 48px;margin-bottom: 15px;letter-spacing: 4px;}
-    .hero-content p{font-size: 20px;opacity: 0.9;max-width: 700px;margin: 0 auto;}
-    
-    .section{padding: 80px 50px;max-width: 1200px;margin: 0 auto;}
-    .section-title{font-size: 36px;color: var(--door-gray);text-align: center;margin-bottom: 50px;position:relative;}
-    .section-title::after{content: '';display: block;width: 60px;height: 3px;background: var(--accent-gold);margin: 15px auto 0;}
-    
-    .pain-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));gap: 25px;}
-    .pain-card{background: var(--white);padding: 30px;border-radius: 16px;box-shadow: 0 6px 20px rgba(0,0,0,0.06);border-top: 4px solid var(--accent-gold);transition: transform 0.3s;}
-    .pain-card:hover{transform: translateY(-8px);}
-    .pain-card h3{color: var(--door-gray);margin-bottom: 10px;font-size: 20px;}
-    .pain-card p{font-size: 15px;line-height: 1.7;opacity: 0.85;}
-    
-    .experience-timeline{position: relative;padding-left: 40px;}
-    .experience-timeline::before{content: '';position: absolute;left: 15px;top: 0;bottom: 0;width: 4px;background: linear-gradient(180deg, var(--door-gray), var(--accent-gold));border-radius: 4px;}
-    .exp-item{position: relative;margin-bottom: 40px;background: var(--white);padding: 30px;border-radius: 16px;box-shadow: 0 4px 16px rgba(0,0,0,0.05);}
-    .exp-marker{position: absolute;left: -33px;top: 30px;width: 24px;height: 24px;background: var(--accent-gold);border: 4px solid var(--bg-cream);border-radius: 50%;}
-    .exp-item h3{color: var(--door-gray);font-size: 22px;margin-bottom: 8px;}
-    .exp-item .tag{display: inline-block;background: var(--brick-green);color: #fff;padding: 4px 12px;border-radius: 20px;font-size: 13px;margin-bottom: 12px;}
-    .exp-item p{line-height: 1.7;opacity: 0.9;}
-    
-    .footer{background: var(--door-gray);color: var(--white);text-align: center;padding: 40px 20px;margin-top: 60px;}
-    .footer p{opacity: 0.8;margin: 5px 0;}
-    
-    @media(max-width: 768px){
-      .navbar{padding: 15px 20px;}
-      .nav-links{gap: 15px;}
-      .nav-links a{padding: 6px 12px;font-size: 14px;}
-      .section{padding: 60px 20px;}
-      .hero-content h1{font-size: 32px;}
+    .intro-block { text-align: center; margin-bottom: 100px; }
+    .intro-block h2 { font-size: 32px; color: var(--door-gray); margin-bottom: 25px; font-weight: 400; }
+    .intro-block p { font-size: 18px; color: #555; max-width: 700px; margin: 0 auto; }
+
+    /* 时光的褶皱：地层概念 */
+    .stratum-card {
+      background: var(--white); border-radius: 30px; padding: 60px;
+      box-shadow: 0 30px 80px rgba(107, 91, 79, 0.08); position: relative;
+    }
+    .stratum-card::before {
+        content: ''; position: absolute; left: 60px; top: 120px; bottom: 60px;
+        width: 1px; background: linear-gradient(to bottom, var(--accent-gold), transparent);
+    }
+    .stratum-item { position: relative; padding-left: 50px; margin-bottom: 60px; }
+    .stratum-item::after {
+        content: ''; position: absolute; left: -5px; top: 10px; width: 11px; height: 11px;
+        background: var(--accent-gold); border-radius: 50%; box-shadow: 0 0 10px var(--accent-gold);
+    }
+    .stratum-year { font-weight: 700; color: var(--accent-gold); font-size: 22px; margin-bottom: 10px; display: block; }
+    .stratum-content h4 { font-size: 20px; color: var(--door-gray); margin-bottom: 10px; }
+    .stratum-content p { color: #666; font-size: 15px; }
+
+    /* 漫步指南网格 */
+    .guide-title { text-align: center; font-size: 32px; color: var(--door-gray); margin-bottom: 60px; font-weight: 300; }
+    .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 100px; }
+    .guide-item { text-align: center; padding: 40px 25px; background: var(--white); border-radius: 24px; transition: 0.4s; }
+    .guide-item:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(107, 91, 79, 0.1); }
+    .guide-icon { font-size: 48px; margin-bottom: 25px; display: block; }
+    .guide-item h3 { color: var(--door-gray); margin-bottom: 15px; font-weight: 600; }
+    .guide-item p { font-size: 14px; color: #777; line-height: 1.7; }
+
+    /* 愿景区块 */
+    .footer-vision {
+      background: var(--door-gray); color: var(--white); padding: 120px 40px;
+      text-align: center; border-radius: 60px 60px 0 0;
+    }
+    .footer-vision h2 { font-size: 36px; font-weight: 300; margin-bottom: 40px; letter-spacing: 4px; }
+    .footer-vision p { max-width: 750px; margin: 0 auto 60px; opacity: 0.85; font-size: 17px; line-height: 2; }
+    .copyright { font-size: 12px; opacity: 0.4; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 15px 20px; }
+      .guide-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 36px; letter-spacing: 6px; }
+      .stratum-card { padding: 40px 25px; }
     }
   </style>
 </head>
 <body>
+
   <nav class="navbar">
-    <div class="logo-container">
-      <div class="logo-placeholder">🏮</div>
-      <div class="brand-text">
-        <h1>门楼里</h1>
-        <p>推开一座门楼，走进一层时光</p>
-      </div>
-    </div>
+    <a href="index.html" class="logo">🏛️ 门楼里</a>
     <div class="nav-links">
       <a href="index.html">首页</a>
-      <a href="quiz.html">智能推荐</a>
-      <a href="map.html">地图</a>
-      <a href="route.html">我的路线</a>
-      <a href="about.html" class="active">项目介绍</a>
+      <a href="map.html">数字导览</a>
+      <a href="gate-3d.html">3D展厅</a>
     </div>
   </nav>
 
-  <div class="main-content">
-    <section class="hero">
-      <div class="hero-content">
-        <h1>门楼层记·故事里</h1>
-        <p>·西四北三条社区文商活化计划· </p>
-      </div>
-    </section>
+  <header class="hero">
+    <h1 id="hero-title">层记西四 · 阅见古今</h1>
+    <p id="hero-sub">—— 西四北三条社区文商活化计划 ——</p>
+  </header>
 
-    <section class="section">
-      <h2 class="section-title">核心痛点</h2>
-      <div class="pain-grid">
-        <div class="pain-card"><h3>🚪 有门楼，无解读</h3><p>六种门楼形制与精美砖雕散布胡同，缺乏系统讲解，游客认知浮于表面。</p></div>
-        <div class="pain-card"><h3>🏡 有院落，无故事</h3><p>226个院落深藏居民记忆，人文故事与建筑空间脱节，未形成文化资产。</p></div>
-        <div class="pain-card"><h3>📦 有空间，无运营</h3><p>公共空间功能单一，缺乏文旅业态与年轻化消费场景，难以持续造血。</p></div>
-        <div class="pain-card"><h3>🔄 有文化，无活化</h3><p>年轻人感兴趣但停留于"拍照打卡"，缺乏深度内容、可带走的文创与分享机制。</p></div>
-      </div>
-    </section>
+  <main class="section">
+    <div class="intro-block" id="trigger-intro">
+      <h2>这不是一条扁平化的“古街”</h2>
+      <p>这是一部在元大都骨架上生长了七百年的<strong>“文化地层”</strong>。每一座门楼，都是时光留下的褶皱，等待您去阅读。</p>
+    </div>
 
-    <section class="section" style="background:var(--white);border-radius:20px;margin:0 20px;padding:60px 40px;">
-      <h2 class="section-title">核心IP："门楼里"三层体验</h2>
-      <div class="experience-timeline">
-        <div class="exp-item">
-          <div class="exp-marker"></div>
-          <span class="tag">读门·门楼探秘</span>
-          <h3>认识建筑密码</h3>
-          <p>识别广亮大门、金柱大门、如意门等六种形制，解读门簪、砖雕纹样寓意，通过实景展与互动拼图读懂"门当户对"的等级美学。</p>
-        </div>
-        <div class="exp-item">
-          <div class="exp-marker"></div>
-          <span class="tag">推门·院落寻访</span>
-          <h3>聆听时光故事</h3>
-          <p>走进程砚秋故居等开放院落，听居民口述史，共饮"一院一茗"特调茶，翻阅《门楼里·故事集》，感受古巷真实生活肌理。</p>
-        </div>
-        <div class="exp-item">
-          <div class="exp-marker"></div>
-          <span class="tag">创门·新颜共生</span>
-          <h3>青年主理共创</h3>
-          <p>京剧体验馆戏服旅拍、手作工坊砖雕拓印、故事书店文创零售、夜市烟火经济。年轻人从消费者变为经营者，实现文商反哺。</p>
+    <!-- 概念：时光的褶皱 -->
+    <div class="stratum-card">
+      <div class="stratum-item animate-stratum">
+        <span class="stratum-year">1271 · 元大都</span>
+        <div class="stratum-content">
+          <h4>胡同骨架的初生</h4>
+          <p>西四北三条至五条保留了最完整的元代胡同规制。在这里，您脚下的巷陌尺度，与七百年前的元大都如出一辙。</p>
         </div>
       </div>
-    </section>
-
-    <section class="section">
-      <h2 class="section-title">治理与可持续机制</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;">
-        <div style="background:var(--white);padding:30px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.05);">
-          <h3 style="color:var(--door-gray);margin-bottom:15px;">🤝 石老娘议事厅</h3>
-          <p style="line-height:1.7;opacity:0.9;">依托成熟基层协商平台，制定《夜市管理公约》，协调居民开放院落、主理人入驻、停车共享等议题，实现"民事民商"。</p>
-        </div>
-        <div style="background:var(--white);padding:30px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.05);">
-          <h3 style="color:var(--door-gray);margin-bottom:15px;">💰 门楼公益金</h3>
-          <p style="line-height:1.7;opacity:0.9;">导览收入40%+业态利润10%-20%注入公益金，用于门楼维护、绿化提升、老年福利、故事采集与主理人启动资金，形成良性循环。</p>
+      <div class="stratum-item animate-stratum">
+        <span class="stratum-year">1368 - 1912 · 明清</span>
+        <div class="stratum-content">
+          <h4>门楼礼制与砖雕美学</h4>
+          <p>广亮大门、金柱大门、如意门... 六种门楼形制散布其间。它们不仅是建筑，更是封建等级制度与民间匠心美学的数字化活态载体。</p>
         </div>
       </div>
-    </section>
-  </div>
+      <div class="stratum-item animate-stratum">
+        <span class="stratum-year">1912 - 1949 · 民国</span>
+        <div class="stratum-content">
+          <h4>名人的时代印记</h4>
+          <p>程砚秋手植的石榴树，傅增湘藏书楼的余墨。这里的每一座门楼背后，都重叠着一个时代的文人气度与家国故事。</p>
+        </div>
+      </div>
+      <div class="stratum-item animate-stratum">
+        <span class="stratum-year">NOW · 当代</span>
+        <div class="stratum-content">
+          <h4>胡同声痕与新颜</h4>
+          <p>鸽哨掠过、邻里问候、精酿茶歇。我们在数字化交互中保留这些市井烟火，并以新商业业态为老街区注入可持续的活力。</p>
+        </div>
+      </div>
+    </div>
 
-  <footer class="footer">
-    <p>© 2026 门楼层记·故事里 | 西四北三条社区文商活化计划</p>
-    <p>文旅融合· 让胡同文化在年轻世代中焕发新生</p>
+    <div style="margin: 120px 0;">
+      <h2 class="guide-title">您的漫步指南</h2>
+      <div class="guide-grid">
+        <div class="guide-item animate-guide">
+          <span class="guide-icon">📖</span>
+          <h3>读门 · 寻古轴</h3>
+          <p>穿行在西四北三条，通过 3D 数字化拆解，读懂那些散落在尘埃里的砖雕纹样与门当户对的美学逻辑。</p>
+        </div>
+        <div class="guide-item animate-guide">
+          <span class="guide-icon">🔊</span>
+          <h3>阅巷 · 生活轴</h3>
+          <p>走进四条、五条。拿起手机轻碰 NFC 标签，戴上耳机聆听原住民口述的胡同记忆，在不扰民的安静中感知生活。</p>
+        </div>
+        <div class="guide-item animate-guide">
+          <span class="guide-icon">🎨</span>
+          <h3>创生 · 新颜带</h3>
+          <p>在漫步的终点——西四北大街，于精酿、茶饮与主理人手作中，带走一份独属于西四的“文化盲盒”。</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer-vision">
+    <h2>文商共荣 · 雅邻共忆</h2>
+    <p>我们设立了“门楼公益金”，将导览收入的 40% 回馈于老旧建筑的修缮维护与社区老年居民的福利。在这里的每一次驻足与消费，都是对古城记忆的一次共同守护。</p>
+    <div class="copyright">© 2026 门楼层记·故事里 项目团队 | 让胡同文化在数字世代焕发新生</div>
   </footer>
 
   <script>
-    gsap.utils.toArray('.pain-card').forEach((card,i)=>{
-      gsap.from(card,{scrollTrigger:{trigger:card,start:"top 85%"},y:40,opacity:0,duration:0.6,delay:i*0.1,ease:"power2.out"});
-    });
-    gsap.utils.toArray('.exp-item').forEach((item,i)=>{
-      gsap.from(item,{scrollTrigger:{trigger:item,start:"top 85%"},x:-30,opacity:0,duration:0.6,delay:i*0.15,ease:"power2.out"});
-    });
+    // 确保 DOM 加载后再执行
+    window.onload = function() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 初始动画：让 Hero 标题优雅浮现
+        gsap.from("#hero-title", { opacity: 0, y: 40, duration: 1.5, ease: "power3.out" });
+        gsap.from("#hero-sub", { opacity: 0, y: 20, duration: 1.5, delay: 0.3, ease: "power3.out" });
+
+        // 地层项动画：设置初始可见度，避免在 iframe 中因为 ScrollTrigger 失灵而“空屏”
+        const stratumItems = document.querySelectorAll('.animate-stratum');
+        stratumItems.forEach((item, index) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 90%",
+                },
+                opacity: 0,
+                x: -30,
+                duration: 1,
+                delay: index * 0.1
+            });
+        });
+
+        // 漫步指南动画
+        const guideItems = document.querySelectorAll('.animate-guide');
+        guideItems.forEach((item, index) => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 90%",
+                },
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                delay: index * 0.15,
+                ease: "back.out(1.7)"
+            });
+        });
+
+        // 刷新 ScrollTrigger 以确保高度计算正确
+        ScrollTrigger.refresh();
+    };
   </script>
 </body>
 </html>
