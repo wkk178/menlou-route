@@ -43,6 +43,7 @@
   </style>
 </head>
 <body>
+  <!-- 导航栏保持不变 -->
   <nav class="navbar">
     <div class="logo-container" onclick="window.location.href='index.html'">
       <div class="logo-placeholder">🏮</div>
@@ -63,6 +64,7 @@
 
   <div class="main-content">
     <!-- 3D 核心组件 -->
+    <!-- 添加了 auto-rotate 让门楼自动缓慢旋转，展现细节 -->
     <model-viewer id="gate-viewer" src="" auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto"></model-viewer>
     
     <div class="info-card">
@@ -83,11 +85,12 @@
       id = "DEFAULT"; 
     }
 
+
     const db = {
       "B1": { title: "无问西东精酿 (概念演示)", desc: "门楼文化的商业转译点。通过 3D 技术展现现代商业空间与传统建筑结构的共生美学。" },
       "N1": { title: "圣祚隆长寺山门 (概念演示)", desc: "明代山门。通过数字化技术复原展示，探索历史遗迹在数字空间的永续保存。" },
       "N2": { title: "马福祥宅 11 号院 (概念演示)", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的砖雕结构布局。" },
-      "DEFAULT": { title: "典型胡同院落形制 (概念演示)", desc: "本模型为西四北三条典型四合院及门楼的 3D 数字孪生原型。您可以通过单指滑动旋转、双指缩放，全方位探索传统建筑的榫卯结构与空间布局。" }
+      "DEFAULT": { title: "典型广亮大门形制 (概念演示)", desc: "本模型为传统【广亮大门】的 3D 数字孪生原型。红漆大门与雀替、门簪等构件清晰可见。您可以通过单指滑动、双指缩放，全方位探索老北京门楼的建筑规制。" }
     };
 
     let displayInfo = db[id] ? db[id] : db["DEFAULT"];
@@ -95,6 +98,7 @@
     document.getElementById('m-title').innerText = displayInfo.title;
     document.getElementById('m-desc').innerText = displayInfo.desc;
     
+    // 直接读取同一目录下的新门楼模型
     document.getElementById('gate-viewer').src = `demo.glb`;
     
   </script>
