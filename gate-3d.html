@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>3D展厅 | 门楼层记</title>
   
-  <!-- 引入谷歌 3D 模型渲染引擎 -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   
   <style>
@@ -25,13 +24,39 @@
 
     .main-content{margin-top: 90px; flex-grow: 1; display: flex; flex-direction: column;}
     
-    /* 3D 视图区域样式 */
+    /* 3D 视图区域 */
     model-viewer { width: 100%; flex-grow: 1; background: radial-gradient(#ffffff, #e2ddd3); outline: none; }
     
-    .info-card{background: white; padding: 25px; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); z-index: 10;}
-    .gate-title{color: var(--door-gray); margin-bottom: 10px; font-size: 22px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;}
-    .demo-badge{font-size: 12px; background: var(--accent-gold); color: white; padding: 4px 10px; border-radius: 12px; font-weight: normal; letter-spacing: 1px;}
+    /* 信息卡片 */
+    .info-card{
+        background: white; 
+        padding: 25px; 
+        border-radius: 24px 24px 0 0; 
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.05); 
+        z-index: 10;
+        max-height: 45vh; 
+        overflow-y: auto;
+    }
+    .gate-title{color: var(--door-gray); margin-bottom: 5px; font-size: 22px; display: flex; align-items: center; gap: 10px;}
+    .demo-badge{font-size: 11px; background: var(--accent-gold); color: white; padding: 3px 8px; border-radius: 4px;}
     
+    /* 音频播放器区域 */
+    .audio-section {
+        margin: 15px 0;
+        padding: 12px;
+        background: #f9f6f0;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .audio-label { font-size: 12px; color: var(--door-gray); font-weight: bold; display: flex; align-items: center; gap: 5px; }
+    audio { width: 100%; height: 35px; }
+
+    /* 文字内容样式 */
+    .desc-content { color: #444; line-height: 1.8; font-size: 14px; white-space: pre-wrap; margin-top: 10px;}
+    .section-header { font-weight: bold; color: var(--brick-green); margin-top: 15px; display: block; border-left: 3px solid var(--brick-green); padding-left: 8px; margin-bottom: 5px;}
+
     @media (max-width: 768px){
       .navbar{padding: 12px 15px; height: 70px;}
       .main-content{margin-top: 70px;}
@@ -43,7 +68,6 @@
   </style>
 </head>
 <body>
-  <!-- 导航栏保持不变 -->
   <nav class="navbar">
     <div class="logo-container" onclick="window.location.href='index.html'">
       <div class="logo-placeholder">🏮</div>
@@ -63,44 +87,55 @@
   </nav>
 
   <div class="main-content">
-    <!-- 3D 核心组件 -->
-    <!-- 添加了 auto-rotate 让门楼自动缓慢旋转，展现细节 -->
-    <model-viewer id="gate-viewer" src="" auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto"></model-viewer>
+    <model-viewer id="gate-viewer" src="demo.glb" auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto"></model-viewer>
     
     <div class="info-card">
       <h2 class="gate-title">
-        <span id="m-title">加载中...</span>
+        <span id="m-title">金柱大门 · 数字化档案</span>
         <span class="demo-badge">技术原型展示</span>
       </h2>
-      <p id="m-desc" style="color:#666; line-height:1.6; font-size: 14px; margin-top: 5px;"></p>
-      <button onclick="window.location.href='map.html'" style="width:100%; margin-top:20px; padding:15px; border:none; background:var(--door-gray); color:white; border-radius:12px; cursor:pointer; font-weight:bold; font-size: 16px; transition: 0.2s;" onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">返回数字导览</button>
+      
+      <div class="audio-section">
+        <span class="audio-label">🎧 听·胡同里的金柱门往事</span>
+        <audio id="gate-audio" src="n3.mp3" controls></audio>
+      </div>
+
+      <div id="m-desc" class="desc-content"></div>
+      
+      <button onclick="window.location.href='map.html'" style="width:100%; margin-top:20px; padding:15px; border:none; background:var(--door-gray); color:white; border-radius:12px; cursor:pointer; font-weight:bold; font-size: 16px;">返回数字导览</button>
     </div>
   </div>
 
   <script>
+    // 解析网址参数
     const params = new URLSearchParams(window.location.search);
-    let id = params.get('id');
+    const id = params.get('id');
 
-    if (!id) {
-      id = "DEFAULT"; 
-    }
-
-
+    // 内容数据库：金柱大门作为终极兜底内容
     const db = {
-      "B1": { title: "无问西东精酿 (概念演示)", desc: "门楼文化的商业转译点。通过 3D 技术展现现代商业空间与传统建筑结构的共生美学。" },
-      "N1": { title: "圣祚隆长寺山门 (概念演示)", desc: "明代山门。通过数字化技术复原展示，探索历史遗迹在数字空间的永续保存。" },
-      "N2": { title: "马福祥宅 11 号院 (概念演示)", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的砖雕结构布局。" },
-      "DEFAULT": { title: "典型广亮大门形制 (概念演示)", desc: "本模型为传统【广亮大门】的 3D 数字孪生原型。红漆大门与雀替、门簪等构件清晰可见。您可以通过单指滑动、双指缩放，全方位探索老北京门楼的建筑规制。" }
+      "N3": {
+        title: "13号院 · 金柱大门",
+        audio: "n3.mp3",
+        desc: `金柱大门属于屋宇式大门，门扇设置在中柱与前檐柱之间的金柱上。相对于广亮大门宽绰的门前空间，金柱大门的门前空间较少，其形制等级低于广亮大门。\n\n<span class="section-header">文化典故：分寸之间</span>\n明嘉靖年间，西四胡同有位五品官建宅，工匠问门制，他指着金柱说：“门扉安此处，外浅内深——少张扬，多自省。”门成，刻“静以修身”。后来人见金柱门皆道：这门不在阔气，在分寸。\n\n<span class="section-header">胡同记忆：打水的故事</span>\n家里的自来水不出水，要去36号院打水。老师家访时正好看见我去拎水，第二天在全班表扬。那时候冬天窗户上都是冰花，中午才化。洗澡还要去领澡票。\n\n<span class="section-header">胡同记忆：邻居丁阿姨</span>\n邻居丁阿姨总说自己“没啥可讲”，但大家记她唱歌识谱，自带文艺气质。国庆演出时，她清亮的歌声回荡在整条胡同里，那是胡同里最动听的声音。`
+      },
+      "B1": { title: "无问西东 (北155号)", audio: "n3.mp3", desc: "门楼文化的商业转译点。通过 3D 展示现代精酿空间与传统门楼结构的共生美学。" },
+      "N1": { title: "圣祚隆长寺山门", audio: "n3.mp3", desc: "明代山门。随墙门形制，内置乾隆诗碑的数字化复原展示。" },
+      "N2": { title: "马福祥宅 11 号院", audio: "n3.mp3", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的牡丹砖雕。" }
     };
 
-    let displayInfo = db[id] ? db[id] : db["DEFAULT"];
+    // 核心逻辑：如果找不到 ID 或没有 ID，统一指向 N3
+    let content = db[id] ? db[id] : db["N3"];
     
-    document.getElementById('m-title').innerText = displayInfo.title;
-    document.getElementById('m-desc').innerText = displayInfo.desc;
+    // 渲染标题和文字
+    document.getElementById('m-title').innerHTML = content.title;
+    document.getElementById('m-desc').innerHTML = content.desc;
     
-    // 直接读取同一目录下的新门楼模型
-    document.getElementById('gate-viewer').src = `demo.glb`;
+    // 强制加载音频
+    const player = document.getElementById('gate-audio');
+    player.src = content.audio;
     
+    // 强制加载模型
+    document.getElementById('gate-viewer').src = "demo.glb";
   </script>
 </body>
 </html>
