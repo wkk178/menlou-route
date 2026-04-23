@@ -101,13 +101,13 @@
         <h3 class="question-title">1. 你更感兴趣的是哪种体验？</h3>
         <div class="options-grid">
           <div class="option-card" onclick="selectOption(1, 'read', this)">
-            <h4>📖 读门·门楼探秘</h4><p>了解建筑形制与砖雕艺术</p>
+            <h4>📖 门楼探秘</h4><p>了解建筑形制与砖雕艺术</p>
           </div>
           <div class="option-card" onclick="selectOption(1, 'push', this)">
-            <h4>🏡 推门·院落故事</h4><p>走进院落，聆听居民口述史</p>
+            <h4>🏡 院落故事</h4><p>走进胡同，感受胡同生活</p>
           </div>
           <div class="option-card" onclick="selectOption(1, 'create', this)">
-            <h4>🎨 创门·新颜共生</h4><p>体验京剧、手作等新业态</p>
+            <h4>🎨 新颜共生</h4><p>体验京剧、手作等新业态</p>
           </div>
           <div class="option-card" onclick="selectOption(1, 'mixed', this)">
             <h4>🌟 综合体验</h4><p>均衡感受文化、故事与创新</p>
@@ -302,7 +302,7 @@
           throw new Error("Backend Error");
         }
       } catch (e) {
-        // 如果后端没开，使用前端模拟数据兜底，保证演示不翻车
+        
         console.warn("后端未连接，使用模拟数据");
         const mockData = {
           route: [
