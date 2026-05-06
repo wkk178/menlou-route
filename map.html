@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>数字导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -96,6 +96,102 @@
             z-index: 99999 !important;
         }
     }
+
+    /* 添加自定义控制栏 */
+    .chat-control-bar {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 20px;
+      border-radius: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      display: none;
+      gap: 15px;
+      z-index: 100000;
+    }
+    
+    .chat-control-bar.show {
+      display: flex;
+    }
+    
+    .control-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      background: var(--door-gray);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .control-btn:hover {
+      background: var(--accent-gold);
+    }
+    
+    .control-btn.active {
+      background: var(--brick-green);
+    }
+    
+    /* 隐藏默认的语音输入提示 */
+    [class*="voice_input_tip"] {
+      display: none !important;
+    }
+    
+    /* 修复朗读按钮 */
+    .tts-button {
+      position: fixed;
+      bottom: 140px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 99998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .tts-button.show {
+      display: flex;
+    }
+    
+    .tts-button.speaking {
+      animation: pulse 1s infinite;
+      background: var(--brick-green);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* 提示框样式 */
+    .notification {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      z-index: 999999;
+      font-size: 16px;
+      display: none;
+    }
+    
+    .notification.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -128,6 +224,27 @@
         <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业/生活轴</span></div>
     </div>
   </div>
+
+  <!-- 添加控制栏 -->
+  <div class="chat-control-bar" id="chatControlBar">
+    <button class="control-btn active" id="textModeBtn" onclick="switchToTextMode()">
+      💬 文字输入
+    </button>
+    <button class="control-btn" id="voiceModeBtn" onclick="switchToVoiceMode()">
+      🎤 语音输入
+    </button>
+    <button class="control-btn" onclick="stopAllAudio()">
+      ⏹ 停止播放
+    </button>
+  </div>
+
+  <!-- 添加朗读按钮 -->
+  <button class="tts-button" id="ttsButton" onclick="readLastMessage()">
+    🔊
+  </button>
+
+  <!-- 提示框 -->
+  <div class="notification" id="notification"></div>
 
   <script>
     // --- 地图数据逻辑 (保持不变) ---
@@ -200,12 +317,18 @@
         sessionStorage.setItem('tourist_uuid', secureUserId);
     }
 
+    // 添加全局变量
+    let currentMode = 'text'; // 'text' 或 'voice'
+    let isSpeaking = false;
+    let speechSynthesis = window.speechSynthesis;
+    let currentRecognition = null;
+
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7636701328664264704',
         user: secureUserId,
-        // 新增：明确指定布局模式，有助于移动端稳定性
-        layout: 'pc' // 虽然叫pc，但在移动端SDK通常会自动适配为响应式，显式声明可避免某些检测错误
+        // 关键：禁用默认的语音输入
+        isNeedAudio: false
       },
       userInfo: {
         id: secureUserId,
@@ -213,8 +336,13 @@
       },
       componentProps: {
         title: 'AI老街坊',
-        // 新增：尝试禁用一些可能导致冲突的高级动画
-        animation: true
+        // 添加回调函数
+        onMessageReceived: function(message) {
+          // 收到消息后显示朗读按钮
+          if (message.type === 'answer' && message.content) {
+            showTTSButton();
+          }
+        }
       },
       auth: {
         type: 'token',
@@ -224,6 +352,190 @@
         }
       }
     });
+
+    // 切换回文字输入模式
+    function switchToTextMode() {
+      currentMode = 'text';
+      document.getElementById('textModeBtn').classList.add('active');
+      document.getElementById('voiceModeBtn').classList.remove('active');
+      
+      // 停止语音识别
+      if (currentRecognition) {
+        currentRecognition.stop();
+        currentRecognition = null;
+      }
+      
+      // 尝试点击输入框，确保焦点在文本输入
+      setTimeout(() => {
+        const inputElement = document.querySelector('[contenteditable="true"], textarea, input[type="text"]');
+        if (inputElement) {
+          inputElement.focus();
+          inputElement.click();
+        }
+      }, 100);
+    }
+
+    // 切换到语音输入模式
+    function switchToVoiceMode() {
+      currentMode = 'voice';
+      document.getElementById('voiceModeBtn').classList.add('active');
+      document.getElementById('textModeBtn').classList.remove('active');
+      
+      // 使用浏览器原生语音识别
+      startBrowserSpeechRecognition();
+    }
+
+    // 使用浏览器原生语音识别
+    function startBrowserSpeechRecognition() {
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        currentRecognition = new SpeechRecognition();
+        
+        currentRecognition.lang = 'zh-CN';
+        currentRecognition.continuous = false;
+        currentRecognition.interimResults = false;
+        
+        currentRecognition.onstart = function() {
+          console.log('语音识别开始');
+          showNotification('🎤 请开始说话...');
+        };
+        
+        currentRecognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          console.log('识别结果:', transcript);
+          
+          // 将识别的文本填入输入框
+          const inputElement = document.querySelector('[contenteditable="true"], textarea, input[type="text"]');
+          if (inputElement) {
+            inputElement.textContent = transcript;
+            inputElement.focus();
+          }
+          
+          // 切换回文字模式
+          switchToTextMode();
+        };
+        
+        currentRecognition.onerror = function(event) {
+          console.error('语音识别错误:', event.error);
+          showNotification('❌ 语音识别失败，请重试');
+          switchToTextMode();
+        };
+        
+        currentRecognition.onend = function() {
+          console.log('语音识别结束');
+          currentRecognition = null;
+        };
+        
+        currentRecognition.start();
+      } else {
+        showNotification('❌ 您的浏览器不支持语音识别');
+        switchToTextMode();
+      }
+    }
+
+    // 显示朗读按钮
+    function showTTSButton() {
+      const ttsButton = document.getElementById('ttsButton');
+      if (ttsButton) {
+        ttsButton.classList.add('show');
+      }
+    }
+
+    // 朗读最后一条消息
+    function readLastMessage() {
+      if (isSpeaking) {
+        stopAllAudio();
+        return;
+      }
+      
+      // 获取最后一条AI回复
+      const messages = document.querySelectorAll('[class*="message"], [class*="chat-item"], div[role="listitem"]');
+      let lastMessage = '';
+      
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const text = messages[i].textContent;
+        if (text && text.length > 10 && !text.includes('西四北老街坊') && !text.includes('AI老街坊')) {
+          lastMessage = text;
+          break;
+        }
+      }
+      
+      if (lastMessage) {
+        speakText(lastMessage);
+      } else {
+        showNotification('❌ 没有找到可朗读的内容');
+      }
+    }
+
+    // 使用浏览器TTS朗读文本
+    function speakText(text) {
+      // 停止之前的朗读
+      speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      // 尝试使用中文语音
+      const voices = speechSynthesis.getVoices();
+      const chineseVoice = voices.find(voice => voice.lang.includes('zh') || voice.lang.includes('CN'));
+      if (chineseVoice) {
+        utterance.voice = chineseVoice;
+      }
+      
+      utterance.onstart = function() {
+        isSpeaking = true;
+        document.getElementById('ttsButton').classList.add('speaking');
+      };
+      
+      utterance.onend = function() {
+        isSpeaking = false;
+        document.getElementById('ttsButton').classList.remove('speaking');
+      };
+      
+      utterance.onerror = function(event) {
+        console.error('朗读错误:', event);
+        isSpeaking = false;
+        document.getElementById('ttsButton').classList.remove('speaking');
+        showNotification('❌ 朗读失败');
+      };
+      
+      speechSynthesis.speak(utterance);
+    }
+
+    // 停止所有音频播放
+    function stopAllAudio() {
+      speechSynthesis.cancel();
+      isSpeaking = false;
+      document.getElementById('ttsButton').classList.remove('speaking');
+      
+      // 停止所有音频元素
+      const audios = document.querySelectorAll('audio');
+      audios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+      
+      showNotification('⏹ 已停止播放');
+    }
+
+    // 显示提示
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), 2000);
+    }
+
+    // 监听消息，自动显示控制栏
+    setTimeout(() => {
+      const controlBar = document.getElementById('chatControlBar');
+      if (controlBar) {
+        controlBar.classList.add('show');
+      }
+    }, 2000);
   </script>
 </body>
 </html>
