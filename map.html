@@ -11,7 +11,7 @@
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden;}
     
-    /* --- 导航栏 --- */
+    /* --- 导航栏（置顶层级1000） --- */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
     .logo-container{display: flex;align-items: center;gap: 15px;}
     .logo-placeholder{width: 50px;height: 50px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 10px;display: flex;align-items: center;justify-content: center;font-size: 28px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
@@ -22,15 +22,15 @@
     .nav-links a:hover, .nav-links a.active{background: var(--door-gray);color: var(--white);}
     @media (max-width: 768px){ .navbar{padding: 10px 15px;} .logo-placeholder{width: 45px;height: 45px;font-size: 24px;} .brand-text h1{font-size: 18px;} .nav-links{gap: 4px;} .nav-links a{padding: 10px 5px; font-size: 11px; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; border-radius: 6px; line-height: 1.1; min-width: 32px; height: auto;} }
     
-    /* --- 地图内容区域 --- */
+    /* --- 地图区域 --- */
     .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0;}
     
-    /* === 核心布局修改：将所有面板移至左侧，避开右侧的 Coze 气泡 === */
-    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;display: flex;align-items: center;justify-content: center;cursor: pointer;}
+    /* === 核心修改区：调低地图控件的 z-index 到 400，绝对防遮挡 === */
+    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 400;display: flex;align-items: center;justify-content: center;cursor: pointer;}
     .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
 
-    .map-controls{position: absolute;top: 85px;left: 20px;width: 320px;background: rgba(255, 255, 255, 0.98);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 1000;max-height: calc(100vh - 220px);overflow-y: auto;}
+    .map-controls{position: absolute;top: 85px;left: 20px;width: 320px;background: rgba(255, 255, 255, 0.95);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 400;max-height: calc(100vh - 220px);overflow-y: auto; backdrop-filter: blur(8px);}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 12px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 13px;}
@@ -43,13 +43,28 @@
     .stop-info h5{font-size: 14px;margin-bottom: 2px;font-weight: 600;}
     .stop-info p{font-size: 11px;color: #666;}
     
-    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 1000;font-size: 11px;}
+    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 400;font-size: 11px;}
     .legend-item{display: flex;align-items: center;gap: 6px;margin: 4px 0;}
     .dot{width: 12px;height: 12px;border-radius: 50%;}
     
+    /* === 专门为手机端瘦身，腾出聊天空间 === */
     @media (max-width: 768px){ 
-        .map-controls{width: 75%; left: 15px; top: 80px; max-height: 45vh;} 
-        .legend { bottom: 120px; left: 15px; } 
+        .map-controls{
+            width: 260px; 
+            max-width: 80%; 
+            left: 10px; 
+            top: 75px; 
+            max-height: 40vh; 
+            padding: 12px;
+        } 
+        .control-title{font-size: 15px; margin-bottom: 10px; padding-bottom: 5px;}
+        .info-box{padding: 8px; margin-bottom: 10px;}
+        .info-row{font-size: 11px;}
+        .stop-item{padding: 6px; margin-bottom: 6px;}
+        .stop-info h5{font-size: 13px; margin-bottom: 0;}
+        .stop-info p{font-size: 10px;}
+        .stop-num{width: 20px; height: 20px; font-size: 10px;}
+        .legend { bottom: 80px; left: 10px; padding: 6px 10px; font-size: 10px;} 
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
   </style>
@@ -68,6 +83,7 @@
   <div class="map-wrapper">
     <div id="map"><div class="loading" id="loading">数据加载中...</div></div>
     <div class="compass" onclick="resetMap()"><div class="compass-arrow"></div></div>
+    
     <div class="map-controls">
       <h3 class="control-title">📍 漫步动线详情</h3>
       <div class="info-box">
@@ -77,6 +93,7 @@
       </div>
       <ul class="stop-list" id="stop-list"></ul>
     </div>
+    
     <div class="legend">
         <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>寻古轴 (三条)</span></div>
         <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业/生活轴</span></div>
@@ -84,7 +101,7 @@
   </div>
 
   <script>
-    // --- 地图数据逻辑 ---
+    // --- 地图数据逻辑 (保持不变) ---
     const allNodesMaster = [
       {id:"B1",name:"无问西东精酿",door:"北155号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92765, lng: 116.37295, desc:"位于西四北大街北155号。提供门楼特调精酿，是文商融合的首站。"},
       {id:"N1",name:"隆长寺山门",door:"3号院",theme:"读门·寻古",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, desc:"【随墙门】明代圣祚隆长寺旧址，存有珍贵的乾隆诗碑。"},
@@ -144,9 +161,22 @@
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
+    // 核心新增：在本地存储一个独一无二的用户ID，实现多设备聊天记录完全隔离
+    let deviceUserId = localStorage.getItem('coze_device_user_id');
+    if (!deviceUserId) {
+        // 生成类似 'tourist_a1b2c3d4e_1690000000' 的唯一标识
+        deviceUserId = 'tourist_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        localStorage.setItem('coze_device_user_id', deviceUserId);
+    }
+
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7636701328664264704',
+      },
+      // 将唯一ID传给扣子服务器，让它知道这是个“新访客”
+      userInfo: {
+        id: deviceUserId,
+        name: '胡同游客'
       },
       componentProps: {
         title: 'AI老街坊', 
