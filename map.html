@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>数字导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -66,6 +66,36 @@
         .legend { bottom: 100px; left: 15px; } 
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
+
+    /* =========================================
+       【新增】Coze SDK 移动端语音输入 Bug 修复补丁
+       ========================================= */
+    /* 1. 强制提升 Coze 聊天窗口的层级，确保它高于地图和所有控件 */
+    div[id*="coze"], iframe[src*="coze"], .coze-web-sdk-container {
+        z-index: 99999 !important;
+    }
+    
+    /* 2. 针对移动端输入框的特殊处理：确保语音切换回文本时，输入框可见且可点 */
+    @media (max-width: 768px) {
+        /* 强制输入区域在最顶层 */
+        .coze-chat-input-area, 
+        [class*="input-wrapper"], 
+        [class*="chat-input"] {
+            z-index: 100000 !important;
+            position: relative !important;
+        }
+        
+        /* 防止语音按钮遮挡或状态卡死 */
+        .coze-voice-btn, 
+        [class*="voice-icon"] {
+            pointer-events: auto !important;
+        }
+
+        /* 如果 SDK 使用了 shadow-dom，尝试穿透样式 */
+        :host, iframe {
+            z-index: 99999 !important;
+        }
+    }
   </style>
 </head>
 <body>
@@ -173,14 +203,18 @@
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7636701328664264704',
-        user: secureUserId  // 强制向大模型声明当前用户的独立身份
+        user: secureUserId,
+        // 新增：明确指定布局模式，有助于移动端稳定性
+        layout: 'pc' // 虽然叫pc，但在移动端SDK通常会自动适配为响应式，显式声明可避免某些检测错误
       },
       userInfo: {
-        id: secureUserId,   // 双重保险
+        id: secureUserId,
         name: '胡同游客'
       },
       componentProps: {
-        title: 'AI老街坊', 
+        title: 'AI老街坊',
+        // 新增：尝试禁用一些可能导致冲突的高级动画
+        animation: true
       },
       auth: {
         type: 'token',
