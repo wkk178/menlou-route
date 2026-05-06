@@ -11,7 +11,7 @@
     *{margin: 0;padding: 0;box-sizing: border-box;}
     body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden;}
     
-    /* --- 导航栏（置顶层级1000） --- */
+    /* --- 导航栏 --- */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
     .logo-container{display: flex;align-items: center;gap: 15px;}
     .logo-placeholder{width: 50px;height: 50px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 10px;display: flex;align-items: center;justify-content: center;font-size: 28px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
@@ -24,13 +24,13 @@
     
     /* --- 地图区域 --- */
     .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
-    #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0;}
+    #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0; position: absolute; top: 0; left: 0;}
     
-    /* === 核心修改区：调低地图控件的 z-index 到 400，绝对防遮挡 === */
-    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 400;display: flex;align-items: center;justify-content: center;cursor: pointer;}
+    /* === 核心修复：把 z-index 降到 10，保证绝对不会遮挡 Coze 的聊天面板 === */
+    .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;display: flex;align-items: center;justify-content: center;cursor: pointer;}
     .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
 
-    .map-controls{position: absolute;top: 85px;left: 20px;width: 320px;background: rgba(255, 255, 255, 0.95);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 400;max-height: calc(100vh - 220px);overflow-y: auto; backdrop-filter: blur(8px);}
+    .map-controls{position: absolute;top: 85px;left: 20px;width: 320px;background: rgba(255, 255, 255, 0.95);border-radius: 16px;padding: 20px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.2);z-index: 10;max-height: calc(100vh - 220px);overflow-y: auto; backdrop-filter: blur(8px);}
     .control-title{font-size: 18px;font-weight: 700;color: var(--door-gray);margin-bottom: 15px;border-bottom: 2px solid var(--accent-gold);padding-bottom: 8px;}
     .info-box{background: var(--bg-cream);padding: 12px;border-radius: 10px;margin-bottom: 15px;}
     .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 13px;}
@@ -43,28 +43,27 @@
     .stop-info h5{font-size: 14px;margin-bottom: 2px;font-weight: 600;}
     .stop-info p{font-size: 11px;color: #666;}
     
-    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 400;font-size: 11px;}
+    .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;font-size: 11px;}
     .legend-item{display: flex;align-items: center;gap: 6px;margin: 4px 0;}
     .dot{width: 12px;height: 12px;border-radius: 50%;}
     
-    /* === 专门为手机端瘦身，腾出聊天空间 === */
+    /* --- 手机端 UI 精致化调整 --- */
     @media (max-width: 768px){ 
         .map-controls{
             width: 260px; 
-            max-width: 80%; 
-            left: 10px; 
-            top: 75px; 
+            max-width: 75%; 
+            left: 15px; 
+            top: 80px; 
             max-height: 40vh; 
-            padding: 12px;
+            padding: 15px;
         } 
-        .control-title{font-size: 15px; margin-bottom: 10px; padding-bottom: 5px;}
-        .info-box{padding: 8px; margin-bottom: 10px;}
-        .info-row{font-size: 11px;}
-        .stop-item{padding: 6px; margin-bottom: 6px;}
-        .stop-info h5{font-size: 13px; margin-bottom: 0;}
+        .control-title{font-size: 16px; margin-bottom: 10px; padding-bottom: 5px;}
+        .info-box{padding: 10px; margin-bottom: 10px;}
+        .info-row{font-size: 12px;}
+        .stop-item{padding: 8px; margin-bottom: 6px;}
+        .stop-info h5{font-size: 13px; margin-bottom: 2px;}
         .stop-info p{font-size: 10px;}
-        .stop-num{width: 20px; height: 20px; font-size: 10px;}
-        .legend { bottom: 80px; left: 10px; padding: 6px 10px; font-size: 10px;} 
+        .legend { bottom: 100px; left: 15px; } 
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
   </style>
@@ -161,21 +160,23 @@
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
-    // 核心新增：在本地存储一个独一无二的用户ID，实现多设备聊天记录完全隔离
-    let deviceUserId = localStorage.getItem('coze_device_user_id');
-    if (!deviceUserId) {
-        // 生成类似 'tourist_a1b2c3d4e_1690000000' 的唯一标识
-        deviceUserId = 'tourist_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
-        localStorage.setItem('coze_device_user_id', deviceUserId);
+    // 核心修复：强制清除旧版本的缓存，防止 SDK 死读以前的记录
+    for(let key in localStorage) { if(key.startsWith('coze')) { localStorage.removeItem(key); } }
+
+    // 生成当前设备绝对唯一的 ID，保证每个游客都是独立的聊天房间
+    let secureUserId = sessionStorage.getItem('tourist_uuid');
+    if (!secureUserId) {
+        secureUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('tourist_uuid', secureUserId);
     }
 
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7636701328664264704',
+        user: secureUserId  // 强制向大模型声明当前用户的独立身份
       },
-      // 将唯一ID传给扣子服务器，让它知道这是个“新访客”
       userInfo: {
-        id: deviceUserId,
+        id: secureUserId,   // 双重保险
         name: '胡同游客'
       },
       componentProps: {
