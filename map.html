@@ -2,14 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>数字导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
-    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden;}
+    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden; height: 100vh; width: 100vw;}
     
     /* --- 导航栏 --- */
     .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
@@ -26,7 +26,6 @@
     .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
     #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0; position: absolute; top: 0; left: 0;}
     
-    /* === 核心修复：把 z-index 降到 10，保证绝对不会遮挡 Coze 的聊天面板 === */
     .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;display: flex;align-items: center;justify-content: center;cursor: pointer;}
     .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
 
@@ -47,15 +46,9 @@
     .legend-item{display: flex;align-items: center;gap: 6px;margin: 4px 0;}
     .dot{width: 12px;height: 12px;border-radius: 50%;}
     
-    /* --- 手机端 UI 精致化调整 --- */
     @media (max-width: 768px){ 
         .map-controls{
-            width: 260px; 
-            max-width: 75%; 
-            left: 15px; 
-            top: 80px; 
-            max-height: 40vh; 
-            padding: 15px;
+            width: 260px; max-width: 75%; left: 15px; top: 80px; max-height: 40vh; padding: 15px;
         } 
         .control-title{font-size: 16px; margin-bottom: 10px; padding-bottom: 5px;}
         .info-box{padding: 10px; margin-bottom: 10px;}
@@ -100,7 +93,6 @@
   </div>
 
   <script>
-    // --- 地图数据逻辑 (保持不变) ---
     const allNodesMaster = [
       {id:"B1",name:"无问西东精酿",door:"北155号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92765, lng: 116.37295, desc:"位于西四北大街北155号。提供门楼特调精酿，是文商融合的首站。"},
       {id:"N1",name:"隆长寺山门",door:"3号院",theme:"读门·寻古",type:"文化",stay:15, lat: 39.92803, lng: 116.37250, desc:"【随墙门】明代圣祚隆长寺旧址，存有珍贵的乾隆诗碑。"},
@@ -160,35 +152,17 @@
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
-    // 核心修复：强制清除旧版本的缓存，防止 SDK 死读以前的记录
-    for(let key in localStorage) { if(key.startsWith('coze')) { localStorage.removeItem(key); } }
-
-    // 生成当前设备绝对唯一的 ID，保证每个游客都是独立的聊天房间
-    let secureUserId = sessionStorage.getItem('tourist_uuid');
-    if (!secureUserId) {
-        secureUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('tourist_uuid', secureUserId);
-    }
+    // 清除残留的包含开发者身份的缓存，强制变成新访客
+    for(let key in localStorage) { if(key.includes('coze')) { localStorage.removeItem(key); } }
 
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7636701328664264704',
-        user: secureUserId  // 强制向大模型声明当前用户的独立身份
-      },
-      userInfo: {
-        id: secureUserId,   // 双重保险
-        name: '胡同游客'
       },
       componentProps: {
         title: 'AI老街坊', 
-      },
-      auth: {
-        type: 'token',
-        token: 'pat_wgP62mV92ZvsK6r1FwD1aXrV3tcDSCCifZ6BV2UfSg8x7bQ2eeCP5oRnCl6S8jSN',
-        onRefreshToken: function () {
-          return 'pat_wgP62mV92ZvsK6r1FwD1aXrV3tcDSCCifZ6BV2UfSg8x7bQ2eeCP5oRnCl6S8jSN'
-        }
       }
+
     });
   </script>
 </body>
