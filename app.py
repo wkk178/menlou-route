@@ -97,7 +97,7 @@ def calc_distance(lat1, lng1, lat2, lng2):
 
 @app.route('/')
 def index():
-    return jsonify({"message": "🚪 门楼层记·故事里 - 后端服务已启动"})
+    return jsonify({"message": "门楼层记·故事里 - 后端服务已启动"})
 
 
 @app.route('/api/nodes', methods=['GET'])
@@ -165,6 +165,6 @@ def data_insights():
 
 
 if __name__ == '__main__':
-    print("🚀 门楼层记后端服务启动中...")
-    print("📊 数据洞察接口: http://127.0.0.1:5000/api/data-insights")
+    print(" 门楼层记后端服务启动中...")
+    print(" 数据洞察接口: http://127.0.0.1:5000/api/data-insights")
     app.run(debug=True, port=5000)
