@@ -10,7 +10,7 @@ CORS(app)
 DATA_FILE = 'user_data.json'
 CONFIG_FILE = 'config.json'
 
-# --- 节点数据：已根据平面图和号牌分布精准修正坐标 ---
+
 NODES = [
     {"id": "B1", "name": "无问西东精酿", "door": "北155号", "theme": "创门", "type": "商业", "stay": 30,
      "lat": 39.92765, "lng": 116.37295, "interfere": 0.1, "tags": ["food", "photo"],
