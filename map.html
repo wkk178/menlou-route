@@ -59,78 +59,79 @@
         .legend { bottom: 100px; left: 15px; } 
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
-  </style>
 
-  /*
-   老街坊智能体 UI 定制
-   */
+    /* =======================================================
+       老街坊智能体 UI 定制 (已修复：移入 style 标签内部生效)
+       ======================================================= */
 
-/* 1. 放大手机端悬浮按钮并固定位置 (适配安全区) */
-#coze-web-sdk-container .coze-fab-button {
-    width: 64px !important;    /* 手机端黄金尺寸 */
-    height: 64px !important;
-    right: 16px !important;
-    bottom: calc(20px + env(safe-area-inset-bottom)) !important; /* 适配全面屏底部黑条 */
-    border: 3px solid #e6a23c !important; /* 暖橙色边框，与大爷头像呼应 */
-    box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important; /* 立体阴影 */
-    background: #ffffff !important;
-    border-radius: 50% !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    overflow: visible !important; /* 确保气泡不会被裁剪 */
-}
-
-/* 2. 保证图片完美填充不变形 */
-#coze-web-sdk-container .coze-fab-button img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    border-radius: 50% !important;
-}
-
-/* 3. 使用 CSS 动态生成气泡文字：“老街坊，路线问我！” */
-#coze-web-sdk-container .coze-fab-button::before {
-    content: "老街坊\A 路线问我！"; /* \A 表示换行 */
-    white-space: pre;
-    position: absolute;
-    bottom: 74px;                   /* 位于头像正上方 */
-    right: -3px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #333333;
-    font-size: 12px;                /* 字号略微调大，保证手机端清晰 */
-    font-weight: bold;
-    line-height: 1.4;
-    padding: 6px 12px;
-    border-radius: 12px 12px 2px 12px; /* 右下角变尖，指向大爷 */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-    border: 1px solid #e6a23c;
-    text-align: center;
-    width: max-content;             /* 宽度自动适应文字，避免换行错乱 */
-    pointer-events: none;           /* 让点击事件穿透气泡，避免误触 */
-    animation: bounceBubble 3s infinite ease-in-out; /* 添加微弱的上下浮动动画 */
-}
-
-/* 4. 气泡微弱浮动动画关键帧 */
-@keyframes bounceBubble {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
-}
-
-/* 5. 触摸按压反馈动效 */
-#coze-web-sdk-container .coze-fab-button:active {
-    transform: scale(0.92) !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
-}
-
-/* 6. 移动端对话窗口适配  */
-@media screen and (max-width: 768px) {
-    #coze-web-sdk-container .coze-chat-window {
-        bottom: 0px !important;
-        right: 0px !important;
-        width: 100% !important;
-        height: 80vh !important;
-        border-radius: 16px 16px 0 0 !important;
+    /* 1. 放大手机端悬浮按钮并固定位置 (适配安全区) */
+    #coze-web-sdk-container .coze-fab-button {
+        width: 64px !important;    /* 手机端黄金尺寸 */
+        height: 64px !important;
+        right: 16px !important;
+        bottom: calc(20px + env(safe-area-inset-bottom)) !important; /* 适配全面屏底部黑条 */
+        border: 3px solid #e6a23c !important; /* 暖橙色边框，与大爷头像呼应 */
+        box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important; /* 立体阴影 */
+        background: transparent !important; /* 修复白边：确保背景透明 */
+        border-radius: 50% !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        overflow: visible !important; /* 确保气泡不会被裁剪 */
     }
-}
+
+    /* 2. 保证图片完美填充不变形且切成圆形 */
+    #coze-web-sdk-container .coze-fab-button img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: 50% !important; /* 强制图片裁切为圆形，去除白边 */
+        background: white !important; /* 防止透明PNG有镂空 */
+    }
+
+    /* 3. 使用 CSS 动态生成气泡文字：“老街坊，路线问我！” */
+    #coze-web-sdk-container .coze-fab-button::before {
+        content: "老街坊\A 路线问我！"; /* \A 表示换行 */
+        white-space: pre;
+        position: absolute;
+        bottom: 74px;                   /* 位于头像正上方 */
+        right: -3px;
+        background: rgba(255, 255, 255, 0.95);
+        color: #333333;
+        font-size: 12px;                /* 字号略微调大，保证手机端清晰 */
+        font-weight: bold;
+        line-height: 1.4;
+        padding: 6px 12px;
+        border-radius: 12px 12px 2px 12px; /* 右下角变尖，指向大爷 */
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        border: 1px solid #e6a23c;
+        text-align: center;
+        width: max-content;             /* 宽度自动适应文字，避免换行错乱 */
+        pointer-events: none;           /* 让点击事件穿透气泡，避免误触 */
+        animation: bounceBubble 3s infinite ease-in-out; /* 添加微弱的上下浮动动画 */
+    }
+
+    /* 4. 气泡微弱浮动动画关键帧 */
+    @keyframes bounceBubble {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+    }
+
+    /* 5. 触摸按压反馈动效 */
+    #coze-web-sdk-container .coze-fab-button:active {
+        transform: scale(0.92) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+    }
+
+    /* 6. 移动端对话窗口适配  */
+    @media screen and (max-width: 768px) {
+        #coze-web-sdk-container .coze-chat-window {
+            bottom: 0px !important;
+            right: 0px !important;
+            width: 100% !important;
+            height: 80vh !important;
+            border-radius: 16px 16px 0 0 !important;
+        }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -142,11 +143,11 @@
         <a href="index.html">首页</a> <a href="quiz.html">智能推荐</a> <a href="map.html" class="active">数字导览</a> <a href="gate-3d.html">3D展厅</a> <a href="route.html">我的路线</a> <a href="about.html">项目介绍</a>
     </div>
   </nav>
-  
+
   <div class="map-wrapper">
     <div id="map"><div class="loading" id="loading">数据加载中...</div></div>
     <div class="compass" onclick="resetMap()"><div class="compass-arrow"></div></div>
-    
+
     <div class="map-controls">
       <h3 class="control-title">📍 漫步动线详情</h3>
       <div class="info-box">
@@ -156,7 +157,7 @@
       </div>
       <ul class="stop-list" id="stop-list"></ul>
     </div>
-    
+
     <div class="legend">
         <div class="legend-item"><div class="dot" style="background:#4A6B5A;"></div><span>寻古轴 (三条)</span></div>
         <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业/生活轴</span></div>
@@ -234,30 +235,29 @@
     // 强制给每台设备生成一段纯随机的乱码 ID
     const randomUserUUID = 'tourist_' + new Date().getTime() + '_' + Math.random().toString(36).substring(2);
 
-
-new CozeWebSDK.WebChatClient({
-  config: {
-    bot_id: '7636701328664264704',
-  },
-  auth: {
-    type: 'token',
-    token: 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR',
-    onRefreshToken: function () {
-      return 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR'
-    }
-  },
-  // 添加 UI 配置
-  ui: {
-    base: {
-      icon: './laojiefang_full.png', // 替换为你刚才放入项目的图片路径 (根据实际情况可能需要修改路径)
-      zIndex: 10005                    // 设置极高的层级，确保在地图之上
-    },
-    chatBot: {
-      title: '老街坊',                  // 对话框的标题
-      titleAvatar: './laojiefang_full.png', // 对话框内的头像
-    }
-  }
-});
+    new CozeWebSDK.WebChatClient({
+      config: {
+        bot_id: '7636701328664264704',
+      },
+      auth: {
+        type: 'token',
+        token: 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR',
+        onRefreshToken: function () {
+          return 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR'
+        }
+      },
+      // 添加 UI 配置
+      ui: {
+        base: {
+          icon: './laojiefang_full.png',
+          zIndex: 10005                    // 设置极高的层级，确保在地图之上
+        },
+        chatBot: {
+          title: '老街坊',                  // 对话框的标题
+          titleAvatar: './laojiefang_full.png', // 对话框内的头像
+        }
+      }
+    });
   </script>
 </body>
 </html>
