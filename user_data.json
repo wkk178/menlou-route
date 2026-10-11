@@ -1,1 +1,109 @@
-[]
+[
+  {
+    "timestamp": "2026-10-11T14:48:50.156414",
+    "request": {
+      "theme": "create",
+      "duration": "90",
+      "profile": "family",
+      "tags": [
+        "architecture",
+        "handcraft"
+      ],
+      "avoidResident": false
+    },
+    "response": {
+      "status": "success",
+      "route": [
+        {
+          "id": "B1",
+          "name": "无问西东精酿",
+          "door": "北155号",
+          "theme": "创门",
+          "type": "商业",
+          "stay": 30,
+          "lat": 39.92765,
+          "lng": 116.37295,
+          "interfere": 0.1,
+          "tags": [
+            "food",
+            "photo"
+          ],
+          "desc": "西四北大街北155号，门楼文化消费转译首站。",
+          "score": 40
+        },
+        {
+          "id": "N1",
+          "name": "隆长寺旧址",
+          "door": "1号",
+          "theme": "读门",
+          "type": "文化",
+          "stay": 15,
+          "lat": 39.92803,
+          "lng": 116.3725,
+          "interfere": 0.2,
+          "tags": [
+            "architecture",
+            "history"
+          ],
+          "desc": "明代圣祚隆长寺旧址（随墙门），存乾隆诗碑。",
+          "score": 52
+        },
+        {
+          "id": "N2",
+          "name": "11号广亮大门",
+          "door": "11号",
+          "theme": "读门",
+          "type": "文化",
+          "stay": 10,
+          "lat": 39.92806,
+          "lng": 116.37126,
+          "interfere": 0.25,
+          "tags": [
+            "architecture"
+          ],
+          "desc": "马福祥故居，旧时高级官宦宅门代表。",
+          "score": 52
+        },
+        {
+          "id": "N3",
+          "name": "13号金柱大门",
+          "door": "13号",
+          "theme": "读门",
+          "type": "文化",
+          "stay": 10,
+          "lat": 39.92807,
+          "lng": 116.37102,
+          "interfere": 0.25,
+          "tags": [
+            "architecture"
+          ],
+          "desc": "金柱大门，规制严谨，砖雕精美。",
+          "score": 52
+        },
+        {
+          "id": "N9",
+          "name": "44号金柱大门",
+          "door": "44号",
+          "theme": "读门",
+          "type": "文化",
+          "stay": 10,
+          "lat": 39.92827,
+          "lng": 116.36706,
+          "interfere": 0.25,
+          "tags": [
+            "architecture"
+          ],
+          "desc": "北侧双号院落代表。",
+          "score": 52
+        }
+      ],
+      "totalTime": 80,
+      "distance": 0.52,
+      "scores": {
+        "culture": 85,
+        "business": 15,
+        "resident": 90
+      }
+    }
+  }
+]
