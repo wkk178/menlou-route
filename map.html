@@ -35,28 +35,30 @@
     .info-row{display: flex;justify-content: space-between;margin: 5px 0;font-size: 13px;}
     .info-val{font-weight: bold;color: var(--brick-green);}
     .stop-list{list-style: none;}
+    .mode-switch{display: block;margin: 0 0 10px;font-size: 12px;color: var(--brick-green);text-decoration: none;}
+    .mode-switch:hover{text-decoration: underline;}
     .stop-item{display: flex;align-items: center;gap: 10px;padding: 10px;margin-bottom: 8px;background: white;border-radius: 8px;border-left: 4px solid var(--accent-gold);cursor: pointer;transition: 0.2s;}
     .stop-item.active{background: var(--bg-cream);border-left-color: var(--door-gray);}
     .stop-num{width: 24px;height: 24px;background: var(--door-gray);color: white;border-radius: 50%;display: flex;align-items: center;justify-content: center;font-size: 12px;font-weight: bold;flex-shrink: 0;}
     .stop-item.active .stop-num{background: var(--accent-gold);}
     .stop-info h5{font-size: 14px;margin-bottom: 2px;font-weight: 600;}
     .stop-info p{font-size: 11px;color: #666;}
-    
+
     .legend{position: absolute;bottom: 30px;left: 20px;background: rgba(255,255,255,0.95);padding: 10px 14px;border-radius: 10px;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;font-size: 11px;}
     .legend-item{display: flex;align-items: center;gap: 6px;margin: 4px 0;}
     .dot{width: 12px;height: 12px;border-radius: 50%;}
-    
-    @media (max-width: 768px){ 
+
+    @media (max-width: 768px){
         .map-controls{
             width: 260px; max-width: 75%; left: 15px; top: 80px; max-height: 40vh; padding: 15px;
-        } 
+        }
         .control-title{font-size: 16px; margin-bottom: 10px; padding-bottom: 5px;}
         .info-box{padding: 10px; margin-bottom: 10px;}
         .info-row{font-size: 12px;}
         .stop-item{padding: 8px; margin-bottom: 6px;}
         .stop-info h5{font-size: 13px; margin-bottom: 2px;}
         .stop-info p{font-size: 10px;}
-        .legend { bottom: 100px; left: 15px; } 
+        .legend { bottom: 100px; left: 15px; }
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
 
@@ -136,12 +138,13 @@
     <div class="compass" onclick="resetMap()"><div class="compass-arrow"></div></div>
 
     <div class="map-controls">
-      <h3 class="control-title">📍 漫步动线详情</h3>
-      <div class="info-box">
+      <h3 class="control-title" id="panel-title">📍 漫步动线详情</h3>
+      <div class="info-box" id="info-box">
         <div class="info-row"><span>⏱ 总计用时</span><span class="info-val" id="r-time">--</span></div>
         <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
         <div class="info-row"><span>📊 文化深度</span><span class="info-val" id="r-score">--</span></div>
       </div>
+      <a id="mode-switch" class="mode-switch" href="#"></a>
       <ul class="stop-list" id="stop-list"></ul>
     </div>
 
@@ -161,9 +164,17 @@
       {id:"L5",name:"傅增湘故居",door:"五条13号院",theme:"阅巷·生活",type:"文化",stay:15, lat: 39.92950, lng: 116.37050, desc:"声音采集点：收录有胡同鸽哨声，感知藏书大师的精神世界。"},
       {id:"B2",name:"易应茶舍",door:"西四北大街147号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92791, lng: 116.37293, desc:"西四北大街沿街茶舍，位于西四北三条路口南侧。"},
       {id:"B3",name:"叙杯",door:"赵登禹路144号附近",theme:"创门·共生",type:"商业",stay:20, lat: 39.92922, lng: 116.36726, desc:"赵登禹路沿街店铺，位于西四北五条与四条之间。"},
-      {id:"B4",name:"无名蹄花",door:"赵登禹路146-148号附近",theme:"创门·共生",type:"商业",stay:30, lat: 39.92906, lng: 116.36719, desc:"赵登禹路沿街餐饮，临近西四北四条路口。"}
+      {id:"B4",name:"无名蹄花",door:"赵登禹路146-148号附近",theme:"创门·共生",type:"商业",stay:30, lat: 39.92906, lng: 116.36719, desc:"赵登禹路沿街餐饮，临近西四北四条路口。"},
+      {id:"N9",name:"44号金柱大门",door:"44号",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92827, lng: 116.36706, desc:"北侧双号院落代表。"},
+      {id:"N10",name:"45号居民院落",door:"45号",theme:"推门·生活",type:"文化",stay:15, lat: 39.92817, lng: 116.36706, desc:"随墙门，感受胡同原真生活。"},
+      {id:"N11",name:"京剧体验馆",door:"17号",theme:"创门·共生",type:"商业",stay:40, lat: 39.92808, lng: 116.37052, desc:"御霜雅集，西洋门形制，京剧文化活化。"},
+      {id:"N12",name:"拾光茶铺",door:"21号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92809, lng: 116.37003, desc:"一院一茗特调茶（蛮子门）。"},
+      {id:"N13",name:"故事书店",door:"43号",theme:"创门·共生",type:"商业",stay:25, lat: 39.92816, lng: 116.36731, desc:"门楼主题文创与口述史展览。"},
+      {id:"N14",name:"胡同夜市",door:"50号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92829, lng: 116.36632, desc:"烟火经济体验区（如意门）。"}
     ];
-    const CAL = new URLSearchParams(location.search).get('calibrate') === '1';
+    const QS = new URLSearchParams(location.search);
+    const CAL = QS.get('calibrate') === '1';
+    const FREE = CAL || QS.get('mode') === 'free';   // 自主游览：显示全部景点
     let map, markers = [], routeLine, currentRoute = [];
     function initMap() {
         map = L.map('map', {center: [39.92840, 116.3710], zoom: 17, zoomControl: false});
@@ -172,9 +183,11 @@
         loadRoute();
     }
     function loadRoute() {
-        if (CAL) { currentRoute = allNodesMaster.map(n => ({...n})); renderMap(currentRoute, {totalTime: 0, distance: 0, scores: {culture: 0}}); return; }
+        if (FREE) { currentRoute = allNodesMaster.map(n => ({...n})); renderMap(currentRoute, {}); return; }
         const savedData = localStorage.getItem('routeData');
-        let routeData = savedData ? JSON.parse(savedData) : { route: allNodesMaster.slice(0,4), totalTime: 90, distance: 0.8, scores: {culture: 90} };
+        let routeData = null;
+        try { routeData = savedData ? JSON.parse(savedData) : null; } catch (e) {}
+        if (!routeData || !routeData.route || !routeData.route.length) { location.replace('choose.html'); return; }
         currentRoute = routeData.route.map(node => {
             const master = allNodesMaster.find(m => m.id === node.id || m.name === node.name);
             return master ? { ...master } : node;
@@ -192,7 +205,7 @@
                 icon: L.divIcon({
                     className: 'custom-marker',
                     html: `<div style="display:flex;flex-direction:column;align-items:center;">
-                            <div style="background:${node.type==='商业'?'#C9A86C':'#4A6B5A'};width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;">${i+1}</div>
+                            <div style="background:${node.type==='商业'?'#C9A86C':'#4A6B5A'};width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;">${FREE ? node.theme.charAt(0) : i+1}</div>
                             <div style="background:white;padding:2px 6px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);font-size:10px;margin-top:2px;font-weight:bold;white-space:nowrap;">${node.name}</div>
                            </div>`,
                     iconSize: [80, 50], iconAnchor: [40, 14]
@@ -201,15 +214,23 @@
             marker.bindPopup(`<div style="min-width:220px;"><h3 style="color:var(--door-gray); margin-bottom:5px;">${node.name}</h3><p style="font-size:12px; color:#666; margin-bottom:8px;">门楼编号：${node.door || '西四北'}</p><div style="background:#f9f5ef; padding:10px; border-radius:6px; font-size:13px; color:#333; line-height:1.5;">${node.desc}</div><button onclick="window.location.href='gate-3d.html?id=${node.id}'" style="width:100%; margin-top:10px; padding:10px; background:var(--door-gray); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">查看 3D 数字化档案</button></div>`);
             if (CAL) marker.on('dragend', e => showCal(node, e.target.getLatLng()));
             markers.push(marker); latlngs.push([node.lat, node.lng]);
-            listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.theme} · ${node.stay}min</p></div></li>`;
+            listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${FREE ? node.theme.charAt(0) : i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.theme} · ${node.stay}min</p></div></li>`;
         });
         if (latlngs.length > 1) {
-            if (!CAL) routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 5, opacity: 0.7, dashArray: '10, 10'}).addTo(map);
+            if (!FREE) routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 5, opacity: 0.7, dashArray: '10, 10'}).addTo(map);
             map.fitBounds(L.latLngBounds(latlngs), {padding: [50, 50]});
         }
         document.getElementById('r-time').textContent = (data.totalTime || 90) + '分钟';
         document.getElementById('r-dist').textContent = (data.distance || 0.8) + '公里';
         document.getElementById('r-score').textContent = (data.scores?.culture || 90) + '%';
+        applyMode(nodes.length);
+    }
+    function applyMode(count) {
+        const sw = document.getElementById('mode-switch');
+        document.getElementById('info-box').style.display = FREE ? 'none' : '';
+        document.getElementById('panel-title').textContent = FREE ? '📍 全部景点（共' + count + '处）' : '📍 漫步动线详情';
+        sw.textContent = FREE ? '不知道怎么逛？获取智能推荐路线 >' : '改为自主游览，查看全部景点 >';
+        sw.href = FREE ? 'quiz.html' : 'map.html?mode=free';
     }
     function showCal(node, p) {
         let box = document.getElementById('cal-box');

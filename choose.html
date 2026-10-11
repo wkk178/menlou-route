@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开启漫步 | 门楼层记·故事里</title>
+<style>
+:root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
+*{margin: 0;padding: 0;box-sizing: border-box;}
+body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);min-height: 100vh;}
+
+.navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+.logo-container{display: flex;align-items: center;gap: 15px;}
+.logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+.brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
+.brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
+.nav-links{display: flex;gap: 30px;}
+.nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
+.nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
+
+.main-content{margin-top: 110px;padding: 40px 20px 60px;min-height: calc(100vh - 110px);display: flex;flex-direction: column;align-items: center;}
+.page-header{text-align: center;margin-bottom: 45px;}
+.page-title{font-size: 36px;color: var(--door-gray);margin-bottom: 10px;}
+.page-subtitle{font-size: 16px;color: var(--brick-green);}
+
+.choice-grid{display: grid;grid-template-columns: repeat(2, 1fr);gap: 30px;width: 100%;max-width: 900px;}
+.choice-card{display: flex;flex-direction: column;background: var(--white);border-radius: 20px;padding: 40px 32px;text-decoration: none;color: inherit;border: 2px solid transparent;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.15);transition: all 0.3s;}
+.choice-card:hover{transform: translateY(-8px);border-color: var(--accent-gold);box-shadow: 0 16px 40px rgba(107, 91, 79, 0.22);}
+.choice-icon{width: 72px;height: 72px;border-radius: 18px;display: flex;align-items: center;justify-content: center;font-size: 38px;margin-bottom: 22px;color: var(--white);}
+.free .choice-icon{background: linear-gradient(135deg, var(--brick-green), #6c8f7c);}
+.smart .choice-icon{background: linear-gradient(135deg, var(--door-gray), var(--accent-gold));}
+.choice-card h2{font-size: 26px;color: var(--door-gray);margin-bottom: 8px;}
+.choice-tag{font-size: 13px;color: var(--brick-green);margin-bottom: 18px;}
+.choice-card p{font-size: 15px;color: #555;line-height: 1.8;margin-bottom: 26px;flex: 1;}
+.choice-go{align-self: flex-start;padding: 10px 24px;border-radius: 24px;font-size: 15px;font-weight: 600;color: var(--white);background: var(--accent-gold);}
+.free .choice-go{background: var(--brick-green);}
+
+.hint{margin-top: 30px;font-size: 13px;color: #888;text-align: center;}
+
+@media (max-width: 768px){
+  .navbar{padding: 12px 15px;}
+  .logo-placeholder{width: 40px;height: 40px;font-size: 20px;}
+  .brand-text h1{font-size: 18px;}
+  .nav-links{gap: 5px;}
+  .nav-links a{padding: 6px 8px;font-size: 12px;}
+  .main-content{margin-top: 90px;padding: 20px 15px 40px;}
+  .page-title{font-size: 28px;}
+  .choice-grid{grid-template-columns: 1fr;gap: 20px;}
+  .choice-card{padding: 28px 24px;}
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="logo-container">
+    <div class="logo-placeholder">🏮</div>
+    <div class="brand-text">
+      <h1>门楼里</h1>
+      <p>推开一座门楼，走进一层时光</p>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="quiz.html">智能推荐</a>
+    <a href="map.html">数字导览</a>
+    <a href="gate-3d.html">3D展厅</a>
+    <a href="route.html">我的路线</a>
+    <a href="about.html">项目介绍</a>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="page-header">
+    <h1 class="page-title">选择你的游览方式</h1>
+    <p class="page-subtitle">自己随心逛，或让系统为你规划一条路线</p>
+  </div>
+
+  <div class="choice-grid">
+    <a class="choice-card free" href="map.html?mode=free">
+      <div class="choice-icon">🚶</div>
+      <h2>自主游览</h2>
+      <div class="choice-tag">无需答题 · 立即开始</div>
+      <p>直接进入地图，查看西四北三条沿线的全部景点。点击点位可了解简介并进入 3D 门楼档案，行程由你自己安排。</p>
+      <span class="choice-go">查看全部景点</span>
+    </a>
+
+    <a class="choice-card smart" href="quiz.html">
+      <div class="choice-icon">🎯</div>
+      <h2>智能推荐</h2>
+      <div class="choice-tag">回答 5 个问题 · 约 1 分钟</div>
+      <p>根据你的体验偏好、游览时长、同行人员和兴趣标签，生成一条量身定制的步行路线，并给出沿途用时与距离。</p>
+      <span class="choice-go">定制我的路线</span>
+    </a>
+  </div>
+
+  <p class="hint">两种方式可随时切换，地图页内也提供切换入口。</p>
+</div>
+</body>
+</html>
