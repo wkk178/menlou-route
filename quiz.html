@@ -1,327 +1,265 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>智能路线推荐 | 门楼层记·故事里</title>
-  <style>
-    :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
-    *{margin: 0;padding: 0;box-sizing: border-box;}
-    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);min-height: 100vh;}
-    
-    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
-    .logo-container{display: flex;align-items: center;gap: 15px;}
-    .logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
-    .brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
-    .brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
-    .nav-links{display: flex;gap: 30px;}
-    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
-    .nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
-    
-    .main-content{margin-top: 110px;padding: 40px 20px;min-height: calc(100vh - 110px);display: flex;flex-direction: column;align-items: center;}
-    .page-header{text-align: center;margin-bottom: 40px;}
-    .page-title{font-size: 36px;color: var(--door-gray);margin-bottom: 10px;}
-    .page-subtitle{font-size: 16px;color: var(--brick-green);}
-    
-    .quiz-wrapper{width: 100%;max-width: 800px;background: var(--white);border-radius: 20px;padding: 40px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.15);position: relative;}
-    
-    .progress-bar-container{height: 6px;background: rgba(107, 91, 79, 0.1);border-radius: 3px;margin-bottom: 30px;overflow: hidden;}
-    .progress-bar{height: 100%;background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));width: 20%;transition: width 0.4s ease;}
-    
-    /* 题目区域 - 稳定修复版 */
-    .question-step{display: none;animation: fadeIn 0.5s ease;}
-    .question-step.active{display: block;}
-    
-    @keyframes fadeIn{from{opacity: 0;transform: translateY(10px);}to{opacity: 1;transform: translateY(0);}}
-    
-    .question-title{font-size: 22px;font-weight: 600;color: var(--door-gray);margin-bottom: 25px;}
-    
-    .options-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));gap: 15px;margin-bottom: 30px;}
-    .option-card{background: var(--bg-cream);border: 2px solid transparent;border-radius: 12px;padding: 20px;cursor: pointer;transition: all 0.2s;}
-    .option-card:hover{border-color: var(--accent-gold);background: #fff;}
-    .option-card.selected{background: var(--door-gray);color: white;border-color: var(--door-gray);}
-    .option-card h4{margin-bottom: 5px;font-size: 16px;}
-    .option-card p{font-size: 13px;opacity: 0.8;}
-    
-    .nav-buttons{display: flex;justify-content: space-between;margin-top: 30px;border-top: 1px solid #eee;padding-top: 20px;}
-    .btn{padding: 12px 30px;border: none;border-radius: 8px;font-size: 16px;cursor: pointer;transition: 0.3s;}
-    .btn-prev{background: #eee;color: #666;}
-    .btn-prev:hover{background: #ddd;}
-    .btn-next{background: var(--accent-gold);color: white;}
-    .btn-next:hover{background: #b89558;}
-    .btn-submit{background: var(--brick-green);color: white;}
-    .btn-submit:hover{background: #3a5546;}
-    .btn:disabled{opacity: 0.5;cursor: not-allowed;}
-    
-    /* 移动端适配 */
-    @media (max-width: 768px){
-      .navbar{padding: 12px 15px;}
-      .logo-placeholder{width: 40px;height: 40px;font-size: 20px;}
-      .brand-text h1{font-size: 18px;}
-      .nav-links{gap: 5px;}
-      .nav-links a{padding: 6px 8px;font-size: 12px;}
-      .main-content{margin-top: 90px;padding: 20px 15px;}
-      .quiz-wrapper{padding: 25px;}
-      .page-title{font-size: 28px;}
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>智能路线推荐 | 门楼层记·故事里</title>
+<style>
+:root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
+*{margin: 0;padding: 0;box-sizing: border-box;}
+body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark);min-height: 100vh;}
+.navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
+.logo-container{display: flex;align-items: center;gap: 15px;}
+.logo-placeholder{width: 60px;height: 60px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 12px;display: flex;align-items: center;justify-content: center;font-size: 32px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
+.brand-text h1{font-size: 24px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;}
+.brand-text p{font-size: 12px;color: var(--brick-green);font-style: italic;}
+.nav-links{display: flex;gap: 30px;}
+.nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;transition: all 0.3s;padding: 8px 16px;border-radius: 8px;}
+.nav-links a:hover,.nav-links a.active{background: var(--door-gray);color: var(--white);}
+.main-content{margin-top: 110px;padding: 40px 20px;min-height: calc(100vh - 110px);display: flex;flex-direction: column;align-items: center;}
+.page-header{text-align: center;margin-bottom: 40px;}
+.page-title{font-size: 36px;color: var(--door-gray);margin-bottom: 10px;}
+.page-subtitle{font-size: 16px;color: var(--brick-green);}
+.quiz-wrapper{width: 100%;max-width: 800px;background: var(--white);border-radius: 20px;padding: 40px;box-shadow: 0 8px 32px rgba(107, 91, 79, 0.15);position: relative;}
+.progress-bar-container{height: 6px;background: rgba(107, 91, 79, 0.1);border-radius: 3px;margin-bottom: 30px;overflow: hidden;}
+.progress-bar{height: 100%;background: linear-gradient(90deg, var(--door-gray), var(--accent-gold));width: 20%;transition: width 0.4s ease;}
+.question-step{display: none;animation: fadeIn 0.5s ease;}
+.question-step.active{display: block;}
+@keyframes fadeIn{from{opacity: 0;transform: translateY(10px);}to{opacity: 1;transform: translateY(0);}}
+.question-title{font-size: 22px;font-weight: 600;color: var(--door-gray);margin-bottom: 25px;}
+.options-grid{display: grid;grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));gap: 15px;margin-bottom: 30px;}
+.option-card{background: var(--bg-cream);border: 2px solid transparent;border-radius: 12px;padding: 20px;cursor: pointer;transition: all 0.2s;}
+.option-card:hover{border-color: var(--accent-gold);background: #fff;}
+.option-card.selected{background: var(--door-gray);color: white;border-color: var(--door-gray);}
+.option-card h4{margin-bottom: 5px;font-size: 16px;}
+.option-card p{font-size: 13px;opacity: 0.8;}
+.nav-buttons{display: flex;justify-content: space-between;margin-top: 30px;border-top: 1px solid #eee;padding-top: 20px;}
+.btn{padding: 12px 30px;border: none;border-radius: 8px;font-size: 16px;cursor: pointer;transition: 0.3s;}
+.btn-prev{background: #eee;color: #666;}
+.btn-prev:hover{background: #ddd;}
+.btn-next{background: var(--accent-gold);color: white;}
+.btn-next:hover{background: #b89558;}
+.btn-submit{background: var(--brick-green);color: white;}
+.btn-submit:hover{background: #3a5546;}
+.btn:disabled{opacity: 0.5;cursor: not-allowed;}
+@media (max-width: 768px){
+  .navbar{padding: 12px 15px;}
+  .logo-placeholder{width: 40px;height: 40px;font-size: 20px;}
+  .brand-text h1{font-size: 18px;}
+  .nav-links{gap: 5px;}
+  .nav-links a{padding: 6px 8px;font-size: 12px;}
+  .main-content{margin-top: 90px;padding: 20px 15px;}
+  .quiz-wrapper{padding: 25px;}
+  .page-title{font-size: 28px;}
+}
+</style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="logo-container">
-      <div class="logo-placeholder">🏮</div>
-      <div class="brand-text">
-        <h1>门楼里</h1>
-        <p>推开一座门楼，走进一层时光</p>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a href="index.html">首页</a>
-      <a href="quiz.html" class="active">智能推荐</a>
-      <a href="map.html">数字导览</a>
-      <a href="gate-3d.html">3D展厅</a>
-      <a href="route.html">我的路线</a>
-      <a href="about.html">项目介绍</a>
-    </div>
-  </nav>
-  
-  <div class="main-content">
-    <div class="page-header">
-      <h1 class="page-title">🎯 智能路线推荐</h1>
-      <p class="page-subtitle">回答几个问题，我们将为你量身定制最佳游览路线</p>
-    </div>
-    
-    <div class="quiz-wrapper">
-      <div class="progress-bar-container">
-        <div class="progress-bar" id="progress"></div>
-      </div>
-      
-      <!-- 题目 1 -->
-      <div class="question-step active" data-step="1">
-        <h3 class="question-title">1. 你更感兴趣的是哪种体验？</h3>
-        <div class="options-grid">
-          <div class="option-card" onclick="selectOption(1, 'read', this)">
-            <h4>📖 门楼探秘</h4><p>了解建筑形制与砖雕艺术</p>
-          </div>
-          <div class="option-card" onclick="selectOption(1, 'push', this)">
-            <h4>🏡 院落故事</h4><p>走进胡同，感受胡同生活</p>
-          </div>
-          <div class="option-card" onclick="selectOption(1, 'create', this)">
-            <h4>🎨 新颜共生</h4><p>体验京剧、手作等新业态</p>
-          </div>
-          <div class="option-card" onclick="selectOption(1, 'mixed', this)">
-            <h4>🌟 综合体验</h4><p>均衡感受文化、故事与创新</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 题目 2 -->
-      <div class="question-step" data-step="2">
-        <h3 class="question-title">2. 你计划游览多长时间？</h3>
-        <div class="options-grid">
-          <div class="option-card" onclick="selectOption(2, '60', this)">
-            <h4>⏱ 1小时</h4><p>快速精华游</p>
-          </div>
-          <div class="option-card" onclick="selectOption(2, '90', this)">
-            <h4>🕐 1.5小时</h4><p>标准深度游</p>
-          </div>
-          <div class="option-card" onclick="selectOption(2, '120', this)">
-            <h4>🕑 2小时</h4><p>全面沉浸游</p>
-          </div>
-          <div class="option-card" onclick="selectOption(2, '180', this)">
-            <h4>🕒 3小时+</h4><p>深度探索游</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 题目 3 -->
-      <div class="question-step" data-step="3">
-        <h3 class="question-title">3. 你和谁一起来？</h3>
-        <div class="options-grid">
-          <div class="option-card" onclick="selectOption(3, 'independent', this)">
-            <h4>🚶 独自一人</h4><p>自由探索，深度体验</p>
-          </div>
-          <div class="option-card" onclick="selectOption(3, 'romantic', this)">
-            <h4>💑 情侣/伴侣</h4><p>浪漫漫步，拍照打卡</p>
-          </div>
-          <div class="option-card" onclick="selectOption(3, 'family', this)">
-            <h4>👨‍👧👦 家庭亲子</h4><p>寓教于乐，适合儿童</p>
-          </div>
-          <div class="option-card" onclick="selectOption(3, 'social', this)">
-            <h4>👥 朋友同行</h4><p>互动体验，分享乐趣</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 题目 4 -->
-      <div class="question-step" data-step="4">
-        <h3 class="question-title">4. 你对哪些内容特别感兴趣？（多选）</h3>
-        <div class="options-grid">
-          <div class="option-card" onclick="toggleMulti(this, 'architecture')">
-            <h4>🏛 古建筑</h4><p>门楼形制、砖雕艺术</p>
-          </div>
-          <div class="option-card" onclick="toggleMulti(this, 'history')">
-            <h4>📜 历史人文</h4><p>名人故居、院落故事</p>
-          </div>
-          <div class="option-card" onclick="toggleMulti(this, 'handcraft')">
-            <h4>✋ 手作体验</h4><p>拓印、拼豆、脸谱绘制</p>
-          </div>
-          <div class="option-card" onclick="toggleMulti(this, 'food')">
-            <h4>🍵 美食茶饮</h4><p>胡同私房菜、特色茶铺</p>
-          </div>
-          <div class="option-card" onclick="toggleMulti(this, 'photo')">
-            <h4>📸 摄影打卡</h4><p>最美角度、出片圣地</p>
-          </div>
-          <div class="option-card" onclick="toggleMulti(this, 'shopping')">
-            <h4>🛍 文创购物</h4><p>门楼主题文创产品</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 题目 5 -->
-      <div class="question-step" data-step="5">
-        <h3 class="question-title">5. 是否希望避开居民生活区，减少打扰？</h3>
-        <div class="options-grid">
-          <div class="option-card" onclick="selectOption(5, 'yes', this)">
-            <h4>🤫 是的，希望居民友好</h4><p>优先选择公共空间和开放区域</p>
-          </div>
-          <div class="option-card" onclick="selectOption(5, 'no', this)">
-            <h4>🏘 没关系，想体验真实生活</h4><p>愿意探访居民院落，感受原真性</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="nav-buttons">
-        <button class="btn btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>上一题</button>
-        <button class="btn btn-next" id="nextBtn" onclick="changeStep(1)" disabled>下一题</button>
-        <button class="btn btn-submit" id="submitBtn" onclick="submitForm()" style="display:none;">生成我的路线</button>
-      </div>
+<nav class="navbar">
+  <div class="logo-container">
+    <div class="logo-placeholder">🏮</div>
+    <div class="brand-text">
+      <h1>门楼里</h1>
+      <p>推开一座门楼，走进一层时光</p>
     </div>
   </div>
-  
-  <script>
-    let currentStep = 1;
-    const totalSteps = 5;
-    let answers = {theme: '', duration: '', profile: '', tags: [], avoidResident: ''};
-    
-    function updateUI() {
-      // 更新进度条
-      document.getElementById('progress').style.width = (currentStep / totalSteps * 100) + '%';
-      
-      // 切换题目显示
-      document.querySelectorAll('.question-step').forEach(el => el.classList.remove('active'));
-      document.querySelector(`.question-step[data-step="${currentStep}"]`).classList.add('active');
-      
-      // 按钮状态
-      document.getElementById('prevBtn').disabled = currentStep === 1;
-      
-      if (currentStep === totalSteps) {
-        document.getElementById('nextBtn').style.display = 'none';
-        // 检查是否有必填项
-        checkFinalSubmit();
-      } else {
-        document.getElementById('nextBtn').style.display = 'inline-block';
-        document.getElementById('submitBtn').style.display = 'none';
-        // 检查当前步骤是否已选
-        checkCurrentStep();
-      }
-    }
-    
-    function checkCurrentStep() {
-      let isValid = false;
-      if (currentStep === 4) {
-        isValid = answers.tags.length > 0;
-      } else if (currentStep === 1) {
-        isValid = answers.theme !== '';
-      } else if (currentStep === 2) {
-        isValid = answers.duration !== '';
-      } else if (currentStep === 3) {
-        isValid = answers.profile !== '';
-      }
-      document.getElementById('nextBtn').disabled = !isValid;
-    }
-    
-    function checkFinalSubmit() {
-      let isValid = answers.avoidResident !== '' && answers.tags.length > 0 && answers.theme !== '';
-      if (isValid) {
-        document.getElementById('submitBtn').style.display = 'inline-block';
-        document.getElementById('submitBtn').disabled = false;
-      } else {
-        document.getElementById('submitBtn').style.display = 'inline-block';
-        document.getElementById('submitBtn').disabled = true;
-      }
-    }
-    
-    function selectOption(step, value, el) {
-      // 清除同组选中状态
-      el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-      
-      if (step === 1) answers.theme = value;
-      if (step === 2) answers.duration = value;
-      if (step === 3) answers.profile = value;
-      if (step === 5) answers.avoidResident = value === 'yes' ? true : false;
-      
-      checkCurrentStep();
-      if(step === 5) checkFinalSubmit();
-    }
-    
-    function toggleMulti(el, tag) {
-      el.classList.toggle('selected');
-      if (answers.tags.includes(tag)) {
-        answers.tags = answers.tags.filter(t => t !== tag);
-      } else {
-        answers.tags.push(tag);
-      }
-      checkCurrentStep();
-      if(currentStep === 5) checkFinalSubmit();
-    }
-    
-    function changeStep(dir) {
-      currentStep += dir;
-      updateUI();
-    }
-    
-    async function submitForm() {
-      const btn = document.getElementById('submitBtn');
-      btn.textContent = "计算中...";
-      btn.disabled = true;
-      
-      try {
-        // 尝试调用后端
-        const response = await fetch('http://127.0.0.1:5000/api/generate-route', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(answers)
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('routeData', JSON.stringify(data));
-        } else {
-          throw new Error("Backend Error");
-        }
-      } catch (e) {
-        
-        console.warn("后端未连接，使用模拟数据");
-        const mockData = {
-          route: [
-            {id:"N1",name:"隆长寺山门",theme:"读门",type:"文化",stay:15,lat:39.9258,lng:116.3725,tags:["architecture"]},
-            {id:"N3",name:"广亮大门展",theme:"读门",type:"文化",stay:10,lat:39.9260,lng:116.3710,tags:["photo"]},
-            {id:"N5",name:"拾光茶铺",theme:"创门",type:"商业",stay:30,lat:39.9257,lng:116.3688,tags:["food"]}
-          ],
-          totalTime: 90,
-          distance: 0.8,
-          scores: {culture: 80, business: 20, resident: 85}
-        };
-        localStorage.setItem('routeData', JSON.stringify(mockData));
-      }
-      
-      window.location.href = 'map.html';
-    }
-    
-    // 初始化
-    updateUI();
-  </script>
+  <div class="nav-links">
+    <a href="index.html">首页</a>
+    <a href="quiz.html" class="active">智能推荐</a>
+    <a href="map.html">数字导览</a>
+    <a href="gate-3d.html">3D展厅</a>
+    <a href="route.html">我的路线</a>
+    <a href="about.html">项目介绍</a>
+  </div>
+</nav>
+
+<div class="main-content">
+  <div class="page-header">
+    <h1 class="page-title">🎯 智能路线推荐</h1>
+    <p class="page-subtitle">回答几个问题，我们将为你量身定制最佳游览路线</p>
+  </div>
+
+  <div class="quiz-wrapper">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <!-- 题目 1 -->
+    <div class="question-step active" data-step="1">
+      <h3 class="question-title">1. 你更感兴趣的是哪种体验？</h3>
+      <div class="options-grid">
+        <div class="option-card" onclick="selectOption(1, 'read', this)">
+          <h4>📖 门楼探秘</h4><p>了解建筑形制与砖雕艺术</p>
+        </div>
+        <div class="option-card" onclick="selectOption(1, 'push', this)">
+          <h4>🏡 院落故事</h4><p>走进胡同，感受胡同生活</p>
+        </div>
+        <div class="option-card" onclick="selectOption(1, 'create', this)">
+          <h4>🎨 新颜共生</h4><p>体验京剧、手作等新业态</p>
+        </div>
+        <div class="option-card" onclick="selectOption(1, 'mixed', this)">
+          <h4>🌟 综合体验</h4><p>均衡感受文化、故事与创新</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 题目 2 -->
+    <div class="question-step" data-step="2">
+      <h3 class="question-title">2. 你计划游览多长时间？</h3>
+      <div class="options-grid">
+        <div class="option-card" onclick="selectOption(2, '60', this)">
+          <h4>⏱ 1小时</h4><p>快速精华游</p>
+        </div>
+        <div class="option-card" onclick="selectOption(2, '90', this)">
+          <h4>🕐 1.5小时</h4><p>标准深度游</p>
+        </div>
+        <div class="option-card" onclick="selectOption(2, '120', this)">
+          <h4>🕑 2小时</h4><p>全面沉浸游</p>
+        </div>
+        <div class="option-card" onclick="selectOption(2, '180', this)">
+          <h4>🕒 3小时+</h4><p>深度探索游</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 题目 3 -->
+    <div class="question-step" data-step="3">
+      <h3 class="question-title">3. 你和谁一起来？</h3>
+      <div class="options-grid">
+        <div class="option-card" onclick="selectOption(3, 'independent', this)">
+          <h4>🚶 独自一人</h4><p>自由探索，深度体验</p>
+        </div>
+        <div class="option-card" onclick="selectOption(3, 'romantic', this)">
+          <h4>💑 情侣/伴侣</h4><p>浪漫漫步，拍照打卡</p>
+        </div>
+        <div class="option-card" onclick="selectOption(3, 'family', this)">
+          <h4>👨‍👧👦 家庭亲子</h4><p>寓教于乐，适合儿童</p>
+        </div>
+        <div class="option-card" onclick="selectOption(3, 'social', this)">
+          <h4>👥 朋友同行</h4><p>互动体验，分享乐趣</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 题目 4 -->
+    <div class="question-step" data-step="4">
+      <h3 class="question-title">4. 你对哪些内容特别感兴趣？（多选）</h3>
+      <div class="options-grid">
+        <div class="option-card" onclick="toggleMulti(this, 'architecture')">
+          <h4>🏛 古建筑</h4><p>门楼形制、砖雕艺术</p>
+        </div>
+        <div class="option-card" onclick="toggleMulti(this, 'history')">
+          <h4>📜 历史人文</h4><p>名人故居、院落故事</p>
+        </div>
+        <div class="option-card" onclick="toggleMulti(this, 'handcraft')">
+          <h4>✋ 手作体验</h4><p>拓印、拼豆、脸谱绘制</p>
+        </div>
+        <div class="option-card" onclick="toggleMulti(this, 'food')">
+          <h4>🍵 美食茶饮</h4><p>胡同私房菜、特色茶铺</p>
+        </div>
+        <div class="option-card" onclick="toggleMulti(this, 'photo')">
+          <h4>📸 摄影打卡</h4><p>最美角度、出片圣地</p>
+        </div>
+        <div class="option-card" onclick="toggleMulti(this, 'shopping')">
+          <h4>🛍 文创购物</h4><p>门楼主题文创产品</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 题目 5 -->
+    <div class="question-step" data-step="5">
+      <h3 class="question-title">5. 是否希望避开居民生活区，减少打扰？</h3>
+      <div class="options-grid">
+        <div class="option-card" onclick="selectOption(5, 'yes', this)">
+          <h4>🤫 是的，希望居民友好</h4><p>优先选择公共空间和开放区域</p>
+        </div>
+        <div class="option-card" onclick="selectOption(5, 'no', this)">
+          <h4>🏘 没关系，想体验真实生活</h4><p>愿意探访居民院落，感受原真性</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-prev" id="prevBtn" onclick="changeStep(-1)" disabled>上一题</button>
+      <button class="btn btn-next" id="nextBtn" onclick="changeStep(1)" disabled>下一题</button>
+      <button class="btn btn-submit" id="submitBtn" onclick="submitForm()" style="display:none;">生成我的路线</button>
+    </div>
+  </div>
+</div>
+
+<script src="route-engine.js"></script>
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+let answers = {theme: '', duration: '', profile: '', tags: [], avoidResident: ''};
+
+function updateUI() {
+  document.getElementById('progress').style.width = (currentStep / totalSteps * 100) + '%';
+  document.querySelectorAll('.question-step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.question-step[data-step="${currentStep}"]`).classList.add('active');
+  document.getElementById('prevBtn').disabled = currentStep === 1;
+
+  if (currentStep === totalSteps) {
+    document.getElementById('nextBtn').style.display = 'none';
+    checkFinalSubmit();
+  } else {
+    document.getElementById('nextBtn').style.display = 'inline-block';
+    document.getElementById('submitBtn').style.display = 'none';
+    checkCurrentStep();
+  }
+}
+
+function checkCurrentStep() {
+  let isValid = false;
+  if (currentStep === 4) isValid = answers.tags.length > 0;
+  else if (currentStep === 1) isValid = answers.theme !== '';
+  else if (currentStep === 2) isValid = answers.duration !== '';
+  else if (currentStep === 3) isValid = answers.profile !== '';
+  document.getElementById('nextBtn').disabled = !isValid;
+}
+
+function checkFinalSubmit() {
+  const isValid = answers.avoidResident !== '' && answers.tags.length > 0 && answers.theme !== '';
+  const btn = document.getElementById('submitBtn');
+  btn.style.display = 'inline-block';
+  btn.disabled = !isValid;
+}
+
+function selectOption(step, value, el) {
+  el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (step === 1) answers.theme = value;
+  if (step === 2) answers.duration = value;
+  if (step === 3) answers.profile = value;
+  if (step === 5) answers.avoidResident = value === 'yes';
+  checkCurrentStep();
+  if (step === 5) checkFinalSubmit();
+}
+
+function toggleMulti(el, tag) {
+  el.classList.toggle('selected');
+  if (answers.tags.includes(tag)) answers.tags = answers.tags.filter(t => t !== tag);
+  else answers.tags.push(tag);
+  checkCurrentStep();
+  if (currentStep === 5) checkFinalSubmit();
+}
+
+function changeStep(dir) {
+  currentStep += dir;
+  updateUI();
+}
+
+
+function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '计算中...';
+  btn.disabled = true;
+  const result = window.generateRoute(answers);
+  localStorage.setItem('routeData', JSON.stringify(result));
+  window.location.href = 'map.html';
+}
+
+updateUI();
+</script>
 </body>
 </html>
