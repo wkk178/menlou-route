@@ -60,76 +60,78 @@
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
 
-    /* =======================================================
-       老街坊智能体 UI 定制 (已修复：移入 style 标签内部生效)
-       ======================================================= */
+    /*
+       老街坊智能体 UI 定制
+      */
 
-    /* 1. 放大手机端悬浮按钮并固定位置 (适配安全区) */
-    #coze-web-sdk-container .coze-fab-button {
-        width: 64px !important;    /* 手机端黄金尺寸 */
-        height: 64px !important;
-        right: 16px !important;
-        bottom: calc(20px + env(safe-area-inset-bottom)) !important; /* 适配全面屏底部黑条 */
-        border: 3px solid #e6a23c !important; /* 暖橙色边框，与大爷头像呼应 */
-        box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important; /* 立体阴影 */
-        background: transparent !important; /* 修复白边：确保背景透明 */
-        border-radius: 50% !important;
-        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-        overflow: visible !important; /* 确保气泡不会被裁剪 */
+    /* 1. 强制重置官方容器，干掉默认约束 */
+    div#coze-web-sdk-container {
+        z-index: 2147483647 !important;
     }
 
-    /* 2. 保证图片完美填充不变形且切成圆形 */
-    #coze-web-sdk-container .coze-fab-button img {
+    /* 2. 放大手机端悬浮按钮，并加入层级穿透 */
+    body #coze-web-sdk-container > div:first-child,
+    #coze-web-sdk-container .coze-fab-button {
+        width: 64px !important;
+        height: 64px !important;
+        right: 16px !important;
+        bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+        border: 3px solid #e6a23c !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.3) !important;
+        background-color: transparent !important;
+        border-radius: 50% !important;
+        overflow: visible !important;
+        /* 强制覆盖官方默认的 transform 缩放，防止被官方缩小 */
+        transform: none !important;
+    }
+
+    /* 3. 彻底干掉白边：针对所有可能生成白边的 img 和内部 svg */
+    #coze-web-sdk-container .coze-fab-button img,
+    #coze-web-sdk-container .coze-fab-button svg {
         width: 100% !important;
         height: 100% !important;
         object-fit: cover !important;
-        border-radius: 50% !important; /* 强制图片裁切为圆形，去除白边 */
-        background: white !important; /* 防止透明PNG有镂空 */
+        border-radius: 50% !important;
+        background: transparent !important;
+        display: block !important;
     }
 
-    /* 3. 使用 CSS 动态生成气泡文字：“老街坊，路线问我！” */
-    #coze-web-sdk-container .coze-fab-button::before {
-        content: "老街坊\A 路线问我！"; /* \A 表示换行 */
-        white-space: pre;
-        position: absolute;
-        bottom: 74px;                   /* 位于头像正上方 */
-        right: -3px;
-        background: rgba(255, 255, 255, 0.95);
-        color: #333333;
-        font-size: 12px;                /* 字号略微调大，保证手机端清晰 */
-        font-weight: bold;
-        line-height: 1.4;
-        padding: 6px 12px;
-        border-radius: 12px 12px 2px 12px; /* 右下角变尖，指向大爷 */
-        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        border: 1px solid #e6a23c;
-        text-align: center;
-        width: max-content;             /* 宽度自动适应文字，避免换行错乱 */
-        pointer-events: none;           /* 让点击事件穿透气泡，避免误触 */
-        animation: bounceBubble 3s infinite ease-in-out; /* 添加微弱的上下浮动动画 */
+    /* 4. 强制生成气泡 (提升选择器权重) */
+    body div#coze-web-sdk-container .coze-fab-button::after {
+        content: "老街坊\A 路线问我！" !important;
+        white-space: pre !important;
+        position: absolute !important;
+        bottom: 74px !important;
+        right: -3px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #333333 !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+        line-height: 1.4 !important;
+        padding: 6px 12px !important;
+        border-radius: 12px 12px 2px 12px !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15) !important;
+        border: 1px solid #e6a23c !important;
+        text-align: center !important;
+        width: max-content !important;
+        pointer-events: none !important;
+        animation: bounceBubble 3s infinite ease-in-out !important;
+        display: block !important; /* 确保伪元素被强制渲染 */
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 999 !important;
     }
 
-    /* 4. 气泡微弱浮动动画关键帧 */
+    /* 5. 气泡微弱浮动动画关键帧 */
     @keyframes bounceBubble {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-4px); }
     }
 
-    /* 5. 触摸按压反馈动效 */
+    /* 6. 触摸按压反馈动效 */
     #coze-web-sdk-container .coze-fab-button:active {
         transform: scale(0.92) !important;
         box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
-    }
-
-    /* 6. 移动端对话窗口适配  */
-    @media screen and (max-width: 768px) {
-        #coze-web-sdk-container .coze-chat-window {
-            bottom: 0px !important;
-            right: 0px !important;
-            width: 100% !important;
-            height: 80vh !important;
-            border-radius: 16px 16px 0 0 !important;
-        }
     }
   </style>
 </head>
