@@ -9,23 +9,28 @@
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
-    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: var(--bg-cream);color: var(--text-dark); overflow: hidden; height: 100vh; width: 100vw;}
-    
-    /* --- 导航栏 --- */
-    .navbar{position: fixed;top: 0;width: 100%;padding: 15px 50px;background: rgba(245, 241, 232, 0.98);backdrop-filter: blur(12px);z-index: 1000;box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);display: flex;justify-content: space-between;align-items: center;}
-    .logo-container{display: flex;align-items: center;gap: 15px;}
-    .logo-placeholder{width: 50px;height: 50px;background: linear-gradient(135deg, var(--door-gray), var(--brick-green));border-radius: 10px;display: flex;align-items: center;justify-content: center;font-size: 28px;box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);}
-    .brand-text h1{font-size: 20px;font-weight: 700;color: var(--door-gray);letter-spacing: 2px;line-height: 1.2;}
-    .brand-text p{font-size: 10px; color: var(--brick-green); font-style: italic; display: block;} 
-    .nav-links{display: flex;gap: 20px;}
-    .nav-links a{text-decoration: none;color: var(--text-dark);font-weight: 500;padding: 8px 16px;border-radius: 8px;transition: 0.3s; font-size: 15px; text-align: center;}
-    .nav-links a:hover, .nav-links a.active{background: var(--door-gray);color: var(--white);}
-    @media (max-width: 768px){ .navbar{padding: 10px 15px;} .logo-placeholder{width: 45px;height: 45px;font-size: 24px;} .brand-text h1{font-size: 18px;} .nav-links{gap: 4px;} .nav-links a{padding: 10px 5px; font-size: 11px; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1px; border-radius: 6px; line-height: 1.1; min-width: 32px; height: auto;} }
-    
+    body{font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;background: #E6DFD0;color: var(--text-dark); overflow: hidden; height: 100vh; height: 100dvh;}
+
+    :root{--red: #B8382E; --tab-h: 57px;}
+    .app{max-width: 480px; margin: 0 auto; height: 100vh; height: 100dvh; position: relative; overflow: hidden; background: var(--bg-cream); box-shadow: 0 0 40px rgba(0,0,0,0.12);}
+
+    /* 顶部切换条 */
+    .seg{position: absolute; top: calc(env(safe-area-inset-top) + 12px); left: 50%; transform: translateX(-50%); z-index: 14; display: flex; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.18);}
+    .seg a{padding: 7px 16px; border-radius: 17px; font-size: 13px; font-weight: 600; color: var(--door-gray); white-space: nowrap; text-decoration: none;}
+    .seg a.on{background: linear-gradient(135deg, #A93027, #E0733B); color: #fff;}
+
+    /* 底部标签栏 */
+    .tabbar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 50; display: flex;
+            background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border-top: 1px solid rgba(107,91,79,0.12); padding: 7px 0 calc(7px + env(safe-area-inset-bottom));}
+    .tab{flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: #9a9088; text-decoration: none;}
+    .tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
+    .tab.active{color: var(--red); font-weight: 600;}
+
     /* --- 地图区域 --- */
-    .map-wrapper{margin-top: 80px;height: calc(100vh - 80px);position: relative;}
+    .map-wrapper{position: absolute; left: 0; right: 0; top: 0; bottom: calc(var(--tab-h) + env(safe-area-inset-bottom));}
     #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0; position: absolute; top: 0; left: 0;}
-    
+
     .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;display: flex;align-items: center;justify-content: center;cursor: pointer;}
     .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
 
@@ -49,21 +54,21 @@
     .dot{width: 12px;height: 12px;border-radius: 50%;}
 
     #panel-tab{display: none;}
-    @media (max-width: 768px){
+    @media (min-width: 0px){
         :root{--drawer-w: min(62vw, 232px);}
-        .compass{top: 12px; left: 12px; width: 40px; height: 40px;}
+        .compass{top: calc(env(safe-area-inset-top) + 12px); left: 12px; width: 40px; height: 40px;}
         .compass-arrow{border-left-width: 5px; border-right-width: 5px; border-bottom-width: 14px;}
 
         /* 侧拉抽屉：默认收起，优先展示地图 */
         .map-controls{
-            width: var(--drawer-w); left: 0; top: 66px; max-height: min(50vh, 420px);
+            width: var(--drawer-w); left: 0; top: calc(env(safe-area-inset-top) + 66px); max-height: min(50vh, 420px);
             padding: 12px; border-radius: 0 14px 14px 0;
             transform: translateX(-102%); transition: transform 0.3s ease; z-index: 12;
         }
         .map-wrapper.drawer-open .map-controls{transform: translateX(0);}
         .map-wrapper:not(.drawer-open) .map-controls{box-shadow: none;}
         #panel-tab{
-            display: flex; position: absolute; top: 66px; left: 0; z-index: 13;
+            display: flex; position: absolute; top: calc(env(safe-area-inset-top) + 66px); left: 0; z-index: 13;
             width: 30px; padding: 14px 0; align-items: center; justify-content: center;
             background: var(--door-gray); color: #fff; font-size: 13px; letter-spacing: 3px;
             writing-mode: vertical-rl; border: none; border-radius: 0 10px 10px 0;
@@ -79,7 +84,7 @@
         .stop-num{width: 22px; height: 22px; font-size: 11px;}
         .stop-info h5{font-size: 13px; margin-bottom: 1px;}
         .stop-info p{font-size: 10px;}
-        .legend{bottom: 84px; left: 10px; padding: 6px 10px; font-size: 10px;}
+        .legend{bottom: 14px; left: 10px; padding: 6px 10px; font-size: 10px;}
         .legend-item{margin: 2px 0;}
         .dot{width: 10px; height: 10px;}
         /* 自主游览缩小到低倍率时，只显示圆点，放大后再显示店名 */
@@ -89,9 +94,9 @@
 
     /* 老街坊智能体：自定义悬浮按钮与提示气泡 */
     #laojiefang-fab {
-        position: fixed;
-        right: 16px;
-        bottom: calc(20px + env(safe-area-inset-bottom));
+        position: absolute;
+        right: 14px;
+        bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);
         width: 68px;
         height: 68px;
         z-index: 10004;
@@ -148,18 +153,11 @@
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="logo-container">
-      <div class="logo-placeholder">🏛️</div>
-      <div class="brand-text"><h1>门楼里</h1><p>层记西四，阅见古今</p></div>
-    </div>
-    <div class="nav-links">
-        <a href="index.html">首页</a> <a href="quiz.html">智能推荐</a> <a href="map.html" class="active">数字导览</a> <a href="gate-3d.html">3D展厅</a> <a href="route.html">我的路线</a> <a href="about.html">项目介绍</a>
-    </div>
-  </nav>
+  <div class="app">
 
   <div class="map-wrapper">
     <div id="map"><div class="loading" id="loading">数据加载中...</div></div>
+    <div class="seg"><a href="map.html?mode=free" id="seg-free">全部景点</a><a href="map.html" id="seg-route">我的路线</a></div>
     <div class="compass" onclick="resetMap()"><div class="compass-arrow"></div></div>
 
     <button id="panel-tab" type="button" onclick="toggleDrawer()">景点列表</button>
@@ -179,6 +177,29 @@
         <div class="legend-item"><div class="dot" style="background:#C9A86C;"></div><span>商业/生活轴</span></div>
     </div>
   </div>
+  <div id="laojiefang-fab" title="老街坊">
+    <div id="laojiefang-bubble">老街坊
+路线问我！</div>
+    <img src="./laojiefang_full.png" alt="老街坊">
+  </div>
+  </div>
+  <nav class="tabbar">
+    <a class="tab" href="index.html">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>首页
+    </a>
+    <a class="tab active" href="choose.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>游览
+    </a>
+    <a class="tab" href="gate-3d.html">
+      <svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg>3D展厅
+    </a>
+    <a class="tab" href="route.html">
+      <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
+    </a>
+    <a class="tab" href="about.html">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
+    </a>
+  </nav>
 
   <script>
 /**
@@ -345,6 +366,9 @@
             return master ? { ...master } : node;
         });
         renderMap(currentRoute, routeData);
+        const fid = QS.get('focus');
+        const fi = fid ? currentRoute.findIndex(n => n.id === fid) : -1;
+        if (fi > -1) setTimeout(() => focusStop(fi), 300);
     }
     function renderMap(nodes, data) {
         markers.forEach(m => map.removeLayer(m));
@@ -384,9 +408,11 @@
         document.getElementById('panel-title').textContent = FREE ? '📍 全部景点（共' + count + '处）' : '📍 漫步动线详情';
         sw.textContent = FREE ? '不知道怎么逛？获取智能推荐路线 >' : '改为自主游览，查看全部景点 >';
         sw.href = FREE ? 'quiz.html' : 'map.html?mode=free';
+        document.getElementById('seg-free').classList.toggle('on', FREE);
+        document.getElementById('seg-route').classList.toggle('on', !FREE);
         setDrawer(false);
     }
-    const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+    const isMobile = () => true;   // 页面本身就是手机栏布局，抽屉始终启用
     function setDrawer(open) {
         document.querySelector('.map-wrapper').classList.toggle('drawer-open', open);
         document.getElementById('panel-tab').textContent = open ? '收起' : (FREE ? '景点列表' : '路线详情');
@@ -418,11 +444,6 @@
     })();
   </script>
 
-  <div id="laojiefang-fab" title="老街坊">
-    <div id="laojiefang-bubble">老街坊
-路线问我！</div>
-    <img src="./laojiefang_full.png" alt="老街坊">
-  </div>
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>

@@ -1,265 +1,160 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>关于项目 | 门楼层记</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <style>
-        :root {
-            --door-gray: #6B5B4F;
-            --brick-green: #4A6B5A;
-            --accent-gold: #C9A86C;
-            --bg-cream: #F5F1E8;
-            --text-dark: #2C2420;
-            --white: #FFFFFF;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: var(--bg-cream);
-            color: var(--text-dark);
-            line-height: 1.8;
-            overflow-x: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6B5B4F">
+<title>关于项目 | 门楼层记</title>
+<style>
+:root{--red: #B8382E; --gray: #6B5B4F; --green: #4A6B5A; --gold: #C9A86C; --cream: #F5F1E8; --ink: #2C2420; --line: rgba(107,91,79,0.12);}
+*{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
+html{-webkit-text-size-adjust: 100%;}
+body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E6DFD0; color: var(--ink);}
+a{color: inherit; text-decoration: none;}
+.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--cream); position: relative; padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow: hidden;}
 
-        /* --- 统一标准导航栏 (手机端兼容纵向矩形) --- */
-        .navbar {
-            position: fixed; top: 0; width: 100%; padding: 15px 50px;
-            background: rgba(245, 241, 232, 0.98); backdrop-filter: blur(12px);
-            z-index: 1000; box-shadow: 0 2px 20px rgba(107, 91, 79, 0.15);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-placeholder {
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, var(--door-gray), var(--brick-green));
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 32px; box-shadow: 0 4px 12px rgba(107, 91, 79, 0.3);
-        }
-        .brand-text h1 { font-size: 24px; font-weight: 700; color: var(--door-gray); letter-spacing: 2px; line-height: 1.2; }
-        .brand-text p { font-size: 12px; color: var(--brick-green); font-style: italic; }
+.hero{position: relative; height: 250px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: calc(env(safe-area-inset-top) + 10px) 20px 30px;
+      background: linear-gradient(rgba(44,36,32,0.30), rgba(44,36,32,0.70)), url('bg-hero.jpg') center / cover no-repeat, linear-gradient(135deg, #6B5B4F, #4A6B5A);}
+.hero h1{font-size: 28px; letter-spacing: 5px; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);}
+.hero p{font-size: 13px; letter-spacing: 3px; opacity: 0.92; margin-top: 10px;}
 
-        .nav-links { display: flex; gap: 15px; align-items: center; }
-        .nav-links a {
-            text-decoration: none; color: var(--text-dark); font-weight: 500;
-            transition: all 0.3s; padding: 8px 16px; border-radius: 8px;
-            font-size: 15px; text-align: center; display: flex; align-items: center; justify-content: center;
-        }
-        .nav-links a:hover { background: rgba(107, 91, 79, 0.1); }
-        .nav-links a.active { background: var(--door-gray); color: var(--white); }
+.intro{position: relative; z-index: 2; margin: -34px 16px 0; background: #fff; border-radius: 18px; padding: 22px 18px; text-align: center; box-shadow: 0 10px 24px rgba(107,91,79,0.16);}
+.intro h2{font-size: 18px; color: var(--gray); margin-bottom: 10px; letter-spacing: 1px;}
+.intro p{font-size: 14px; line-height: 1.85; color: #5b5048;}
+.intro strong{color: var(--red);}
 
-        @media (max-width: 768px) {
-            .navbar { padding: 10px 15px; }
-            .logo-placeholder { width: 45px; height: 45px; font-size: 24px; border-radius: 8px; }
-            .brand-text h1 { font-size: 18px; }
-            .brand-text p { font-size: 10px; }
-            .nav-links { gap: 4px; }
-            .nav-links a {
-                padding: 10px 5px;
-                font-size: 12px;
-                writing-mode: vertical-rl;
-                text-orientation: upright;
-                letter-spacing: 1px;
-                border-radius: 6px;
-                line-height: 1.2;
-                min-width: 32px;
-            }
-        }
-        /* --- 导航栏结束 --- */
+.block{margin-top: 26px; padding: 0 16px;}
+.block-head{margin-bottom: 14px;}
+.block-head h2{font-size: 18px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1;}
 
-        /* Hero 区域 */
-        .hero {
-            height: 65vh;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('bg-hero.jpg');
-            background-size: cover; background-position: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; color: var(--white);
-            margin-top: 0;
-        }
-        .hero h1 { font-size: 52px; letter-spacing: 12px; margin-bottom: 20px; font-weight: 300; text-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .hero p { font-size: 20px; letter-spacing: 5px; opacity: 0.95; font-style: italic; }
+/* 文化地层时间线 */
+.strata{background: #fff; border-radius: 18px; padding: 20px 16px 6px; box-shadow: 0 4px 16px rgba(107,91,79,0.08);}
+.stratum{position: relative; padding-left: 22px; padding-bottom: 20px;}
+.stratum::before{content: ''; position: absolute; left: 4px; top: 8px; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--gold), rgba(201,168,108,0.1));}
+.stratum:last-child::before{display: none;}
+.stratum::after{content: ''; position: absolute; left: 0; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,108,0.25);}
+.stratum .yr{display: block; font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 3px;}
+.stratum h4{font-size: 16px; color: var(--gray); margin-bottom: 5px;}
+.stratum p{font-size: 13.5px; line-height: 1.75; color: #6a5f57;}
 
-        /* 核心内容区 */
-        .section { max-width: 960px; margin: 0 auto; padding: 100px 30px; }
-        
-        .intro-block { text-align: center; margin-bottom: 100px; }
-        .intro-block h2 { font-size: 32px; color: var(--door-gray); margin-bottom: 25px; font-weight: 400; }
-        .intro-block p { font-size: 18px; color: #555; max-width: 700px; margin: 0 auto; }
+/* 漫步指南 */
+.guides{display: flex; flex-direction: column; gap: 12px;}
+.guide{display: flex; gap: 14px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 4px 16px rgba(107,91,79,0.08);}
+.g-ic{flex: 0 0 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff;}
+.g1{background: linear-gradient(145deg, #6B5B4F, #9A8574);} .g2{background: linear-gradient(145deg, #3E5C4D, #6C917F);} .g3{background: linear-gradient(145deg, #B58E4A, #DDBF85);}
+.guide h3{font-size: 16px; color: var(--gray); margin-bottom: 4px;}
+.guide p{font-size: 13px; line-height: 1.7; color: #6a5f57;}
 
-        /* 时光的褶皱：地层概念 */
-        .stratum-card {
-            background: var(--white); border-radius: 30px; padding: 60px;
-            box-shadow: 0 30px 80px rgba(107, 91, 79, 0.08); position: relative;
-        }
-        .stratum-card::before {
-            content: ''; position: absolute; left: 60px; top: 120px; bottom: 60px;
-            width: 1px; background: linear-gradient(to bottom, var(--accent-gold), transparent);
-        }
-        .stratum-item { position: relative; padding-left: 50px; margin-bottom: 60px; }
-        .stratum-item::after {
-            content: ''; position: absolute; left: -5px; top: 10px; width: 11px; height: 11px;
-            background: var(--accent-gold); border-radius: 50%; box-shadow: 0 0 10px var(--accent-gold);
-        }
-        .stratum-year { font-weight: 700; color: var(--accent-gold); font-size: 22px; margin-bottom: 10px; display: block; }
-        .stratum-content h4 { font-size: 20px; color: var(--door-gray); margin-bottom: 10px; }
-        .stratum-content p { color: #666; font-size: 15px; }
+/* 愿景 */
+.vision{margin: 26px 16px 0; padding: 26px 20px 18px; border-radius: 20px; color: #fff; text-align: center; background: linear-gradient(145deg, #6B5B4F, #4A6B5A);}
+.vision h2{font-size: 20px; letter-spacing: 4px; font-weight: 600; margin-bottom: 12px;}
+.vision p{font-size: 13.5px; line-height: 1.95; opacity: 0.92;}
+.vision .cta{display: inline-block; margin-top: 16px; padding: 10px 26px; border-radius: 22px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #A93027, #E0733B);}
+.copy{margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 11px; opacity: 0.6; line-height: 1.7;}
 
-        /* 漫步指南网格 */
-        .guide-title { text-align: center; font-size: 32px; color: var(--door-gray); margin-bottom: 60px; font-weight: 300; }
-        .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-bottom: 100px; }
-        .guide-item { text-align: center; padding: 40px 25px; background: var(--white); border-radius: 24px; transition: 0.4s; }
-        .guide-item:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(107, 91, 79, 0.1); }
-        .guide-icon { font-size: 48px; margin-bottom: 25px; display: block; }
-        .guide-item h3 { color: var(--door-gray); margin-bottom: 15px; font-weight: 600; }
-        .guide-item p { font-size: 14px; color: #777; line-height: 1.7; }
+.reveal{opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease;}
+.reveal.in{opacity: 1; transform: none;}
 
-        /* 愿景区块 */
-        .footer-vision {
-            background: var(--door-gray); color: var(--white); padding: 120px 40px;
-            text-align: center; border-radius: 60px 60px 0 0;
-        }
-        .footer-vision h2 { font-size: 36px; font-weight: 300; margin-bottom: 40px; letter-spacing: 4px; }
-        .footer-vision p { max-width: 750px; margin: 0 auto 60px; opacity: 0.85; font-size: 17px; line-height: 2; }
-        .copyright { font-size: 12px; opacity: 0.4; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); }
-
-        @media (max-width: 768px) {
-            .stratum-card { padding: 40px 25px; }
-            .guide-grid { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 36px; letter-spacing: 6px; }
-        }
-    </style>
+/* 底部标签栏 */
+.tabbar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 50; display: flex;
+        background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border-top: 1px solid var(--line); padding: 7px 0 calc(7px + env(safe-area-inset-bottom));}
+.tab{flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: #9a9088;}
+.tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
+.tab.active{color: var(--red); font-weight: 600;}
+</style>
 </head>
 <body>
+<div class="app">
+  <header class="hero">
+    <h1>层记西四 · 阅见古今</h1>
+    <p>—— 西四北三条社区文商活化计划 ——</p>
+  </header>
 
-    <nav class="navbar">
-        <div class="logo-container">
-            <div class="logo-placeholder">🏮</div>
-            <div class="brand-text">
-                <h1>门楼里</h1>
-                <p>层记西四，阅见古今</p>
-            </div>
-        </div>
-        <div class="nav-links">
-            <a href="index.html">首页</a>
-            <a href="quiz.html">智能推荐</a>
-            <a href="map.html">数字导览</a>
-            <a href="gate-3d.html">3D展厅</a>
-            <a href="route.html">我的路线</a>
-            <a href="about.html" class="active">项目介绍</a>
-        </div>
-    </nav>
+  <section class="intro">
+    <h2>这不是一条扁平化的“古街”</h2>
+    <p>这是一部在元大都骨架上生长了七百年的<strong>“文化地层”</strong>。每一座门楼，都是时光留下的褶皱，等待您去阅读。</p>
+  </section>
 
-    <header class="hero">
-        <h1 id="hero-title">层记西四 · 阅见古今</h1>
-        <p id="hero-sub">—— ·西四北三条社区文商活化计划· ——</p>
-    </header>
+  <section class="block reveal">
+    <div class="block-head"><h2>时光的褶皱</h2></div>
+    <div class="strata">
+      <div class="stratum">
+        <span class="yr">1271 · 元大都</span>
+        <h4>胡同骨架的初生</h4>
+        <p>西四北三条至五条保留了最完整的元代胡同规制。在这里，您脚下的巷陌尺度，与七百年前的元大都如出一辙。</p>
+      </div>
+      <div class="stratum">
+        <span class="yr">1368 - 1912 · 明清</span>
+        <h4>门楼礼制与砖雕美学</h4>
+        <p>广亮大门、金柱大门、如意门... 六种门楼形制散布其间。它们不仅是建筑，更是封建等级制度与民间匠心美学的数字化活态载体。</p>
+      </div>
+      <div class="stratum">
+        <span class="yr">1912 - 1949 · 民国</span>
+        <h4>名人的时代印记</h4>
+        <p>程砚秋手植的石榴树，傅增湘藏书楼的余墨。这里的每一座门楼背后，都重叠着一个时代的文人气度与家国故事。</p>
+      </div>
+      <div class="stratum">
+        <span class="yr">NOW · 当代</span>
+        <h4>胡同声痕与新颜</h4>
+        <p>鸽哨掠过、邻里问候、精酿茶歇。我们在数字化交互中保留这些市井烟火，并以新商业业态为老街区注入可持续的活力。</p>
+      </div>
+    </div>
+  </section>
 
-    <main class="section">
-        <div class="intro-block" id="trigger-intro">
-            <h2>这不是一条扁平化的“古街”</h2>
-            <p>这是一部在元大都骨架上生长了七百年的<strong>“文化地层”</strong>。每一座门楼，都是时光留下的褶皱，等待您去阅读。</p>
-        </div>
+  <section class="block reveal">
+    <div class="block-head"><h2>您的漫步指南</h2></div>
+    <div class="guides">
+      <div class="guide">
+        <span class="g-ic g1">📖</span>
+        <div><h3>寻古轴</h3><p>穿行在西四北三条，通过 3D 数字化拆解，读懂那些散落在尘埃里的砖雕纹样与门当户对的美学逻辑。</p></div>
+      </div>
+      <div class="guide">
+        <span class="g-ic g2">🔊</span>
+        <div><h3>生活轴</h3><p>走进四条、五条。拿起手机轻碰 NFC 标签，戴上耳机聆听原住民口述的胡同记忆，在不扰民的安静中感知生活。</p></div>
+      </div>
+      <div class="guide">
+        <span class="g-ic g3">🎨</span>
+        <div><h3>新颜带</h3><p>在漫步的终点——西四北大街，于精酿、茶饮与主理人手作中，带走一份独属于西四的“文化盲盒”。</p></div>
+      </div>
+    </div>
+  </section>
 
-        <!-- 概念：时光的褶皱 -->
-        <div class="stratum-card">
-            <div class="stratum-item animate-stratum">
-                <span class="stratum-year">1271 · 元大都</span>
-                <div class="stratum-content">
-                    <h4>胡同骨架的初生</h4>
-                    <p>西四北三条至五条保留了最完整的元代胡同规制。在这里，您脚下的巷陌尺度，与七百年前的元大都如出一辙。</p>
-                </div>
-            </div>
-            <div class="stratum-item animate-stratum">
-                <span class="stratum-year">1368 - 1912 · 明清</span>
-                <div class="stratum-content">
-                    <h4>门楼礼制与砖雕美学</h4>
-                    <p>广亮大门、金柱大门、如意门... 六种门楼形制散布其间。它们不仅是建筑，更是封建等级制度与民间匠心美学的数字化活态载体。</p>
-                </div>
-            </div>
-            <div class="stratum-item animate-stratum">
-                <span class="stratum-year">1912 - 1949 · 民国</span>
-                <div class="stratum-content">
-                    <h4>名人的时代印记</h4>
-                    <p>程砚秋手植的石榴树，傅增湘藏书楼的余墨。这里的每一座门楼背后，都重叠着一个时代的文人气度与家国故事。</p>
-                </div>
-            </div>
-            <div class="stratum-item animate-stratum">
-                <span class="stratum-year">NOW · 当代</span>
-                <div class="stratum-content">
-                    <h4>胡同声痕与新颜</h4>
-                    <p>鸽哨掠过、邻里问候、精酿茶歇。我们在数字化交互中保留这些市井烟火，并以新商业业态为老街区注入可持续的活力。</p>
-                </div>
-            </div>
-        </div>
+  <section class="vision reveal">
+    <h2>文商共荣 · 雅邻共忆</h2>
+    <p>我们设立了“门楼公益金”，将导览收入的回馈于老旧建筑的修缮维护与社区老年居民的福利。在这里的每一次驻足与消费，都是对古城记忆的一次共同守护。</p>
+    <a class="cta" href="choose.html">开启漫步路线 ›</a>
+    <div class="copy">© 2026 门楼层记·故事里 项目团队<br>让胡同文化在数字世代焕发新生</div>
+  </section>
+</div>
 
-        <div style="margin: 120px 0;">
-            <h2 class="guide-title">您的漫步指南</h2>
-            <div class="guide-grid">
-                <div class="guide-item animate-guide">
-                    <span class="guide-icon">📖</span>
-                    <h3> 寻古轴</h3>
-                    <p>穿行在西四北三条，通过 3D 数字化拆解，读懂那些散落在尘埃里的砖雕纹样与门当户对的美学逻辑。</p>
-                </div>
-                <div class="guide-item animate-guide">
-                    <span class="guide-icon">🔊</span>
-                    <h3> 生活轴</h3>
-                    <p>走进四条、五条。拿起手机轻碰 NFC 标签，戴上耳机聆听原住民口述的胡同记忆，在不扰民的安静中感知生活。</p>
-                </div>
-                <div class="guide-item animate-guide">
-                    <span class="guide-icon">🎨</span>
-                    <h3> 新颜带</h3>
-                    <p>在漫步的终点——西四北大街，于精酿、茶饮与主理人手作中，带走一份独属于西四的“文化盲盒”。</p>
-                </div>
-            </div>
-        </div>
-    </main>
+<nav class="tabbar">
+  <a class="tab" href="index.html">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>首页
+  </a>
+  <a class="tab" href="choose.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>游览
+  </a>
+  <a class="tab" href="gate-3d.html">
+    <svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg>3D展厅
+  </a>
+  <a class="tab" href="route.html">
+    <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
+  </a>
+  <a class="tab active" href="about.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
+  </a>
+</nav>
 
-    <footer class="footer-vision">
-        <h2>文商共荣 · 雅邻共忆</h2>
-        <p>我们设立了“门楼公益金”，将导览收入的回馈于老旧建筑的修缮维护与社区老年居民的福利。在这里的每一次驻足与消费，都是对古城记忆的一次共同守护。</p>
-        <div class="copyright">© 2026 门楼层记·故事里 项目团队 | 让胡同文化在数字世代焕发新生</div>
-    </footer>
-
-    <script>
-        window.onload = function() {
-            gsap.registerPlugin(ScrollTrigger);
-
-            gsap.from("#hero-title", { opacity: 0, y: 40, duration: 1.5, ease: "power3.out" });
-            gsap.from("#hero-sub", { opacity: 0, y: 20, duration: 1.5, delay: 0.3, ease: "power3.out" });
-
-            const stratumItems = document.querySelectorAll('.animate-stratum');
-            stratumItems.forEach((item, index) => {
-                gsap.from(item, {
-                    scrollTrigger: {
-                        trigger: item,
-                        start: "top 90%",
-                    },
-                    opacity: 0,
-                    x: -30,
-                    duration: 1,
-                    delay: index * 0.1
-                });
-            });
-
-            const guideItems = document.querySelectorAll('.animate-guide');
-            guideItems.forEach((item, index) => {
-                gsap.from(item, {
-                    scrollTrigger: {
-                        trigger: item,
-                        start: "top 90%",
-                    },
-                    opacity: 0,
-                    y: 30,
-                    duration: 0.8,
-                    delay: index * 0.15,
-                    ease: "back.out(1.7)"
-                });
-            });
-
-            ScrollTrigger.refresh();
-        };
-    </script>
+<script>
+(function () {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function (list) {
+    list.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold: 0.1});
+  els.forEach(function (e) { io.observe(e); });
+})();
+</script>
 </body>
 </html>
