@@ -85,7 +85,6 @@
         transform: none !important;
     }
 
-    /* 3. 彻底干掉白边：针对所有可能生成白边的 img 和内部 svg */
     #coze-web-sdk-container .coze-fab-button img,
     #coze-web-sdk-container .coze-fab-button svg {
         width: 100% !important;
@@ -94,6 +93,7 @@
         border-radius: 50% !important;
         background: transparent !important;
         display: block !important;
+        clip-path: circle(50% at 50% 50%) !important;
     }
 
     /* 4. 强制生成气泡 (提升选择器权重) */
