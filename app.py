@@ -37,7 +37,16 @@ NODES = [
     {"id": "N9", "name": "44号金柱大门", "door": "44号", "theme": "读门", "type": "文化", "stay": 10, "lat": 39.92827,
      "lng": 116.36706, "interfere": 0.25, "tags": ["architecture"], "desc": "北侧双号院落代表。"},
     {"id": "N14", "name": "胡同夜市", "door": "50号", "theme": "创门", "type": "商业", "stay": 30, "lat": 39.92829,
-     "lng": 116.36632, "interfere": 0.35, "tags": ["food", "photo"], "desc": "烟火经济体验区（如意门）。"}
+     "lng": 116.36632, "interfere": 0.35, "tags": ["food", "photo"], "desc": "烟火经济体验区（如意门）。"},
+    {"id": "B2", "name": "易应茶舍", "door": "西四北大街147号", "theme": "创门", "type": "商业", "stay": 30,
+ "lat": 39.92791, "lng": 116.37293, "interfere": 0.1, "tags": ["food"],
+ "desc": "西四北大街沿街茶舍，位于西四北三条路口南侧。"},
+    {"id": "B3", "name": "叙杯", "door": "赵登禹路144号附近", "theme": "创门", "type": "商业", "stay": 20,
+ "lat": 39.92922, "lng": 116.36726, "interfere": 0.1, "tags": ["food"],
+ "desc": "赵登禹路沿街店铺，位于西四北五条与四条之间。"},
+    {"id": "B4", "name": "无名蹄花", "door": "赵登禹路146-148号附近", "theme": "创门", "type": "商业", "stay": 30,
+ "lat": 39.92906, "lng": 116.36719, "interfere": 0.1, "tags": ["food"],
+ "desc": "赵登禹路沿街餐饮，临近西四北四条路口。"}
 ]
 
 

@@ -158,8 +158,12 @@
       {id:"N2",name:"马福祥宅 (11号院)",door:"11号院",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92806, lng: 116.37126, desc:"【广亮大门】高级官宦宅门代表，牡丹缠枝砖雕极尽考究。"},
       {id:"N3",name:"13号院金柱大门",door:"13号院",theme:"读门·寻古",type:"文化",stay:10, lat: 39.92807, lng: 116.37102, desc:"【金柱大门】等级仅次于广亮，完整保留了清末民初的规制。"},
       {id:"N39",name:"程砚秋故居",door:"39号院",theme:"读门·寻古",type:"文化",stay:20, lat: 39.92815, lng: 116.36780, desc:"【如意门】京剧大师程砚秋先生居住21年之处。"},
-      {id:"L5",name:"傅增湘故居",door:"五条13号院",theme:"阅巷·生活",type:"文化",stay:15, lat: 39.92950, lng: 116.37050, desc:"声音采集点：收录有胡同鸽哨声，感知藏书大师的精神世界。"}
+      {id:"L5",name:"傅增湘故居",door:"五条13号院",theme:"阅巷·生活",type:"文化",stay:15, lat: 39.92950, lng: 116.37050, desc:"声音采集点：收录有胡同鸽哨声，感知藏书大师的精神世界。"},
+      {id:"B2",name:"易应茶舍",door:"西四北大街147号",theme:"创门·共生",type:"商业",stay:30, lat: 39.92791, lng: 116.37293, desc:"西四北大街沿街茶舍，位于西四北三条路口南侧。"},
+      {id:"B3",name:"叙杯",door:"赵登禹路144号附近",theme:"创门·共生",type:"商业",stay:20, lat: 39.92922, lng: 116.36726, desc:"赵登禹路沿街店铺，位于西四北五条与四条之间。"},
+      {id:"B4",name:"无名蹄花",door:"赵登禹路146-148号附近",theme:"创门·共生",type:"商业",stay:30, lat: 39.92906, lng: 116.36719, desc:"赵登禹路沿街餐饮，临近西四北四条路口。"}
     ];
+    const CAL = new URLSearchParams(location.search).get('calibrate') === '1';
     let map, markers = [], routeLine, currentRoute = [];
     function initMap() {
         map = L.map('map', {center: [39.92840, 116.3710], zoom: 17, zoomControl: false});
@@ -168,6 +172,7 @@
         loadRoute();
     }
     function loadRoute() {
+        if (CAL) { currentRoute = allNodesMaster.map(n => ({...n})); renderMap(currentRoute, {totalTime: 0, distance: 0, scores: {culture: 0}}); return; }
         const savedData = localStorage.getItem('routeData');
         let routeData = savedData ? JSON.parse(savedData) : { route: allNodesMaster.slice(0,4), totalTime: 90, distance: 0.8, scores: {culture: 90} };
         currentRoute = routeData.route.map(node => {
@@ -183,26 +188,38 @@
         listEl.innerHTML = '';
         nodes.forEach((node, i) => {
             const marker = L.marker([node.lat, node.lng], {
+                draggable: CAL,
                 icon: L.divIcon({
                     className: 'custom-marker',
                     html: `<div style="display:flex;flex-direction:column;align-items:center;">
                             <div style="background:${node.type==='商业'?'#C9A86C':'#4A6B5A'};width:28px;height:28px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:12px;">${i+1}</div>
                             <div style="background:white;padding:2px 6px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.1);font-size:10px;margin-top:2px;font-weight:bold;white-space:nowrap;">${node.name}</div>
                            </div>`,
-                    iconSize: [80, 50], iconAnchor: [40, 25]
+                    iconSize: [80, 50], iconAnchor: [40, 14]
                 })
             }).addTo(map);
             marker.bindPopup(`<div style="min-width:220px;"><h3 style="color:var(--door-gray); margin-bottom:5px;">${node.name}</h3><p style="font-size:12px; color:#666; margin-bottom:8px;">门楼编号：${node.door || '西四北'}</p><div style="background:#f9f5ef; padding:10px; border-radius:6px; font-size:13px; color:#333; line-height:1.5;">${node.desc}</div><button onclick="window.location.href='gate-3d.html?id=${node.id}'" style="width:100%; margin-top:10px; padding:10px; background:var(--door-gray); color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">查看 3D 数字化档案</button></div>`);
+            if (CAL) marker.on('dragend', e => showCal(node, e.target.getLatLng()));
             markers.push(marker); latlngs.push([node.lat, node.lng]);
             listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.theme} · ${node.stay}min</p></div></li>`;
         });
         if (latlngs.length > 1) {
-            routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 5, opacity: 0.7, dashArray: '10, 10'}).addTo(map);
+            if (!CAL) routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 5, opacity: 0.7, dashArray: '10, 10'}).addTo(map);
             map.fitBounds(L.latLngBounds(latlngs), {padding: [50, 50]});
         }
         document.getElementById('r-time').textContent = (data.totalTime || 90) + '分钟';
         document.getElementById('r-dist').textContent = (data.distance || 0.8) + '公里';
         document.getElementById('r-score').textContent = (data.scores?.culture || 90) + '%';
+    }
+    function showCal(node, p) {
+        let box = document.getElementById('cal-box');
+        if (!box) {
+            box = document.createElement('div');
+            box.id = 'cal-box';
+            box.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:10006;background:#fff;border:1px solid #C9A86C;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;max-width:90vw;user-select:all;box-shadow:0 2px 10px rgba(0,0,0,.2)';
+            document.body.appendChild(box);
+        }
+        box.textContent = node.name + ' lat: ' + p.lat.toFixed(5) + ', lng: ' + p.lng.toFixed(5);
     }
     function resetMap() { if (currentRoute.length > 0) map.fitBounds(L.latLngBounds(currentRoute.map(n => [n.lat, n.lng])), {padding: [50, 50]}); }
     function focusStop(index) { const marker = markers[index]; if (marker) { map.setView(marker.getLatLng(), 18, {animate: true}); marker.openPopup(); document.querySelectorAll('.stop-item').forEach((el, i) => el.classList.toggle('active', i === index)); } }
@@ -217,7 +234,7 @@
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
-    // 暴力清除：每次打开页面，强行删掉浏览器里 Coze 存的历史记录缓存
+    // 每次打开页面，强行删掉浏览器里 Coze 存的历史记录缓存
     for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.indexOf('coze') > -1) {
@@ -249,7 +266,7 @@
           isNeed: false
         },
         chatBot: {
-          title: '老街坊',
+          title: '老街坊',                  // 对话框的标题
           titleAvatar: './laojiefang_full.png', // 对话框内的头像
         }
       }
