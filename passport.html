@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F5F1E8">
+<title>电子护照 | 门楼层记·故事里</title>
+<style>
+:root{--red: #B8382E; --gray: #6B5B4F; --green: #4A6B5A; --gold: #C9A86C; --cream: #F5F1E8; --ink: #2C2420; --line: rgba(107,91,79,0.12);
+      --hand: 'Ma Shan Zheng','STXingkai','Xingkai SC','STKaiti','KaiTi','Kaiti SC',cursive,serif;}
+*{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
+html{-webkit-text-size-adjust: 100%;}
+body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E6DFD0; color: var(--ink);}
+a{color: inherit; text-decoration: none;}
+button{font-family: inherit; border: none; background: none; cursor: pointer; color: inherit;}
+.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--cream); position: relative; padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12);}
+
+.top{position: sticky; top: 0; z-index: 20; text-align: center; font-size: 17px; font-weight: 700; letter-spacing: 1px; padding: calc(env(safe-area-inset-top) + 14px) 0 12px; background: rgba(245,241,232,0.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);}
+
+/* ---------- 护照封面 ---------- */
+.cover{position: relative; margin: 4px 16px 0; padding: 26px 20px 20px; border-radius: 8px 18px 18px 8px; color: #F3E3B8; text-align: center; overflow: hidden;
+       background: radial-gradient(circle at 30% 20%, #3f6150, #27402F 70%); box-shadow: 0 12px 28px rgba(39,64,47,0.38), inset 0 0 0 1px rgba(255,255,255,0.06);}
+.cover::before{content: ''; position: absolute; inset: 9px; border: 1.5px dashed rgba(243,227,184,0.55); border-radius: 4px 12px 12px 4px; pointer-events: none;}
+.cover::after{content: ''; position: absolute; right: 26px; top: -4px; bottom: -4px; width: 14px; background: linear-gradient(90deg, #7d2a22, #B8382E, #7d2a22); opacity: 0.9; box-shadow: 0 0 8px rgba(0,0,0,0.3);}
+.cover .emb{width: 70px; height: 70px; margin: 0 auto 10px; border-radius: 50%; border: 2px solid #E8CF8E; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 4px rgba(232,207,142,0.18);}
+.cover h1{font-size: 24px; letter-spacing: 6px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.35);}
+.cover .en{font-size: 10px; letter-spacing: 3px; opacity: 0.8; margin-top: 4px;}
+.cover .sub{font-size: 12px; opacity: 0.85; margin-top: 8px; letter-spacing: 2px;}
+.cover .cnt{margin-top: 16px; font-size: 13px; letter-spacing: 1px;}
+.cover .cnt b{font-size: 34px; color: #fff; font-family: Georgia, serif; margin: 0 4px;}
+.dots{display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 10px 30px 0 0;}
+.dots i{width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(232,207,142,0.6);}
+.dots i.on{background: #E8CF8E; border-color: #E8CF8E; box-shadow: 0 0 6px rgba(232,207,142,0.8);}
+.rank{display: inline-block; margin-top: 12px; margin-right: 30px; padding: 3px 14px; border-radius: 12px; font-size: 12px; background: rgba(232,207,142,0.18); border: 1px solid rgba(232,207,142,0.5);}
+
+/* ---------- 集章规则 ---------- */
+.rules{margin: 16px 16px 0; padding: 14px 16px; background: #fff; border-radius: 16px; box-shadow: 0 4px 14px rgba(107,91,79,0.08);}
+.rules h3{font-size: 15px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1; margin-bottom: 10px;}
+.rule{display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: #4d433c; padding: 5px 0;}
+.rule .ri{flex: 0 0 30px; height: 30px; border-radius: 10px; background: #F6E3DF; color: var(--red); display: flex; align-items: center; justify-content: center;}
+.rule .ri svg{width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;}
+.rule b{color: var(--ink);}
+
+/* ---------- 手账页 ---------- */
+.page{position: relative; margin: 22px 16px 0; padding: 20px 14px 14px 36px; border-radius: 6px 14px 14px 6px; background-color: #FFFDF6;
+      background-image: radial-gradient(#e2d6bf 1px, transparent 1.2px); background-size: 16px 16px;
+      box-shadow: 0 6px 18px rgba(107,91,79,0.16), 0 1px 0 #fff inset;}
+.page::before{content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 24px; border-radius: 6px 0 0 6px;
+              background: radial-gradient(circle at 12px 14px, #cfc3ad 0 4px, #8a7d6a 4px 5px, transparent 5.5px) 0 0 / 24px 30px repeat-y, linear-gradient(90deg, #efe7d5, #f8f2e3);}
+.tape{position: absolute; width: 74px; height: 20px; background: rgba(201,168,108,0.45); top: -8px; right: 26px; transform: rotate(4deg); box-shadow: 0 1px 3px rgba(0,0,0,0.12);}
+.tape.t2{left: 40px; right: auto; transform: rotate(-5deg); background: rgba(184,56,46,0.28); width: 56px;}
+.ph{display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;}
+.ph .no{font-family: var(--hand); font-size: 26px; color: var(--red); line-height: 1;}
+.ph h2{font-size: 17px; letter-spacing: 2px;}
+.ph .pc{margin-left: auto; font-size: 12px; color: #8a7f76;}
+.pn{font-family: var(--hand); font-size: 14px; color: #8a7a62; margin-bottom: 10px;}
+.grid{display: grid; grid-template-columns: 1fr 1fr; gap: 10px 6px;}
+.slot{display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 2px 8px; border-radius: 10px; transition: background 0.15s;}
+.slot:active{background: rgba(201,168,108,0.12);}
+.stamp{width: 112px; height: 112px;}
+.stamp svg{width: 100%; height: 100%; display: block; overflow: visible;}
+.cap{font-family: var(--hand); font-size: 17px; margin-top: 2px; color: #3b3027;}
+.slot.lock .cap{color: #b3a692;}
+.meta{font-size: 10.5px; color: #8a7f76; margin-top: 1px; min-height: 14px;}
+
+/* ---------- 证书 ---------- */
+.cert{margin: 22px 16px 0; padding: 18px 16px; border-radius: 16px; background: #fff; box-shadow: 0 4px 14px rgba(107,91,79,0.1);}
+.cert h3{font-size: 15px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1; margin-bottom: 8px;}
+.cert p{font-size: 13px; color: #6a5f57; line-height: 1.7;}
+.bar{height: 8px; border-radius: 4px; background: #efe9de; margin: 12px 0; overflow: hidden;}
+.bar i{display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #A93027, #E0733B); transition: width 0.6s;}
+.nick{width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--cream); font-size: 14px; margin-bottom: 10px; font-family: inherit; color: var(--ink);}
+.btn{display: block; width: 100%; padding: 13px 0; border-radius: 24px; font-size: 15px; font-weight: 700; text-align: center; color: #fff; background: linear-gradient(135deg, #A93027, #E0733B); box-shadow: 0 6px 14px rgba(184,56,46,0.3);}
+.btn:disabled{background: #d9d1c7; box-shadow: none; cursor: not-allowed;}
+.btn.sub{color: var(--gray); background: var(--cream); box-shadow: none; margin-top: 8px;}
+
+.demo{margin: 22px 16px 0; padding: 12px 14px; border-radius: 14px; border: 1px dashed #cfc3ad; font-size: 12px; color: #8a7f76; line-height: 1.7;}
+.demo label{display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); font-weight: 600;}
+.demo a, .demo button{color: var(--red); text-decoration: underline; font-size: 12px;}
+
+/* ---------- 弹层 ---------- */
+.mask{position: fixed; inset: 0; z-index: 100; background: rgba(30,22,16,0.62); display: none; align-items: center; justify-content: center; padding: 20px;}
+.mask.show{display: flex;}
+.dialog{width: 100%; max-width: 340px; background: #FFFDF6; border-radius: 22px; padding: 26px 20px 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4);}
+.dialog .bigstamp{width: 168px; height: 168px; margin: 0 auto; }
+.dialog .bigstamp svg{width: 100%; height: 100%; overflow: visible;}
+.dialog .bigstamp.press svg{animation: press 0.7s cubic-bezier(.2,.9,.3,1.2) both;}
+@keyframes press{0%{transform: scale(2.6) rotate(-18deg); opacity: 0;} 55%{transform: scale(0.94) rotate(var(--rot,-4deg)); opacity: 1;} 100%{transform: scale(1) rotate(var(--rot,-4deg)); opacity: 1;}}
+.dialog h3{font-size: 19px; margin-top: 12px; letter-spacing: 1px;}
+.dialog p{font-size: 13px; color: #7a6f66; margin-top: 6px; line-height: 1.7;}
+.dialog .row{display: flex; gap: 10px; margin-top: 18px;}
+.dialog .row .btn{flex: 1;}
+.dialog img{width: 100%; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.2);}
+
+.sheet{position: fixed; left: 50%; transform: translate(-50%, 110%); bottom: 0; width: 100%; max-width: 480px; z-index: 110; background: #fff; border-radius: 22px 22px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); transition: transform 0.28s ease; box-shadow: 0 -10px 30px rgba(0,0,0,0.2);}
+.sheet.show{transform: translate(-50%, 0);}
+.sheet .sh{display: flex; gap: 14px; align-items: center;}
+.sheet .sh .stamp{flex: 0 0 96px; width: 96px; height: 96px;}
+.sheet h3{font-size: 18px;}
+.sheet .sd{font-size: 12px; color: #8a7f76; margin-top: 3px;}
+.sheet p{font-size: 13px; line-height: 1.75; color: #4d433c; margin: 12px 0;}
+.sheet .row{display: flex; gap: 10px;}
+.sheet .row a, .sheet .row button{flex: 1; padding: 11px 0; border-radius: 22px; font-size: 14px; font-weight: 700; text-align: center; background: var(--cream); color: var(--gray);}
+.sheet .row .pri{color: #fff; background: linear-gradient(135deg, #A93027, #E0733B);}
+
+.toast{position: fixed; left: 50%; bottom: calc(86px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 120; background: rgba(44,36,32,0.92); color: #fff; padding: 9px 18px; border-radius: 20px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.25s;}
+.toast.show{opacity: 1;}
+
+/* 底部标签栏 */
+.tabbar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 50; display: flex;
+        background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border-top: 1px solid var(--line); padding: 7px 0 calc(7px + env(safe-area-inset-bottom));}
+.tab{flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: #9a9088;}
+.tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
+.tab.active{color: var(--red); font-weight: 600;}
+</style>
+</head>
+<body>
+<!-- 印章墨迹滤镜：边缘毛糙 + 少量墨点缺口 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="ink" x="-8%" y="-8%" width="116%" height="116%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -8 0 0 0 5.6" result="holes"/>
+    <feComposite in="SourceGraphic" in2="holes" operator="in" result="speck"/>
+    <feTurbulence type="turbulence" baseFrequency="0.035" numOctaves="2" seed="9" result="w"/>
+    <feDisplacementMap in="speck" in2="w" scale="2.6"/>
+  </filter>
+</defs></svg>
+
+<div class="app">
+  <header class="top">电子护照</header>
+
+  <section class="cover">
+    <div class="emb"><svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="#E8CF8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L24 8l18 12"/><path d="M11 20v20M37 20v20"/><path d="M17 40V24h14v16"/><path d="M4 40h40"/><circle cx="28" cy="32" r="1.2" fill="#E8CF8E"/></svg></div>
+    <h1>胡同漫游护照</h1>
+    <div class="en">HUTONG WALK PASSPORT</div>
+    <div class="sub">门楼层记 · 西四北三条</div>
+    <div class="cnt">已集印章<b id="got">0</b>/ <span id="total">15</span> 枚</div>
+    <div class="dots" id="dots"></div>
+    <span class="rank" id="rank">初访游客</span>
+  </section>
+
+  <section class="rules">
+    <h3>怎么集章</h3>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><div><b>浏览档案</b>　在 3D 展厅打开点位档案并停留片刻</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></span><div><b>收听讲解</b>　播放点位的讲解音频</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/></svg></span><div><b>现场打卡</b>　扫描点位二维码，或用手机轻触 NFC 标签</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7 21l5-3 5 3-2-7.5"/></svg></span><div><b>集齐全部印章</b>　即可生成专属漫游证书</div></div>
+  </section>
+
+  <div id="pages"></div>
+
+  <section class="cert">
+    <h3>漫游证书</h3>
+    <p id="certTip">集齐全部印章后，可生成带有你昵称的漫游证书。</p>
+    <div class="bar"><i id="certBar" style="width:0%"></i></div>
+    <input class="nick" id="nick" maxlength="12" placeholder="证书上的昵称（选填）">
+    <button class="btn" id="certBtn" disabled>生成漫游证书</button>
+    <button class="btn sub" id="previewBtn" hidden>预览证书样式（演示）</button>
+  </section>
+
+  <section class="demo">
+    <label><input type="checkbox" id="demoToggle"> 演示模式</label>
+    开启后，点击印章位可“模拟扫码打卡”。演示打卡会在运营看板中记为<b>测试数据</b>，不计入真实记录。
+    <div style="margin-top:6px"><button id="resetBtn">清除本机护照记录</button></div>
+  </section>
+</div>
+
+<!-- 获得印章弹层 -->
+<div class="mask" id="claimMask">
+  <div class="dialog">
+    <div class="bigstamp press" id="claimStamp"></div>
+    <h3 id="claimTitle"></h3>
+    <p id="claimText"></p>
+    <div class="row"><a class="btn sub" style="margin-top:0" href="choose.html">继续漫游</a><button class="btn" id="claimOk">收进护照</button></div>
+  </div>
+</div>
+
+<!-- 证书预览弹层 -->
+<div class="mask" id="certMask">
+  <div class="dialog" style="max-width:360px">
+    <img id="certImg" alt="漫游证书">
+    <p>长按图片即可保存到相册</p>
+    <div class="row"><button class="btn" id="certOk">完成</button></div>
+  </div>
+</div>
+
+<!-- 印章详情 -->
+<div class="sheet" id="sheet">
+  <div class="sh"><div class="stamp" id="shStamp"></div><div><h3 id="shName"></h3><div class="sd" id="shMeta"></div></div></div>
+  <p id="shDesc"></p>
+  <div class="row" id="shRow"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<nav class="tabbar">
+  <a class="tab" href="index.html">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>首页
+  </a>
+  <a class="tab" href="choose.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>游览
+  </a>
+  <a class="tab" href="gate-3d.html">
+    <svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg>3D展厅
+  </a>
+  <a class="tab" href="route.html">
+    <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
+  </a>
+  <a class="tab active" href="passport.html">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><circle cx="12.5" cy="10" r="3"/><path d="M9 16h7"/></svg>护照
+  </a>
+</nav>
+
+<script>
+
+var CH = [
+  {name: '读门篇', sub: '寻古 · 读懂门楼形制', no: '壹', shape: 'circle', color: '#B8382E', label: '读门·寻古'},
+  {name: '院落篇', sub: '阅巷 · 走进胡同生活', no: '贰', shape: 'square', color: '#3E5C4D', label: '推门·阅巷'},
+  {name: '新颜篇', sub: '共生 · 体验新业态', no: '叁', shape: 'octagon', color: '#A8741A', label: '创门·共生'}
+];
+var NODES = [
+  {id:'N1',  ch:0, L:['隆长寺','山门'],   name:'隆长寺山门',     door:'3号院',   desc:'【随墙门】明代圣祚隆长寺旧址，存有珍贵的乾隆诗碑。'},
+  {id:'N2',  ch:0, L:['马福祥宅'],       name:'马福祥宅 (11号院)', door:'11号院',  desc:'【广亮大门】高级官宦宅门代表，牡丹缠枝砖雕极尽考究。'},
+  {id:'N3',  ch:0, L:['13号院','金柱门'], name:'13号院金柱大门', door:'13号院',  desc:'【金柱大门】等级仅次于广亮，完整保留了清末民初的规制。'},
+  {id:'N39', ch:0, L:['程砚秋','故居'],   name:'程砚秋故居',     door:'39号院',  desc:'【如意门】京剧大师程砚秋先生居住21年之处。'},
+  {id:'N9',  ch:0, L:['44号院','金柱门'], name:'44号金柱大门',   door:'44号',    desc:'北侧双号院落代表。'},
+  {id:'L5',  ch:1, L:['傅增湘','故居'],   name:'傅增湘故居',     door:'五条13号院', desc:'声音采集点：收录有胡同鸽哨声，感知藏书大师的精神世界。'},
+  {id:'N10', ch:1, L:['45号','居民院落'], name:'45号居民院落',   door:'45号',    desc:'随墙门，感受胡同原真生活。'},
+  {id:'B1',  ch:2, L:['无问','西东'],     name:'无问西东精酿',   door:'北155号', desc:'位于西四北大街北155号。提供门楼特调精酿，是文商融合的首站。'},
+  {id:'B2',  ch:2, L:['易应','茶舍'],     name:'易应茶舍',       door:'西四北大街147号', desc:'西四北大街沿街茶舍，位于西四北三条路口南侧。'},
+  {id:'N11', ch:2, L:['京剧','体验馆'],   name:'京剧体验馆',     door:'17号',    desc:'御霜雅集，西洋门形制，京剧文化活化。'},
+  {id:'N12', ch:2, L:['拾光','茶铺'],     name:'拾光茶铺',       door:'21号',    desc:'一院一茗特调茶（蛮子门）。'},
+  {id:'N13', ch:2, L:['故事','书店'],     name:'故事书店',       door:'43号',    desc:'门楼主题文创与口述史展览。'},
+  {id:'N14', ch:2, L:['胡同','夜市'],     name:'胡同夜市',       door:'50号',    desc:'烟火经济体验区（如意门）。'},
+  {id:'B3',  ch:2, L:['叙杯'],           name:'叙杯',           door:'赵登禹路144号附近', desc:'赵登禹路沿街店铺，位于西四北五条与四条之间。'},
+  {id:'B4',  ch:2, L:['无名','蹄花'],     name:'无名蹄花',       door:'赵登禹路146-148号附近', desc:'赵登禹路沿街餐饮，临近西四北四条路口。'}
+];
+var HOW = {browse: '浏览档案', audio: '收听讲解', qr: '扫码打卡', nfc: 'NFC 触碰', demo: '演示打卡'};
+
+/*  本地存储 */
+var K_ST = 'menlouStamps', K_EV = 'menlouEvents', K_NICK = 'menlouNick', K_DEMO = 'menlouDemo';
+function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function record(id, type, demo) {   // 匿名互动记录：只含点位、类型、时间
+  var ev = load(K_EV, []); ev.push({id: id, type: type, t: Date.now(), demo: demo ? 1 : 0});
+  if (ev.length > 3000) ev = ev.slice(-3000); save(K_EV, ev);
+}
+function claim(id, how) {
+  var st = load(K_ST, {}); if (st[id]) return false;
+  st[id] = {t: Date.now(), how: how}; save(K_ST, st); return true;
+}
+function byId(id) { return NODES.filter(function (n) { return n.id === id; })[0]; }
+function $(id) { return document.getElementById(id); }
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function ymd(t) { var d = new Date(t); return d.getFullYear() + '.' + pad(d.getMonth() + 1) + '.' + pad(d.getDate()); }
+function hm(t) { var d = new Date(t); return pad(d.getMonth() + 1) + '.' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function rotOf(id) { var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 97; return (h % 13) - 6; }
+
+/* 邮戳绘制 */
+function icon(ch, c) {
+  var g = '<g transform="translate(60 35)" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">';
+  if (ch === 0) g += '<path d="M-15 -4L0 -13L15 -4"/><path d="M-11 -4V12M11 -4V12"/><path d="M-5 12V0H5V12"/><circle cx="2.4" cy="6.5" r="0.9" fill="' + c + '"/>';
+  if (ch === 1) g += '<path d="M-15 5L-4 -6L7 5"/><path d="M-11.5 5V12H2V5"/><path d="M12 12V3"/><circle cx="12" cy="-1" r="6"/>';
+  if (ch === 2) g += '<path d="M0 -14V-10"/><ellipse cx="0" cy="0" rx="9.5" ry="10"/><path d="M-4 -9Q-7.5 0 -4 9M4 -9Q7.5 0 4 9"/><path d="M-3.5 10V14M3.5 10V14"/>';
+  return g + '</g>';
+}
+function stampSVG(n, o) {
+  o = o || {};
+  var ch = CH[n.ch], c = o.locked ? '#cbbfaa' : ch.color, uid = 'rp' + n.id + (o.uid || '');
+  var s = '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><g' + (o.rough === false || o.locked ? '' : ' filter="url(#ink)"') + ' opacity="' + (o.locked ? 1 : 0.92) + '">';
+  var dash = o.locked ? ' stroke-dasharray="4 4"' : '';
+  if (ch.shape === 'circle') {
+    s += '<circle cx="60" cy="60" r="55" fill="none" stroke="' + c + '" stroke-width="3.2"' + dash + '/><circle cx="60" cy="60" r="49" fill="none" stroke="' + c + '" stroke-width="1"' + dash + '/>';
+    if (!o.locked) s += '<path id="' + uid + '" d="M 18 60 a 42 42 0 1 1 84 0" fill="none"/><text font-size="8.6" letter-spacing="2" fill="' + c + '" font-weight="700"><textPath href="#' + uid + '" startOffset="50%" text-anchor="middle">西四北三条 · 门楼层记</textPath></text>';
+  } else if (ch.shape === 'square') {
+    s += '<rect x="6" y="6" width="108" height="108" rx="17" fill="none" stroke="' + c + '" stroke-width="3.2"' + dash + '/><rect x="12.5" y="12.5" width="95" height="95" rx="11" fill="none" stroke="' + c + '" stroke-width="1"' + dash + '/>';
+  } else {
+    s += '<polygon points="35,5 85,5 115,35 115,85 85,115 35,115 5,85 5,35" fill="none" stroke="' + c + '" stroke-width="3.2" stroke-linejoin="round"' + dash + '/><polygon points="39,12 81,12 108,39 108,81 81,108 39,108 12,81 12,39" fill="none" stroke="' + c + '" stroke-width="1" stroke-linejoin="round"' + dash + '/>';
+  }
+  var cy = ch.shape === 'circle' ? 40 : 38;
+  s += icon(n.ch, c).replace('translate(60 35)', 'translate(60 ' + cy + ')');
+  var font = "font-family=\"'STKaiti','KaiTi','Kaiti SC','Songti SC','Noto Serif CJK SC',serif\" font-weight=\"700\"";
+  if (n.L.length === 1) s += '<text x="60" y="78" text-anchor="middle" font-size="18" fill="' + c + '" ' + font + '>' + n.L[0] + '</text>';
+  else s += '<text x="60" y="72" text-anchor="middle" font-size="15.5" fill="' + c + '" ' + font + '>' + n.L[0] + '</text><text x="60" y="89" text-anchor="middle" font-size="15.5" fill="' + c + '" ' + font + '>' + n.L[1] + '</text>';
+  s += '<text x="60" y="' + (ch.shape === 'circle' ? 103 : 104) + '" text-anchor="middle" font-size="7.6" letter-spacing="1" fill="' + c + '" font-weight="700">' + (o.locked ? '待 打 卡' : (o.date || '')) + '</text>';
+  return s + '</g></svg>';
+}
+
+
+function rank(n) { return n >= 15 ? '门楼通' : n >= 10 ? '门楼行家' : n >= 5 ? '胡同漫游者' : '初访游客'; }
+function render() {
+  var st = load(K_ST, {}), got = NODES.filter(function (n) { return st[n.id]; }).length, total = NODES.length;
+  $('got').textContent = got; $('total').textContent = total; $('rank').textContent = rank(got);
+  $('dots').innerHTML = NODES.map(function (n) { return '<i class="' + (st[n.id] ? 'on' : '') + '"></i>'; }).join('');
+
+  var html = '';
+  CH.forEach(function (c, ci) {
+    var list = NODES.filter(function (n) { return n.ch === ci; });
+    var cnt = list.filter(function (n) { return st[n.id]; }).length;
+    html += '<section class="page"><span class="tape"></span>' + (ci % 2 ? '<span class="tape t2"></span>' : '') +
+      '<div class="ph"><span class="no">' + c.no + '</span><h2>' + c.name + '</h2><span class="pc">' + cnt + ' / ' + list.length + '</span></div>' +
+      '<div class="pn">' + c.sub + '</div><div class="grid">';
+    list.forEach(function (n) {
+      var r = st[n.id], rot = rotOf(n.id);
+      html += '<button class="slot' + (r ? '' : ' lock') + '" data-id="' + n.id + '"><div class="stamp" style="transform:rotate(' + (r ? rot : 0) + 'deg)">' +
+        stampSVG(n, {locked: !r, date: r ? ymd(r.t) : '', uid: 'p'}) + '</div><div class="cap">' + n.name.replace(/ \(.*\)/, '') + '</div>' +
+        '<div class="meta">' + (r ? hm(r.t) + ' · ' + (HOW[r.how] || '') : '点击查看') + '</div></button>';
+    });
+    html += '</div></section>';
+  });
+  $('pages').innerHTML = html;
+  document.querySelectorAll('.slot').forEach(function (el) { el.addEventListener('click', function () { openSheet(el.getAttribute('data-id')); }); });
+
+  // 证书区
+  var demo = !!load(K_DEMO, false);
+  $('certBar').style.width = Math.round(got / total * 100) + '%';
+  $('certTip').textContent = got >= total ? '恭喜集齐全部印章！填写昵称，生成你的专属漫游证书。' : '再集 ' + (total - got) + ' 枚印章，即可生成漫游证书。';
+  $('certBtn').disabled = got < total;
+  $('previewBtn').hidden = !(demo && got < total);
+  $('demoToggle').checked = demo;
+}
+
+/* 印章详情 */
+var curId = null;
+function openSheet(id) {
+  curId = id; var n = byId(id), r = load(K_ST, {})[id], demo = !!load(K_DEMO, false);
+  $('shStamp').innerHTML = stampSVG(n, {locked: !r, date: r ? ymd(r.t) : '', uid: 's'});
+  $('shName').textContent = n.name;
+  $('shMeta').textContent = n.door + ' · ' + CH[n.ch].name + (r ? ' · ' + hm(r.t) + ' ' + (HOW[r.how] || '') : ' · 尚未获得');
+  $('shDesc').textContent = n.desc;
+  var h = '<a href="gate-3d.html?id=' + n.id + '">去浏览档案</a><a href="map.html?mode=free&focus=' + n.id + '">地图定位</a>';
+  if (demo && !r) h += '<button class="pri" id="simBtn">模拟扫码</button>';
+  $('shRow').innerHTML = h;
+  var sb = $('simBtn'); if (sb) sb.addEventListener('click', function () { closeSheet(); doClaim(id, 'demo'); });
+  $('sheet').classList.add('show');
+}
+function closeSheet() { $('sheet').classList.remove('show'); }
+document.addEventListener('click', function (e) { if ($('sheet').classList.contains('show') && !e.target.closest('#sheet') && !e.target.closest('.slot')) closeSheet(); });
+
+/* 领取印章  */
+function doClaim(id, how) {
+  var n = byId(id); if (!n) { toast('无效的打卡码'); return; }
+  var demo = how === 'demo';
+  record(id, demo ? 'qr' : how, demo);                 // 每次触碰都计入互动记录
+  var isNew = claim(id, how);
+  render();
+  var r = load(K_ST, {})[id];
+  var box = $('claimStamp'); box.style.setProperty('--rot', rotOf(id) + 'deg');
+  box.innerHTML = stampSVG(n, {date: ymd(r.t), uid: 'c' + Date.now()});
+  box.classList.remove('press'); void box.offsetWidth; box.classList.add('press');
+  var got = NODES.filter(function (x) { return load(K_ST, {})[x.id]; }).length;
+  $('claimTitle').textContent = isNew ? '获得印章 · ' + n.name : '你已打卡过 · ' + n.name;
+  $('claimText').textContent = isNew ? ('已集 ' + got + ' / ' + NODES.length + ' 枚。' + (got >= NODES.length ? '全部集齐，可以生成漫游证书啦！' : '继续漫游，集齐更多印章吧。')) : '这个点位的印章已在你的护照里，本次触碰已记录。';
+  $('claimMask').classList.add('show');
+}
+$('claimOk').addEventListener('click', function () { $('claimMask').classList.remove('show'); });
+
+/* 漫游证书  */
+function certSVG(nick, preview) {
+  var st = load(K_ST, {}), times = NODES.map(function (n) { return st[n.id] ? st[n.id].t : 0; });
+  var last = Math.max.apply(null, times) || Date.now(), d = new Date(last);
+  var no = 'MLC-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + String(times.reduce(function (a, b) { return (a * 31 + b) % 9973; }, 7)).padStart(4, '0');
+  var F = "font-family=\"'STKaiti','KaiTi','Kaiti SC','Songti SC','Noto Serif CJK SC',serif\"";
+  var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 840" width="600" height="840"><rect width="600" height="840" fill="#FBF6EA"/>' +
+    '<rect x="20" y="20" width="560" height="800" fill="none" stroke="#B8382E" stroke-width="5"/><rect x="32" y="32" width="536" height="776" fill="none" stroke="#C9A86C" stroke-width="1.5"/>' +
+    '<path d="M32 70V32H70M530 32H568V70M568 770V808H530M70 808H32V770" fill="none" stroke="#B8382E" stroke-width="4"/>' +
+    '<text x="300" y="118" text-anchor="middle" font-size="58" letter-spacing="18" fill="#B8382E" font-weight="700" ' + F + '>漫游证书</text>' +
+    '<text x="300" y="150" text-anchor="middle" font-size="12" letter-spacing="5" fill="#8a7a62">CERTIFICATE OF HUTONG WALK</text>' +
+    '<line x1="150" y1="172" x2="450" y2="172" stroke="#C9A86C" stroke-width="1.5"/>' +
+    '<text x="300" y="222" text-anchor="middle" font-size="20" fill="#4d433c" ' + F + '>兹 证 明</text>' +
+    '<text x="300" y="282" text-anchor="middle" font-size="44" fill="#2C2420" font-weight="700" ' + F + '>' + nick.replace(/[<>&]/g, '') + '</text>' +
+    '<line x1="170" y1="298" x2="430" y2="298" stroke="#2C2420" stroke-width="1"/>' +
+    '<text x="300" y="338" text-anchor="middle" font-size="19" fill="#4d433c" ' + F + '>于 ' + d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日 完成</text>' +
+    '<text x="300" y="370" text-anchor="middle" font-size="19" fill="#4d433c" ' + F + '>西四北三条胡同漫游，集齐 ' + NODES.filter(function (n) { return st[n.id]; }).length + ' 枚门楼印章</text>' +
+    '<text x="300" y="402" text-anchor="middle" font-size="16" fill="#8a7a62" ' + F + '>读懂门楼 · 走进院落 · 体验新颜</text>';
+  NODES.forEach(function (n, i) {
+    var col = i % 5, row = Math.floor(i / 5), x = 62 + col * 100, y = 440 + row * 106, r = st[n.id];
+    s += '<g transform="rotate(' + rotOf(n.id) + ' ' + (x + 42) + ' ' + (y + 42) + ')">' +
+      stampSVG(n, {locked: !r, date: r ? ymd(r.t) : '', rough: false, uid: 'k'}).replace('<svg ', '<svg x="' + x + '" y="' + y + '" width="84" height="84" ') + '</g>';
+  });
+  s += '<text x="60" y="780" font-size="12" fill="#8a7a62">证书编号 ' + no + '</text><text x="60" y="798" font-size="12" fill="#8a7a62">门楼层记·故事里 项目组</text>' +
+    '<g transform="rotate(-8 500 770)"><circle cx="500" cy="770" r="34" fill="none" stroke="#B8382E" stroke-width="3"/><circle cx="500" cy="770" r="29" fill="none" stroke="#B8382E" stroke-width="1"/>' +
+    '<text x="500" y="766" text-anchor="middle" font-size="17" fill="#B8382E" font-weight="700" ' + F + '>门楼</text><text x="500" y="786" text-anchor="middle" font-size="17" fill="#B8382E" font-weight="700" ' + F + '>层记</text></g>';
+  if (preview) s += '<text x="300" y="640" text-anchor="middle" font-size="64" fill="rgba(184,56,46,0.12)" font-weight="700" transform="rotate(-24 300 640)" ' + F + '>演示预览</text>';
+  return s + '</svg>';
+}
+function makeCert(preview) {
+  var nick = ($('nick').value || '').trim() || '漫游者';
+  save(K_NICK, nick);
+  var svg = certSVG(nick, preview), img = new Image();
+  img.onload = function () {
+    var cv = document.createElement('canvas'); cv.width = 1200; cv.height = 1680;
+    var cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, 1200, 1680);
+    $('certImg').src = cv.toDataURL('image/png'); $('certMask').classList.add('show');
+  };
+  img.onerror = function () { $('certImg').src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); $('certMask').classList.add('show'); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+$('certBtn').addEventListener('click', function () { makeCert(false); });
+$('previewBtn').addEventListener('click', function () { makeCert(true); });
+$('certOk').addEventListener('click', function () { $('certMask').classList.remove('show'); });
+$('nick').value = load(K_NICK, '') === '漫游者' ? '' : load(K_NICK, '');
+
+/* 演示模式与杂项 */
+$('demoToggle').addEventListener('change', function () { save(K_DEMO, this.checked); render(); toast(this.checked ? '演示模式已开启' : '演示模式已关闭'); });
+$('resetBtn').addEventListener('click', function () {
+  if (!confirm('将清除本机的印章与互动记录（仅限这台设备），确定吗？')) return;
+  localStorage.removeItem(K_ST); localStorage.removeItem(K_EV); render(); toast('已清除');
+});
+var tt; function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 1800); }
+
+/* 入口：扫码 / NFC 打卡链接  */
+render();
+(function () {
+  var q = new URLSearchParams(location.search), id = q.get('checkin');
+  if (!id) return;
+  var src = q.get('src') === 'nfc' ? 'nfc' : 'qr';
+  history.replaceState(null, '', location.pathname);      // 去掉参数，避免刷新重复计数
+  setTimeout(function () { doClaim(id, src); }, 250);
+})();
+window.addEventListener('storage', render);
+</script>
+</body>
+</html>
