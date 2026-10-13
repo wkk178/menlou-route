@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3a2f28">
+<title>文化探索热度看板 | 门楼层记·故事里</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--red: #B8382E; --gray: #6B5B4F; --green: #4A6B5A; --gold: #C9A86C; --cream: #F5F1E8; --ink: #2C2420; --line: rgba(107,91,79,0.14);
+      --c-browse: #6C917F; --c-audio: #C9A86C; --c-touch: #B8382E;}
+*{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
+body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh;}
+a{color: inherit; text-decoration: none;}
+button{font-family: inherit; border: none; background: none; cursor: pointer; color: inherit;}
+svg.i{width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;}
+
+/* 顶栏 */
+.head{background: linear-gradient(135deg, #3a2f28, #4A6B5A); color: #fff; padding: calc(env(safe-area-inset-top) + 16px) 20px 18px;}
+.head-in{max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;}
+.logo{width: 46px; height: 46px; border-radius: 13px; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center;}
+.logo svg{width: 28px; height: 28px; fill: none; stroke: #E8CF8E; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;}
+.head h1{font-size: 20px; letter-spacing: 2px;}
+.head small{display: block; font-size: 12px; opacity: 0.8; margin-top: 3px; letter-spacing: 1px;}
+.live{margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 12px; border-radius: 16px; background: rgba(255,255,255,0.14);}
+.live i{width: 8px; height: 8px; border-radius: 50%; background: #7ed99a; box-shadow: 0 0 0 0 rgba(126,217,154,0.7); animation: pulse 1.8s infinite;}
+@keyframes pulse{0%{box-shadow: 0 0 0 0 rgba(126,217,154,0.7);} 70%{box-shadow: 0 0 0 9px rgba(126,217,154,0);} 100%{box-shadow: 0 0 0 0 rgba(126,217,154,0);}}
+
+.wrap{max-width: 1100px; margin: 0 auto; padding: 16px 16px 60px;}
+
+/* 提示条 */
+.notice{display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #FFF4DC; border: 1px solid #ecd49b; color: #7a5a14; font-size: 13px; line-height: 1.7;}
+.notice svg{flex: 0 0 20px; margin-top: 2px;}
+.notice[hidden]{display: none;}
+
+/* 工具栏 */
+.bar{display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0;}
+.seg{display: inline-flex; background: #fff; border-radius: 20px; padding: 3px; box-shadow: 0 2px 8px rgba(107,91,79,0.1);}
+.seg button{padding: 7px 14px; border-radius: 17px; font-size: 13px; font-weight: 600; color: var(--gray);}
+.seg button.on{background: linear-gradient(135deg, #A93027, #E0733B); color: #fff;}
+.btn{padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 600; background: #fff; color: var(--gray); box-shadow: 0 2px 8px rgba(107,91,79,0.1); display: inline-flex; align-items: center; gap: 6px;}
+.btn.on{background: var(--green); color: #fff;}
+.bar .sp{flex: 1;}
+
+/* 指标卡 */
+.kpis{display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;}
+.kpi{background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 3px 12px rgba(107,91,79,0.08);}
+.kpi .ic{width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 8px;}
+.kpi b{display: block; font-size: 26px; font-family: Georgia, serif; line-height: 1.1;}
+.kpi span{font-size: 12px; color: #7a6f66;}
+.kpi em{display: block; font-style: normal; font-size: 11px; color: #a39a91; margin-top: 3px;}
+
+/* 卡片 */
+.grid2{display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; margin-top: 14px;}
+.card{background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 3px 12px rgba(107,91,79,0.08); min-width: 0;}
+.card h2{font-size: 16px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1; margin-bottom: 4px;}
+.card .sub{font-size: 12px; color: #8a7f76; margin: 6px 0 12px; line-height: 1.6;}
+#map{height: 400px; border-radius: 12px; overflow: hidden; background: #ece7dc;}
+.legend{display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: #7a6f66;}
+.legend .gr{flex: 1; max-width: 160px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(240,200,90,0.9), rgba(235,130,50,0.95), rgba(184,56,46,1));}
+.blob{border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.6);}
+
+/* 排行 */
+.key{display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: #7a6f66; margin-bottom: 10px;}
+.key i{display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px;}
+.rk{display: flex; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 13px;}
+.rk .no{flex: 0 0 20px; height: 20px; border-radius: 6px; background: var(--cream); color: var(--gray); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;}
+.rk:nth-child(-n+3) .no{background: var(--red); color: #fff;}
+.rk .nm{flex: 0 0 92px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+.rk .tr{flex: 1; height: 10px; border-radius: 5px; background: #f1ebdf; display: flex; overflow: hidden;}
+.rk .tr i{display: block; height: 100%;}
+.rk .v{flex: 0 0 34px; text-align: right; font-weight: 700;}
+
+/* 时段 */
+.hours{display: flex; align-items: flex-end; gap: 3px; height: 120px; margin-top: 6px;}
+.hours div{flex: 1; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #E0733B, #B8382E); min-height: 2px; position: relative; opacity: 0.85;}
+.hours div.now{opacity: 1; outline: 2px solid var(--gold);}
+.hlabel{display: flex; justify-content: space-between; font-size: 10.5px; color: #a39a91; margin-top: 4px;}
+
+/* 实时动态 */
+.feed{list-style: none; max-height: 290px; overflow-y: auto;}
+.feed li{display: flex; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; animation: fin 0.5s ease;}
+.feed li:last-child{border-bottom: none;}
+@keyframes fin{from{opacity: 0; transform: translateY(-8px); background: #FFF4DC;} to{opacity: 1; transform: none;}}
+.feed .t{flex: 0 0 52px; color: #a39a91; font-size: 12px; font-variant-numeric: tabular-nums;}
+.feed .d{flex: 0 0 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff;}
+.feed .d svg{width: 14px; height: 14px;}
+.feed .n{flex: 1; min-width: 0;}
+.feed .n small{display: block; color: #8a7f76; font-size: 11px;}
+.tag{font-size: 10.5px; padding: 1px 7px; border-radius: 8px; font-weight: 700;}
+.tag.real{background: #DCE9E1; color: #2f5642;}
+.tag.test{background: #FFE9B8; color: #8a5f00;}
+.tag.demo{background: #E4DDF3; color: #4b3a85;}
+
+/* 口径 */
+.defs{display: grid; grid-template-columns: 110px 1fr; gap: 0; font-size: 13px; line-height: 1.75;}
+.defs dt{color: var(--gray); font-weight: 700; padding: 9px 0; border-top: 1px solid var(--line);}
+.defs dd{padding: 9px 0; border-top: 1px solid var(--line); color: #4d433c;}
+.defs dt:first-of-type, .defs dt:first-of-type + dd{border-top: none;}
+.defs ol{padding-left: 18px;}
+
+/* 打卡链接 */
+details{margin-top: 14px; background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 3px 12px rgba(107,91,79,0.08);}
+summary{cursor: pointer; font-size: 16px; font-weight: 700; list-style: none; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1;}
+summary::-webkit-details-marker{display: none;}
+.ck{display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 12.5px;}
+.ck b{flex: 0 0 96px;}
+.demo-ck{background: #F4EFE3; padding: 10px; border-radius: 10px; border-bottom: none; margin-top: 4px;}
+.ck code{flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #6a5f57; font-size: 11.5px;}
+.ck button{padding: 4px 11px; border-radius: 12px; background: var(--cream); font-size: 12px; font-weight: 600; color: var(--gray);}
+
+/* 弹层 */
+.mask{position: fixed; inset: 0; z-index: 1000; background: rgba(30,22,16,0.6); display: none; align-items: center; justify-content: center; padding: 20px;}
+.mask.show{display: flex;}
+.dlg{background: #fff; border-radius: 20px; padding: 22px; width: 100%; max-width: 320px; text-align: center;}
+.dlg h3{font-size: 17px; margin-bottom: 6px;}
+.dlg p{font-size: 12px; color: #8a7f76; line-height: 1.6; margin-bottom: 14px; word-break: break-all;}
+#qr{display: flex; justify-content: center; margin-bottom: 12px;}
+.pin{width: 100%; padding: 13px; font-size: 22px; letter-spacing: 12px; text-align: center; border-radius: 12px; border: 1px solid var(--line); background: var(--cream); margin: 12px 0 10px; font-family: inherit;}
+.go{display: block; width: 100%; padding: 12px; border-radius: 22px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #A93027, #E0733B);}
+.err{color: var(--red); font-size: 12px; min-height: 16px;}
+.back{display: inline-flex; margin-top: 18px; font-size: 13px; color: var(--green); font-weight: 600;}
+
+.toast{position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: rgba(44,36,32,0.92); color: #fff; padding: 9px 18px; border-radius: 20px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 1100;}
+.toast.show{opacity: 1;}
+
+@media (max-width: 860px){
+  .kpis{grid-template-columns: 1fr 1fr;}
+  .grid2{grid-template-columns: 1fr;}
+  #map{height: 320px;}
+}
+</style>
+</head>
+<body>
+
+<header class="head"><div class="head-in">
+  <div class="logo"><svg viewBox="0 0 48 48"><path d="M6 20L24 8l18 12"/><path d="M11 20v20M37 20v20"/><path d="M17 40V24h14v16"/><path d="M4 40h40"/></svg></div>
+  <div><h1>文化探索热度看板</h1><small>运营管理端 · 西四北三条</small></div>
+  <div class="live"><i></i><span id="updated">实时更新中</span></div>
+</div></header>
+
+<main class="wrap">
+  <div class="notice" id="notice">
+    <svg class="i" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>
+    <div id="noticeText"></div>
+  </div>
+
+  <div class="bar">
+    <div class="seg" id="rangeSeg"><button data-v="today">今日</button><button data-v="7d" class="on">近 7 天</button></div>
+    <div class="seg" id="srcSeg"><button data-v="all" class="on">全部数据</button><button data-v="notest">不含测试数据</button><button data-v="real">仅现场真实</button></div>
+    <span class="sp"></span>
+    <button class="btn" id="liveBtn"><svg class="i" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9z"/></svg><span>开启实时模拟</span></button>
+    <button class="btn" id="touchBtn"><svg class="i" viewBox="0 0 24 24"><path d="M5 12a7 7 0 0 1 14 0M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/><path d="M12 15v6"/></svg><span>模拟一次 NFC 触碰</span></button>
+  </div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <div class="grid2">
+    <section class="card">
+      <h2>文化探索热度分布</h2>
+      <p class="sub">圆斑越大、越红，表示该点位在所选范围内的互动次数越多。点击圆斑查看明细。</p>
+      <div id="map"></div>
+      <div class="legend"><span>低</span><span class="gr"></span><span>高</span><span style="margin-left:auto" id="maxNote"></span></div>
+    </section>
+    <section class="card">
+      <h2>点位热度排行</h2>
+      <p class="sub">按互动次数合计排序，色块表示互动类型构成。</p>
+      <div class="key"><span><i style="background:var(--c-browse)"></i>浏览档案</span><span><i style="background:var(--c-audio)"></i>收听讲解</span><span><i style="background:var(--c-touch)"></i>现场触碰</span></div>
+      <div id="rank"></div>
+    </section>
+  </div>
+
+  <div class="grid2" style="grid-template-columns: 1fr 1fr;">
+    <section class="card">
+      <h2>时段分布</h2>
+      <p class="sub">按一天中的小时汇总互动次数，可用于判断人流高峰时段。</p>
+      <div class="hours" id="hours"></div>
+      <div class="hlabel"><span>0 时</span><span>6</span><span>12</span><span>18</span><span>23 时</span></div>
+    </section>
+    <section class="card">
+      <h2>实时动态</h2>
+      <p class="sub">最新的互动记录，标签区分真实记录与测试数据。</p>
+      <ul class="feed" id="feed"></ul>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:14px">
+    <h2>数据口径与局限性</h2>
+    <p class="sub">请在引用本页数据时一并说明以下信息。</p>
+    <dl class="defs" id="defs"></dl>
+  </section>
+
+  <details id="links">
+    <summary>点位打卡链接</summary>
+    <p class="sub" style="margin-top:10px">游客触碰或扫码后会在护照中领取印章，同时产生一条触碰记录。</p>
+    <div class="ck demo-ck"><b>演示标签</b><code id="demoUrl"></code><button data-act="copy" data-id="__demo">复制</button><button data-act="qr" data-id="__demo">二维码</button></div>
+    <p class="sub" style="margin:8px 0 4px">上面是演示用的 1 枚 NFC 标签链接。下面是正式部署时每个点位各用一枚标签的链接。</p>
+    <div id="ckList"></div>
+  </details>
+
+  <a class="back" href="about.html">返回项目介绍</a>
+</main>
+
+<!-- 口令 -->
+<div class="mask show" id="gate">
+  <div class="dlg">
+    <h3>运营看板</h3>
+    <p>请输入管理口令。<br>演示口令：2026（原型用，正式版应改为账号登录）</p>
+    <input class="pin" id="pin" type="tel" inputmode="numeric" maxlength="4" autocomplete="off">
+    <div class="err" id="pinErr"></div>
+    <button class="go" id="pinOk">进入</button>
+  </div>
+</div>
+<div class="mask" id="qrMask"><div class="dlg"><h3 id="qrTitle"></h3><div id="qr"></div><p id="qrUrl"></p><button class="go" id="qrOk">关闭</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* 基础数据  */
+var ADMIN_PIN = '2026';
+var NODES = [
+  {id:'N1',  name:'隆长寺山门',     lat:39.92803, lng:116.37250, w:0.80},
+  {id:'N2',  name:'马福祥宅',       lat:39.92806, lng:116.37126, w:0.55},
+  {id:'N3',  name:'13号院金柱大门', lat:39.92807, lng:116.37102, w:0.85},
+  {id:'N39', name:'程砚秋故居',     lat:39.92815, lng:116.36780, w:1.00},
+  {id:'N9',  name:'44号金柱大门',   lat:39.92827, lng:116.36706, w:0.30},
+  {id:'L5',  name:'傅增湘故居',     lat:39.92950, lng:116.37050, w:0.50},
+  {id:'N10', name:'45号居民院落',   lat:39.92817, lng:116.36706, w:0.20},
+  {id:'B1',  name:'无问西东精酿',   lat:39.92765, lng:116.37295, w:0.90},
+  {id:'B2',  name:'易应茶舍',       lat:39.92791, lng:116.37293, w:0.45},
+  {id:'N11', name:'京剧体验馆',     lat:39.92808, lng:116.37052, w:0.70},
+  {id:'N12', name:'拾光茶铺',       lat:39.92809, lng:116.37003, w:0.60},
+  {id:'N13', name:'故事书店',       lat:39.92816, lng:116.36731, w:0.40},
+  {id:'N14', name:'胡同夜市',       lat:39.92829, lng:116.36632, w:0.45},
+  {id:'B3',  name:'叙杯',           lat:39.92922, lng:116.36726, w:0.25},
+  {id:'B4',  name:'无名蹄花',       lat:39.92906, lng:116.36719, w:0.30}
+];
+var TYPE = {
+  browse: {name: '浏览档案', color: '#6C917F', icon: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'},
+  audio:  {name: '收听讲解', color: '#C9A86C', icon: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>'},
+  qr:     {name: '扫码打卡', color: '#B8382E', icon: '<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/>'},
+  nfc:    {name: 'NFC 触碰', color: '#B8382E', icon: '<path d="M5 12a7 7 0 0 1 14 0M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="12" r="1" fill="currentColor"/><path d="M12 15v6"/>'}
+};
+var TAGCLS = {real: 'real', tag: 'demo', test: 'test'}, TAGTXT = {real: '现场真实', tag: '演示标签', test: '测试'};
+function cls(t) { return t === 'browse' ? 'browse' : t === 'audio' ? 'audio' : 'touch'; }   // 触碰 = NFC + 二维码
+function $(id) { return document.getElementById(id); }
+function nodeOf(id) { return NODES.filter(function (n) { return n.id === id; })[0]; }
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function fmtDate(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function icon(t) { return '<svg class="i" viewBox="0 0 24 24">' + TYPE[t].icon + '</svg>'; }
+
+/* ================= 数据：测试数据 + 真实记录 ================= */
+// 测试数据：程序按预设分布生成（固定随机种子），仅用于演示界面
+function rng(seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; }
+var HOUR_W = [0,0,0,0,0,0,0.1,0.4,1,2.2,3.4,3.6,2.4,2.0,3.0,3.6,3.2,2.0,1.2,0.8,0.5,0.2,0.1,0];
+function pick(r, weights) { var s = weights.reduce(function (a, b) { return a + b; }, 0), x = r() * s, i = 0; while (i < weights.length - 1 && x >= weights[i]) { x -= weights[i]; i++; } return i; }
+function genSim() {
+  var r = rng(20261012), out = [], now = Date.now(), today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  for (var d = 6; d >= 0; d--) {
+    var base = today0.getTime() - d * 86400000, wk = new Date(base).getDay(), n = Math.round(48 + r() * 26 + (wk === 0 || wk === 6 ? 24 : 0));
+    for (var k = 0; k < n; k++) {
+      var h = pick(r, HOUR_W), t = base + h * 3600000 + Math.floor(r() * 3600000);
+      if (t > now) continue;
+      var ni = pick(r, NODES.map(function (x) { return x.w; })), ty = ['browse', 'audio', 'qr', 'nfc'][pick(r, [5.5, 2, 1.2, 1.3])];
+      out.push({id: NODES[ni].id, type: ty, t: t, k: 'test'});
+    }
+  }
+  return out;
+}
+var SIM = genSim(), LIVE = [];       // LIVE：本页“模拟实时”追加的测试记录（仅在内存中）
+function realEvents() {                // 真实记录：本设备浏览器中的护照/档案互动
+  var arr = []; try { arr = JSON.parse(localStorage.getItem('menlouEvents')) || []; } catch (e) {}
+  return arr.filter(function (e) { return nodeOf(e.id); }).map(function (e) { return {id: e.id, type: e.type, t: e.t, k: e.demo === 2 ? 'tag' : (e.demo ? 'test' : 'real')}; });
+}
+
+
+var state = {range: '7d', src: 'all'};
+function rangeStart() {
+  var d = new Date(); d.setHours(0, 0, 0, 0);
+  return state.range === 'today' ? d.getTime() : d.getTime() - 6 * 86400000;
+}
+function filtered() {
+  var s = rangeStart();
+  return SIM.concat(LIVE, realEvents()).filter(function (e) { return e.t >= s && (state.src === 'all' || (state.src === 'notest' && e.k !== 'test') || (state.src === 'real' && e.k === 'real')); }).sort(function (a, b) { return a.t - b.t; });
+}
+function calc(ev) {
+  var m = {}; NODES.forEach(function (n) { m[n.id] = {browse: 0, audio: 0, touch: 0, total: 0, test: 0, tag: 0, real: 0}; });
+  var hours = []; for (var i = 0; i < 24; i++) hours.push(0);
+  var tot = {browse: 0, audio: 0, touch: 0, test: 0, tag: 0, real: 0};
+  ev.forEach(function (e) {
+    var c = cls(e.type), x = m[e.id]; x[c]++; x.total++; x[e.k]++;
+    tot[c]++; tot[e.k]++; hours[new Date(e.t).getHours()]++;
+  });
+  return {m: m, hours: hours, tot: tot, n: ev.length};
+}
+
+
+var map, layer, mapReady = false;
+function renderKpis(c) {
+  var items = [
+    {l: '互动总次数', v: c.n, c: '#4A6B5A', ic: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', s: '测试 ' + c.tot.test + ' · 演示标签 ' + c.tot.tag + ' · 现场真实 ' + c.tot.real},
+    {l: '现场触碰（NFC / 二维码）', v: c.tot.touch, c: '#B8382E', ic: TYPE.nfc.icon, s: '到访点位的直接信号'},
+    {l: '讲解播放', v: c.tot.audio, c: '#C9A86C', ic: TYPE.audio.icon, s: '播放满 5 秒计 1 次'},
+    {l: '覆盖点位', v: NODES.filter(function (n) { return c.m[n.id].total > 0; }).length + ' / ' + NODES.length, c: '#6B5B4F', ic: '<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', s: '有互动记录的点位数'}
+  ];
+  $('kpis').innerHTML = items.map(function (x) {
+    return '<div class="kpi"><div class="ic" style="background:' + x.c + '"><svg class="i" viewBox="0 0 24 24">' + x.ic + '</svg></div><b>' + x.v + '</b><span>' + x.l + '</span><em>' + x.s + '</em></div>';
+  }).join('');
+}
+function heatColor(p) {   // 0-1 → 黄 → 橙 → 红
+  var a = [240, 200, 90], b = [235, 130, 50], c = [184, 56, 46], t = p < 0.5 ? p * 2 : (p - 0.5) * 2, f = p < 0.5 ? [a, b] : [b, c];
+  return 'rgb(' + f[0].map(function (v, i) { return Math.round(v + (f[1][i] - v) * t); }).join(',') + ')';
+}
+function renderMap(c) {
+  if (!window.L) return;
+  if (!mapReady) {
+    map = L.map('map', {center: [39.9286, 116.3700], zoom: 16, zoomControl: true, attributionControl: false});
+    L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {subdomains: '1234', maxZoom: 18}).addTo(map);
+    layer = L.layerGroup().addTo(map); mapReady = true;
+    var b = L.latLngBounds(NODES.map(function (n) { return [n.lat, n.lng]; })); map.fitBounds(b, {padding: [30, 30]});
+  }
+  layer.clearLayers();
+  var max = Math.max.apply(null, NODES.map(function (n) { return c.m[n.id].total; })) || 1;
+  $('maxNote').textContent = '当前最大值：' + max + ' 次';
+  NODES.forEach(function (n) {
+    var x = c.m[n.id]; if (!x.total) return;
+    var p = x.total / max, size = Math.round(34 + p * 70), col = heatColor(p);
+    var html = '<div class="blob" style="width:' + size + 'px;height:' + size + 'px;background:radial-gradient(circle, ' + col.replace('rgb', 'rgba').replace(')', ',0.88)') + ' 0%, ' + col.replace('rgb', 'rgba').replace(')', ',0.45)') + ' 55%, ' + col.replace('rgb', 'rgba').replace(')', ',0)') + ' 100%)">' + x.total + '</div>';
+    L.marker([n.lat, n.lng], {icon: L.divIcon({html: html, className: '', iconSize: [size, size], iconAnchor: [size / 2, size / 2]})})
+      .bindPopup('<b>' + n.name + '</b><br>互动 ' + x.total + ' 次<br>浏览 ' + x.browse + ' · 讲解 ' + x.audio + ' · 触碰 ' + x.touch + '<br><span style="color:#8a7f76">测试 ' + x.test + ' · 演示标签 ' + x.tag + ' · 现场真实 ' + x.real + '</span>')
+      .addTo(layer);
+  });
+}
+function renderRank(c) {
+  var list = NODES.slice().sort(function (a, b) { return c.m[b.id].total - c.m[a.id].total; });
+  var max = c.m[list[0].id].total || 1;
+  $('rank').innerHTML = list.map(function (n, i) {
+    var x = c.m[n.id], w = function (v) { return (v / max * 100).toFixed(1) + '%'; };
+    return '<div class="rk"><span class="no">' + (i + 1) + '</span><span class="nm">' + n.name + '</span><span class="tr"><i style="width:' + w(x.browse) + ';background:var(--c-browse)"></i><i style="width:' + w(x.audio) + ';background:var(--c-audio)"></i><i style="width:' + w(x.touch) + ';background:var(--c-touch)"></i></span><span class="v">' + x.total + '</span></div>';
+  }).join('');
+}
+function renderHours(c) {
+  var max = Math.max.apply(null, c.hours) || 1, nowH = new Date().getHours();
+  $('hours').innerHTML = c.hours.map(function (v, h) { return '<div class="' + (h === nowH ? 'now' : '') + '" style="height:' + Math.max(2, v / max * 100) + '%" title="' + h + ' 时：' + v + ' 次"></div>'; }).join('');
+}
+var lastFeedKey = '';
+function renderFeed(ev) {
+  var last = ev.slice(-12).reverse(), key = last.map(function (e) { return e.t + e.id; }).join('|');
+  if (key === lastFeedKey) return; lastFeedKey = key;
+  $('feed').innerHTML = last.map(function (e) {
+    var n = nodeOf(e.id), t = new Date(e.t);
+    return '<li><span class="t">' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds()) + '</span><span class="d" style="background:' + TYPE[e.type].color + '">' + icon(e.type) + '</span><span class="n">' + n.name + '<small>' + TYPE[e.type].name + '</small></span><span class="tag ' + TAGCLS[e.k] + '">' + TAGTXT[e.k] + '</span></li>';
+  }).join('') || '<li style="color:#a39a91">所选范围内暂无记录</li>';
+}
+function renderDefs(c) {
+  var s = new Date(rangeStart()), e = new Date();
+  $('defs').innerHTML =
+    '<dt>数据来源</dt><dd>本平台内的匿名互动行为：点位档案浏览（停留满 8 秒）、讲解音频播放（满 5 秒）、现场二维码 / NFC 触碰。不采集姓名、账号、手机号和定位轨迹，记录中只有点位编号、互动类型和时间。</dd>' +
+    '<dt>统计口径</dt><dd>“文化探索热度”＝所选时间范围内各点位互动次数合计，三类互动各计 1 次。同一游客重复互动会重复计数，因此它反映的是“被探索的程度”，不是到访人数。</dd>' +
+    '<dt>时间范围</dt><dd>' + fmtDate(s) + ' 至 ' + fmtDate(e) + '（' + (state.range === 'today' ? '今日' : '近 7 天') + '，按本地时间统计）。</dd>' +
+    '<dt>样本量</dt><dd>当前统计 <b>' + c.n + '</b> 条互动记录：现场真实 <b>' + c.tot.real + '</b> 条、演示标签触碰 <b>' + c.tot.tag + '</b> 条、测试数据 <b>' + c.tot.test + '</b> 条。</dd>' +
+    '<dt>数据类别</dt><dd><span class="tag real">现场真实</span> 游客在点位现场扫码或触碰标签产生的记录。<br><span class="tag demo">演示标签</span> 演示阶段用 1 枚 NFC 标签代表多个点位：触碰本身是真实的硬件操作，但点位归属由演示顺序分配，不代表该点位的真实到访。<br><span class="tag test">测试</span> 程序按预设分布生成或手动模拟的数据，仅用于演示界面。</dd>' +
+    '<dt>局限性</dt><dd><ol>' +
+      '<li>测试数据和演示标签触碰<b>不代表真实客流</b>，只用于展示系统功能；对外引用时请选择“仅现场真实”。</li>' +
+      '<li>记录目前保存在产生记录的那台设备的浏览器中，本页只能看到与它同一浏览器的记录；跨设备汇总需接入服务器。</li>' +
+      '<li>互动次数不等于客流人数，也无法覆盖未使用本平台的游客。</li>' +
+      '<li>原型阶段的打卡链接可被手动构造，正式上线需要服务端校验。</li></ol></dd>';
+  var parts = [];
+  if (c.tot.test) parts.push('<b>' + c.tot.test + ' 条测试数据</b>（程序生成，仅用于演示界面）');
+  if (c.tot.tag) parts.push('<b>' + c.tot.tag + ' 条演示标签触碰</b>（1 枚 NFC 标签代表多个点位，点位归属为演示分配）');
+  $('notice').hidden = !parts.length;
+  $('noticeText').innerHTML = '当前图表包含 ' + parts.join('；') + '，均不构成真实客流结论。选择“仅现场真实”可只查看游客在点位现场产生的记录（当前 ' + c.tot.real + ' 条）。';
+}
+function refresh() {
+  var ev = filtered(), c = calc(ev);
+  renderKpis(c); renderMap(c); renderRank(c); renderHours(c); renderFeed(ev); renderDefs(c);
+  var d = new Date(); $('updated').textContent = '实时更新 ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+}
+
+/* ================= 交互 ================= */
+function bindSeg(id, key) {
+  $(id).addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    state[key] = b.getAttribute('data-v'); lastFeedKey = ''; refresh();
+  });
+}
+bindSeg('rangeSeg', 'range'); bindSeg('srcSeg', 'src');
+
+function addLive(type) {
+  var r = Math.random(), i = pick(Math.random, NODES.map(function (x) { return x.w; }));
+  LIVE.push({id: NODES[i].id, type: type || (r < 0.55 ? 'nfc' : r < 0.8 ? 'qr' : r < 0.92 ? 'browse' : 'audio'), t: Date.now(), k: 'test'});
+  refresh();
+}
+var liveTimer = null;
+$('liveBtn').addEventListener('click', function () {
+  if (liveTimer) { clearInterval(liveTimer); liveTimer = null; this.classList.remove('on'); this.querySelector('span').textContent = '开启实时模拟'; }
+  else { liveTimer = setInterval(addLive, 2200); this.classList.add('on'); this.querySelector('span').textContent = '实时模拟中（测试数据）'; }
+});
+$('touchBtn').addEventListener('click', function () { addLive('nfc'); toast('已追加 1 条模拟 NFC 触碰（测试数据）'); });
+
+// 真实记录：其他标签页或本机护照产生新记录时自动刷新
+var lastLen = realEvents().length;
+setInterval(function () { var n = realEvents().length; if (n !== lastLen) { lastLen = n; refresh(); } else { var d = new Date(); $('updated').textContent = '实时更新 ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); } }, 2000);
+window.addEventListener('storage', function () { refresh(); });
+
+/* 打卡链接与二维码 */
+function demoTagUrl() { return new URL('passport.html?nfc=demo', location.href).href; }
+$('demoUrl').textContent = demoTagUrl();
+function checkinUrl(id, src) { return new URL('passport.html?checkin=' + id + '&src=' + src, location.href).href; }
+$('ckList').innerHTML = NODES.map(function (n) {
+  return '<div class="ck"><b>' + n.name + '</b><code>' + checkinUrl(n.id, 'nfc') + '</code><button data-act="copy" data-id="' + n.id + '">复制</button><button data-act="qr" data-id="' + n.id + '">二维码</button></div>';
+}).join('');
+$('links').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  var id = b.getAttribute('data-id'), isDemo = id === '__demo', n = isDemo ? {name: '演示标签'} : nodeOf(id);
+  if (b.getAttribute('data-act') === 'copy') {
+    var u = isDemo ? demoTagUrl() : checkinUrl(id, 'nfc');
+    (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function () { toast('已复制 NFC 链接'); }, function () { prompt('请手动复制：', u); });
+  } else {
+    var url = isDemo ? demoTagUrl() : checkinUrl(id, 'qr');
+    $('qrTitle').textContent = n.name; $('qrUrl').textContent = url; $('qr').innerHTML = '';
+    if (window.QRCode) new QRCode($('qr'), {text: url, width: 180, height: 180}); else $('qr').textContent = '二维码组件未加载，请先复制链接';
+    $('qrMask').classList.add('show');
+  }
+});
+$('qrOk').addEventListener('click', function () { $('qrMask').classList.remove('show'); });
+
+/* 口令 */
+function enter() { $('gate').classList.remove('show'); refresh(); setTimeout(function () { if (map) map.invalidateSize(); }, 200); }
+function tryPin() { if ($('pin').value === ADMIN_PIN) { sessionStorage.setItem('mlAdmin', '1'); enter(); } else { $('pinErr').textContent = '口令不正确'; $('pin').value = ''; } }
+$('pinOk').addEventListener('click', tryPin);
+$('pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryPin(); });
+if (sessionStorage.getItem('mlAdmin') === '1') enter();
+
+var tt; function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 1800); }
+</script>
+</body>
+</html>

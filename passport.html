@@ -76,6 +76,8 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 
 .demo{margin: 22px 16px 0; padding: 12px 14px; border-radius: 14px; border: 1px dashed #cfc3ad; font-size: 12px; color: #8a7f76; line-height: 1.7;}
 .demo label{display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); font-weight: 600;}
+.nfcbox{margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: #F4EFE3; color: #5b5048;}
+.nfcbox code{display: block; margin: 4px 0; padding: 5px 8px; border-radius: 6px; background: #fff; font-size: 11px; word-break: break-all; color: #6a5f57;}
 .demo a, .demo button{color: var(--red); text-decoration: underline; font-size: 12px;}
 
 /* ---------- 弹层 ---------- */
@@ -156,12 +158,18 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
     <div class="bar"><i id="certBar" style="width:0%"></i></div>
     <input class="nick" id="nick" maxlength="12" placeholder="证书上的昵称（选填）">
     <button class="btn" id="certBtn" disabled>生成漫游证书</button>
-    <button class="btn sub" id="previewBtn" hidden>预览证书样式（演示）</button>
+    <button class="btn sub" id="previewBtn" hidden>预览证书样式</button>
   </section>
 
   <section class="demo">
     <label><input type="checkbox" id="demoToggle"> 演示模式</label>
-    开启后，点击印章位可“模拟扫码打卡”。演示打卡会在运营看板中记为<b>测试数据</b>，不计入真实记录。
+    开启后，点击印章位可“模拟扫码打卡”，会在运营看板中记为<b>测试数据</b>。
+    <div class="nfcbox">
+      <b>NFC 演示标签</b><br>
+      用 1 枚 NFC 贴纸代替多个点位：每次触碰会生成 1 条记录，并按路线顺序分配 1 枚印章。数据中会标注为“演示标签”。<br>
+      标签链接：<code id="nfcUrl"></code> <button id="copyNfc">复制</button><br>
+      下一次触碰将分配到：<b id="nextNode"></b>
+    </div>
     <div style="margin-top:6px"><button id="resetBtn">清除本机护照记录</button></div>
   </section>
 </div>
@@ -212,7 +220,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 </nav>
 
 <script>
-
+/*点位与章节 */
 var CH = [
   {name: '读门篇', sub: '寻古 · 读懂门楼形制', no: '壹', shape: 'circle', color: '#B8382E', label: '读门·寻古'},
   {name: '院落篇', sub: '阅巷 · 走进胡同生活', no: '贰', shape: 'square', color: '#3E5C4D', label: '推门·阅巷'},
@@ -235,14 +243,16 @@ var NODES = [
   {id:'B3',  ch:2, L:['叙杯'],           name:'叙杯',           door:'赵登禹路144号附近', desc:'赵登禹路沿街店铺，位于西四北五条与四条之间。'},
   {id:'B4',  ch:2, L:['无名','蹄花'],     name:'无名蹄花',       door:'赵登禹路146-148号附近', desc:'赵登禹路沿街餐饮，临近西四北四条路口。'}
 ];
-var HOW = {browse: '浏览档案', audio: '收听讲解', qr: '扫码打卡', nfc: 'NFC 触碰', demo: '演示打卡'};
+var HOW = {browse: '浏览档案', audio: '收听讲解', qr: '扫码打卡', nfc: 'NFC 触碰', nfcdemo: 'NFC 演示触碰', demo: '演示打卡'};
+// 演示标签：1 枚 NFC 贴纸代表多个点位，按下列路线顺序依次分配（由东向西）
+var ORDER = ['B1','B2','N1','N2','N3','N11','N12','N39','N13','N9','N10','N14','L5','B3','B4'];
 
-/*  本地存储 */
-var K_ST = 'menlouStamps', K_EV = 'menlouEvents', K_NICK = 'menlouNick', K_DEMO = 'menlouDemo';
+/*本地存储（仅在本机，不上传） */
+var K_ST = 'menlouStamps', K_EV = 'menlouEvents', K_NICK = 'menlouNick', K_DEMO = 'menlouDemo', K_SEQ = 'menlouDemoSeq', K_LAST = 'menlouLastTap';
 function load(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
 function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-function record(id, type, demo) {   // 匿名互动记录：只含点位、类型、时间
-  var ev = load(K_EV, []); ev.push({id: id, type: type, t: Date.now(), demo: demo ? 1 : 0});
+function record(id, type, kind) {   // 匿名互动记录：只含点位、类型、时间；kind: 0 现场真实 / 1 测试 / 2 演示标签
+  var ev = load(K_EV, []); ev.push({id: id, type: type, t: Date.now(), demo: kind || 0});
   if (ev.length > 3000) ev = ev.slice(-3000); save(K_EV, ev);
 }
 function claim(id, how) {
@@ -256,7 +266,7 @@ function ymd(t) { var d = new Date(t); return d.getFullYear() + '.' + pad(d.getM
 function hm(t) { var d = new Date(t); return pad(d.getMonth() + 1) + '.' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
 function rotOf(id) { var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 97; return (h % 13) - 6; }
 
-/* 邮戳绘制 */
+/* ============ 邮戳绘制 ============ */
 function icon(ch, c) {
   var g = '<g transform="translate(60 35)" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">';
   if (ch === 0) g += '<path d="M-15 -4L0 -13L15 -4"/><path d="M-11 -4V12M11 -4V12"/><path d="M-5 12V0H5V12"/><circle cx="2.4" cy="6.5" r="0.9" fill="' + c + '"/>';
@@ -286,7 +296,7 @@ function stampSVG(n, o) {
   return s + '</g></svg>';
 }
 
-
+/* ============ 页面渲染 ============ */
 function rank(n) { return n >= 15 ? '门楼通' : n >= 10 ? '门楼行家' : n >= 5 ? '胡同漫游者' : '初访游客'; }
 function render() {
   var st = load(K_ST, {}), got = NODES.filter(function (n) { return st[n.id]; }).length, total = NODES.length;
@@ -320,7 +330,7 @@ function render() {
   $('demoToggle').checked = demo;
 }
 
-/* 印章详情 */
+/* 印章详情  */
 var curId = null;
 function openSheet(id) {
   curId = id; var n = byId(id), r = load(K_ST, {})[id], demo = !!load(K_DEMO, false);
@@ -338,10 +348,10 @@ function closeSheet() { $('sheet').classList.remove('show'); }
 document.addEventListener('click', function (e) { if ($('sheet').classList.contains('show') && !e.target.closest('#sheet') && !e.target.closest('.slot')) closeSheet(); });
 
 /* 领取印章  */
-function doClaim(id, how) {
+function doClaim(id, how, info) {
   var n = byId(id); if (!n) { toast('无效的打卡码'); return; }
-  var demo = how === 'demo';
-  record(id, demo ? 'qr' : how, demo);                 // 每次触碰都计入互动记录
+  var kind = how === 'demo' ? 1 : how === 'nfcdemo' ? 2 : 0;
+  record(id, how === 'demo' ? 'qr' : how === 'nfcdemo' ? 'nfc' : how, kind);        // 每次触碰都计入互动记录
   var isNew = claim(id, how);
   render();
   var r = load(K_ST, {})[id];
@@ -349,13 +359,15 @@ function doClaim(id, how) {
   box.innerHTML = stampSVG(n, {date: ymd(r.t), uid: 'c' + Date.now()});
   box.classList.remove('press'); void box.offsetWidth; box.classList.add('press');
   var got = NODES.filter(function (x) { return load(K_ST, {})[x.id]; }).length;
-  $('claimTitle').textContent = isNew ? '获得印章 · ' + n.name : '你已打卡过 · ' + n.name;
-  $('claimText').textContent = isNew ? ('已集 ' + got + ' / ' + NODES.length + ' 枚。' + (got >= NODES.length ? '全部集齐，可以生成漫游证书啦！' : '继续漫游，集齐更多印章吧。')) : '这个点位的印章已在你的护照里，本次触碰已记录。';
+  $('claimTitle').textContent = isNew ? '获得印章 · ' + n.name : '已打卡过 · ' + n.name;
+  var t = isNew ? ('已集 ' + got + ' / ' + NODES.length + ' 枚。' + (got >= NODES.length ? '全部集齐，可以生成漫游证书啦！' : '继续漫游，集齐更多印章吧。')) : '这个点位的印章已在你的护照里，本次触碰已记录。';
+  if (how === 'nfcdemo') t = '演示标签第 ' + info.seq + ' 次触碰，由演示顺序分配到本点位。' + t;
+  $('claimText').textContent = t;
   $('claimMask').classList.add('show');
 }
 $('claimOk').addEventListener('click', function () { $('claimMask').classList.remove('show'); });
 
-/* 漫游证书  */
+/*  漫游证书 */
 function certSVG(nick, preview) {
   var st = load(K_ST, {}), times = NODES.map(function (n) { return st[n.id] ? st[n.id].t : 0; });
   var last = Math.max.apply(null, times) || Date.now(), d = new Date(last);
@@ -374,7 +386,7 @@ function certSVG(nick, preview) {
     '<text x="300" y="370" text-anchor="middle" font-size="19" fill="#4d433c" ' + F + '>西四北三条胡同漫游，集齐 ' + NODES.filter(function (n) { return st[n.id]; }).length + ' 枚门楼印章</text>' +
     '<text x="300" y="402" text-anchor="middle" font-size="16" fill="#8a7a62" ' + F + '>读懂门楼 · 走进院落 · 体验新颜</text>';
   NODES.forEach(function (n, i) {
-    var col = i % 5, row = Math.floor(i / 5), x = 62 + col * 100, y = 440 + row * 106, r = st[n.id];
+    var col = i % 5, row = Math.floor(i / 5), x = 62 + col * 100, y = 426 + row * 100, r = st[n.id];
     s += '<g transform="rotate(' + rotOf(n.id) + ' ' + (x + 42) + ' ' + (y + 42) + ')">' +
       stampSVG(n, {locked: !r, date: r ? ymd(r.t) : '', rough: false, uid: 'k'}).replace('<svg ', '<svg x="' + x + '" y="' + y + '" width="84" height="84" ') + '</g>';
   });
@@ -401,24 +413,48 @@ $('previewBtn').addEventListener('click', function () { makeCert(true); });
 $('certOk').addEventListener('click', function () { $('certMask').classList.remove('show'); });
 $('nick').value = load(K_NICK, '') === '漫游者' ? '' : load(K_NICK, '');
 
-/* 演示模式与杂项 */
-$('demoToggle').addEventListener('change', function () { save(K_DEMO, this.checked); render(); toast(this.checked ? '演示模式已开启' : '演示模式已关闭'); });
+/*  演示模式与杂项 */
+$('demoToggle').addEventListener('change', function () { save(K_DEMO, this.checked); render(); fillNfcBox(); toast(this.checked ? '演示模式已开启' : '演示模式已关闭'); });
 $('resetBtn').addEventListener('click', function () {
   if (!confirm('将清除本机的印章与互动记录（仅限这台设备），确定吗？')) return;
-  localStorage.removeItem(K_ST); localStorage.removeItem(K_EV); render(); toast('已清除');
+  localStorage.removeItem(K_ST); localStorage.removeItem(K_EV); localStorage.removeItem(K_SEQ); localStorage.removeItem(K_LAST); render(); fillNfcBox(); toast('已清除');
 });
 var tt; function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 1800); }
 
-/* 入口：扫码 / NFC 打卡链接  */
-render();
+/* 入口：扫码 / NFC 打卡链接 */
+function nextDemoNode() {
+  var st = load(K_ST, {});
+  for (var i = 0; i < ORDER.length; i++) if (!st[ORDER[i]]) return ORDER[i];
+  return ORDER[load(K_SEQ, 0) % ORDER.length];     // 已集齐：继续按顺序轮转，使热度数据持续变化
+}
+function fillNfcBox() {
+  $('nfcUrl').textContent = new URL('passport.html?nfc=demo', location.href).href;
+  $('nextNode').textContent = byId(nextDemoNode()).name;
+}
+$('copyNfc').addEventListener('click', function () {
+  var u = $('nfcUrl').textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function () { toast('已复制标签链接'); }, function () { prompt('请手动复制：', u); });
+});
+render(); fillNfcBox();
 (function () {
-  var q = new URLSearchParams(location.search), id = q.get('checkin');
-  if (!id) return;
+  var q = new URLSearchParams(location.search);
+  if (q.get('nfc') === 'demo') {                              // 演示标签：每次触碰 = 1 条记录，并分配 1 个点位
+    history.replaceState(null, '', location.pathname);        // 去掉参数，避免刷新重复计数
+    var now = Date.now();
+    if (now - load(K_LAST, 0) < 3000) { toast('刚刚已触碰，请稍后再碰'); return; }   // 防止一次触碰被手机重复打开
+    save(K_LAST, now);
+    var seq = load(K_SEQ, 0) + 1, id = nextDemoNode();
+    save(K_SEQ, seq);
+    setTimeout(function () { doClaim(id, 'nfcdemo', {seq: seq}); fillNfcBox(); }, 250);
+    return;
+  }
+  var cid = q.get('checkin');
+  if (!cid) return;
   var src = q.get('src') === 'nfc' ? 'nfc' : 'qr';
-  history.replaceState(null, '', location.pathname);      // 去掉参数，避免刷新重复计数
-  setTimeout(function () { doClaim(id, src); }, 250);
+  history.replaceState(null, '', location.pathname);
+  setTimeout(function () { doClaim(cid, src); }, 250);
 })();
-window.addEventListener('storage', render);
+window.addEventListener('storage', function () { render(); fillNfcBox(); });
 </script>
 </body>
 </html>

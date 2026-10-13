@@ -49,6 +49,14 @@ audio{width: 100%; height: 36px;}
 .tab{flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: #9a9088;}
 .tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
 .tab.active{color: var(--red); font-weight: 600;}
+
+/* 印章提示 */
+.stamp-toast{position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 14px); transform: translate(-50%, -140%); z-index: 200; display: flex; align-items: center; gap: 10px; padding: 9px 16px 9px 10px; border-radius: 26px; background: rgba(39,64,47,0.96); color: #F3E3B8; font-size: 13px; box-shadow: 0 8px 22px rgba(0,0,0,0.3); transition: transform 0.4s cubic-bezier(.2,.9,.3,1.2); max-width: 92%;}
+.stamp-toast.show{transform: translate(-50%, 0);}
+.stamp-toast .sq{flex: 0 0 30px; height: 30px; border-radius: 50%; border: 1.5px solid #E8CF8E; display: flex; align-items: center; justify-content: center;}
+.stamp-toast .sq svg{width: 18px; height: 18px;}
+.stamp-toast b{color: #fff;}
+.stamp-toast a{color: #E8CF8E; text-decoration: underline; white-space: nowrap;}
 </style>
 </head>
 <body>
@@ -71,7 +79,7 @@ audio{width: 100%; height: 36px;}
     </h2>
 
     <div class="audio-section">
-      <span class="audio-label">🎧 听·胡同里的金柱门往事</span>
+      <span class="audio-label"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>听·胡同里的金柱门往事</span>
       <audio id="gate-audio" src="n3.mp3" controls></audio>
     </div>
 
@@ -97,8 +105,8 @@ audio{width: 100%; height: 36px;}
   <a class="tab" href="route.html">
     <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
   </a>
-  <a class="tab" href="about.html">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
+  <a class="tab" href="passport.html">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><circle cx="12.5" cy="10" r="3"/><path d="M9 16h7"/></svg>护照
   </a>
 </nav>
 
@@ -140,6 +148,35 @@ function goBack() {
 }
 document.getElementById('back').addEventListener('click', goBack);
 document.getElementById('back2').addEventListener('click', goBack);
+
+// ===== 电子护照：浏览 / 听讲解 即可领取印章（仅记录点位编号、类型、时间，保存在本机）=====
+var STAMP_NAMES = {N1:'隆长寺山门',N2:'马福祥宅',N3:'13号院金柱大门',N39:'程砚秋故居',N9:'44号金柱大门',L5:'傅增湘故居',N10:'45号居民院落',B1:'无问西东精酿',B2:'易应茶舍',N11:'京剧体验馆',N12:'拾光茶铺',N13:'故事书店',N14:'胡同夜市',B3:'叙杯',B4:'无名蹄花'};
+function mlLoad(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+function mlSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function mlRecord(type) {
+  var ev = mlLoad('menlouEvents', []); ev.push({id: id, type: type, t: Date.now(), demo: 0});
+  if (ev.length > 3000) ev = ev.slice(-3000); mlSave('menlouEvents', ev);
+  var st = mlLoad('menlouStamps', {});
+  if (!st[id]) { st[id] = {t: Date.now(), how: type}; mlSave('menlouStamps', st); stampToast(); }
+}
+var toastTimer;
+function stampToast() {
+  var el = document.getElementById('stampToast');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'stampToast'; el.className = 'stamp-toast';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<span class="sq"><svg viewBox="0 0 48 48" fill="none" stroke="#E8CF8E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L24 8l18 12"/><path d="M11 20v20M37 20v20"/><path d="M17 40V24h14v16"/></svg></span><span>获得印章 <b>' + STAMP_NAMES[id] + '</b>　<a href="passport.html">去护照</a></span>';
+  requestAnimationFrame(function () { el.classList.add('show'); });
+  clearTimeout(toastTimer); toastTimer = setTimeout(function () { el.classList.remove('show'); }, 4200);
+}
+if (id && STAMP_NAMES[id]) {
+  setTimeout(function () { mlRecord('browse'); }, 8000);                       // 浏览满 8 秒
+  var audioDone = false;
+  player.addEventListener('timeupdate', function () {                          // 播放满 5 秒
+    if (!audioDone && player.currentTime >= 5) { audioDone = true; mlRecord('audio'); }
+  });
+}
 </script>
 </body>
 </html>

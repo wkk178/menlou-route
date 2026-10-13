@@ -15,6 +15,7 @@ a{color: inherit; text-decoration: none;}
 
 .hero{position: relative; height: 250px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: calc(env(safe-area-inset-top) + 10px) 20px 30px;
       background: linear-gradient(rgba(44,36,32,0.30), rgba(44,36,32,0.70)), url('bg-hero.jpg') center / cover no-repeat, linear-gradient(135deg, #6B5B4F, #4A6B5A);}
+.bk{position: absolute; left: 16px; top: calc(env(safe-area-inset-top) + 14px); padding: 7px 13px; border-radius: 20px; font-size: 13px; background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);}
 .hero h1{font-size: 28px; letter-spacing: 5px; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);}
 .hero p{font-size: 13px; letter-spacing: 3px; opacity: 0.92; margin-top: 10px;}
 
@@ -67,6 +68,7 @@ a{color: inherit; text-decoration: none;}
 <body>
 <div class="app">
   <header class="hero">
+    <a class="bk" href="index.html">‹ 首页</a>
     <h1>层记西四 · 阅见古今</h1>
     <p>—— 西四北三条社区文商活化计划 ——</p>
   </header>
@@ -124,7 +126,7 @@ a{color: inherit; text-decoration: none;}
     <h2>文商共荣 · 雅邻共忆</h2>
     <p>我们设立了“门楼公益金”，将导览收入的回馈于老旧建筑的修缮维护与社区老年居民的福利。在这里的每一次驻足与消费，都是对古城记忆的一次共同守护。</p>
     <a class="cta" href="choose.html">开启漫步路线 ›</a>
-    <div class="copy">© 2026 门楼层记·故事里 项目团队<br>让胡同文化在数字世代焕发新生</div>
+    <div class="copy"><a href="admin.html" style="text-decoration:underline">运营看板（管理方）</a><br>© 2026 门楼层记·故事里 项目团队<br>让胡同文化在数字世代焕发新生</div>
   </section>
 </div>
 
@@ -141,8 +143,8 @@ a{color: inherit; text-decoration: none;}
   <a class="tab" href="route.html">
     <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
   </a>
-  <a class="tab active" href="about.html">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
+  <a class="tab" href="passport.html">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><circle cx="12.5" cy="10" r="3"/><path d="M9 16h7"/></svg>护照
   </a>
 </nav>
 

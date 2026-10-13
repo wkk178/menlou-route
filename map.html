@@ -196,9 +196,9 @@
     <a class="tab" href="route.html">
       <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
     </a>
-    <a class="tab" href="about.html">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
-    </a>
+    <a class="tab" href="passport.html">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><circle cx="12.5" cy="10" r="3"/><path d="M9 16h7"/></svg>护照
+  </a>
   </nav>
 
   <script>
@@ -300,9 +300,20 @@
       time += bestT; dist += bestD; cur = best;
     }
 
-    var culture = route.filter(function (n) { return n.type === '文化'; }).length;
-    var avgInterfere = route.length ? route.reduce(function (s, n) { return s + n.interfere; }, 0) / route.length : 0;
-    var cultureScore = route.length ? Math.round(culture * 100 / route.length) : 0;
+    // 路线评分：三项指数各自独立计算（不再互补），且都大于 0
+    //   文化深度：文化点位计 1，商业点位同样带有门楼、曲艺、口述史等文化转译内容，计 0.4
+    //   商业体验：商业点位计 1，文化点位周边的沿街配套与文创体验计 0.3
+    //   居民友好度：100 减去平均干扰度，干扰度最高 0.4，因此不会低于 60
+    var N = route.length || 1, cSum = 0, bSum = 0, iSum = 0;
+    route.forEach(function (n) {
+      var isCulture = n.type === '文化';
+      cSum += isCulture ? 1 : 0.4;
+      bSum += isCulture ? 0.3 : 1;
+      iSum += n.interfere;
+    });
+    var cultureScore = Math.round(cSum * 100 / N);
+    var businessScore = Math.round(bSum * 100 / N);
+    var residentScore = Math.round(100 - iSum * 100 / N);
 
     return {
       status: 'success',
@@ -313,7 +324,7 @@
       }),
       totalTime: time,
       distance: Math.round(dist / 10) / 100,
-      scores: {culture: cultureScore, business: 100 - cultureScore, resident: Math.round(100 - avgInterfere * 100)},
+      scores: {culture: cultureScore, business: businessScore, resident: residentScore},
       request: a,
       generatedAt: new Date().toISOString()
     };
@@ -398,7 +409,7 @@
         }
         document.getElementById('r-time').textContent = (data.totalTime || 90) + '分钟';
         document.getElementById('r-dist').textContent = (data.distance || 0.8) + '公里';
-        document.getElementById('r-score').textContent = (data.scores?.culture || 90) + '%';
+        document.getElementById('r-score').textContent = (data.scores?.culture ?? 90) + '%';
         applyMode(nodes.length);
         updateLabels();
     }
@@ -473,7 +484,7 @@
       ui: {
         base: {
           icon: './laojiefang_full.png',
-          zIndex: 10005
+          zIndex: 10005                    // 设置极高的层级，确保在地图之上
         },
         asstBtn: {
           isNeed: false                    // 隐藏官方默认悬浮按钮

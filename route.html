@@ -49,6 +49,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .body h4{font-size: 15px; margin-bottom: 6px;}
 .chips{display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px;}
 .chip{font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fff; color: var(--gray);}
+.chip.got{background: #DCE9E1; color: #2f5642; font-weight: 600;}
 .chip.time{background: #F6E3DF; color: var(--red); font-weight: 600;}
 .body p{font-size: 13px; line-height: 1.7; color: #4d433c;}
 .tags{margin-top: 7px; display: flex; flex-wrap: wrap; gap: 5px;}
@@ -103,8 +104,8 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   <a class="tab active" href="route.html">
     <svg viewBox="0 0 24 24"><path d="M5 22V3"/><path d="M5 4h12l-2 4 2 4H5"/></svg>我的路线
   </a>
-  <a class="tab" href="about.html">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>关于
+  <a class="tab" href="passport.html">
+    <svg viewBox="0 0 24 24"><path d="M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3z"/><circle cx="12.5" cy="10" r="3"/><path d="M9 16h7"/></svg>护照
   </a>
 </nav>
 
@@ -113,6 +114,8 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 var TAG_CN = {architecture: '古建筑', history: '历史人文', handcraft: '手作体验', food: '美食茶饮', photo: '摄影打卡', shopping: '文创购物', sound: '胡同声音'};
 
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
+
+var STAMPS = {}; try { STAMPS = JSON.parse(localStorage.getItem('menlouStamps') || '{}'); } catch (e) {}
 
 function loadRoute() {
   var data = null;
@@ -127,8 +130,14 @@ function loadRoute() {
     return;
   }
 
-  var sc = data.scores || {};
   var stops = data.route;
+  var sc = data.scores || {};
+  if (!(sc.culture > 0 && sc.business > 0 && sc.resident > 0)) {   // 兼容旧数据：评分缺失或含 0 时，按当前公式重新计算
+    var cS = 0, bS = 0, iS = 0;
+    stops.forEach(function (n) { var c = n.type === '文化'; cS += c ? 1 : 0.4; bS += c ? 0.3 : 1; iS += (n.interfere != null ? n.interfere : 0.2); });
+    var N = stops.length || 1;
+    sc = {culture: Math.round(cS * 100 / N), business: Math.round(bS * 100 / N), resident: Math.round(100 - iS * 100 / N)};
+  }
   var html = '';
 
   html += '<section class="summary"><small>基于您的偏好智能规划</small><h2>您的专属路线已生成</h2>' +
@@ -150,7 +159,7 @@ function loadRoute() {
     var tags = (n.tags || []).map(function (t) { return '<span class="tag">' + esc(TAG_CN[t] || t) + '</span>'; }).join('');
     html += '<div class="stop"><div class="dot ' + (biz ? 'biz' : 'culture') + '">' + (i + 1) + '</div><div class="body">' +
       '<h4>' + esc(n.name) + '</h4>' +
-      '<div class="chips"><span class="chip">' + esc(String(n.theme || '').split('·')[0]) + '</span><span class="chip">' + esc(n.type) + '</span><span class="chip time">停留 ' + esc(n.stay) + ' 分钟</span></div>' +
+      '<div class="chips"><span class="chip">' + esc(String(n.theme || '').split('·')[0]) + '</span><span class="chip">' + esc(n.type) + '</span><span class="chip time">停留 ' + esc(n.stay) + ' 分钟</span>' + (STAMPS[n.id] ? '<span class="chip got">已盖章</span>' : '') + '</div>' +
       '<p>' + esc(n.desc || '精彩体验点') + '</p>' +
       (tags ? '<div class="tags">' + tags + '</div>' : '') +
       '<div class="links"><a href="gate-3d.html?id=' + encodeURIComponent(n.id) + '">3D 档案 ›</a><a href="map.html?focus=' + encodeURIComponent(n.id) + '">地图定位 ›</a></div>' +
