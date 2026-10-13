@@ -151,23 +151,7 @@
         50% { transform: translateY(-4px); }
     }
 
-    /*  强制控制扣子聊天气泡左右布局 */
-    /* 用户的消息强行靠右 */
-    #coze-web-sdk-container [class*="message-me"],
-    #coze-web-sdk-container [class*="message-user"] {
-        display: flex !important;
-        flex-direction: row-reverse !important; /* 强制头像和气泡反向 */
-        justify-content: flex-start !important;
-        text-align: right !important;
-    }
 
-    /* AI 的消息强行靠左 */
-    #coze-web-sdk-container [class*="message-bot"],
-    #coze-web-sdk-container [class*="message-ai"] {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-start !important;
-        text-align: left !important;
     }
   </style>
 </head>
@@ -504,7 +488,7 @@
         base: {
           icon: './laojiefang_full.png',
           zIndex: 10005  ,
-          layout: 'pc'
+
         },
         asstBtn: {
           isNeed: false                    // 隐藏官方默认悬浮按钮
