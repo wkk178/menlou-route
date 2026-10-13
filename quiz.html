@@ -25,7 +25,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .progress i.on{background: linear-gradient(90deg, var(--red), #E0733B);}
 
 /* 内容 */
-.content{padding: 18px 16px calc(110px + env(safe-area-inset-bottom));}
+.content{padding: 18px 16px calc(150px + env(safe-area-inset-bottom));} /* 增加底部留白，给温馨提示让位 */
 .stage{animation: slideIn 0.28s ease;}
 @keyframes slideIn{from{opacity: 0; transform: translateX(18px);} to{opacity: 1; transform: none;}}
 .eyebrow{font-size: 12px; color: var(--red); font-weight: 700; letter-spacing: 2px;}
@@ -63,9 +63,13 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .recap .row span{color: #8a7f76; flex: 0 0 auto;}
 .recap .row b{text-align: right; font-weight: 600;}
 
-/* 底部操作栏 */
-.bar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 30; display: flex; align-items: center; gap: 12px;
-     padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line);}
+/* 底部操作栏及温馨提示 */
+.bottom-wrapper{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 30;}
+.tips-box {background: rgba(245,241,232,0.96); padding: 10px 16px 5px; text-align: center;}
+.tips-box p {font-size: 11px; color: #8a7f76; line-height: 1.5; margin-bottom: 0;}
+.tips-box strong {color: var(--gray); font-size: 12px; display: block; margin-bottom: 2px;}
+
+.bar{display: flex; align-items: center; gap: 12px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line);}
 .btn-prev{flex: 0 0 auto; padding: 14px 8px; font-size: 15px; color: var(--gray);}
 .btn-main{flex: 1; padding: 15px 0; border-radius: 28px; font-size: 16px; font-weight: 700; letter-spacing: 2px; color: #fff; background: linear-gradient(135deg, #A93027, #E0733B); box-shadow: 0 6px 16px rgba(184,56,46,0.32); transition: all 0.15s;}
 .btn-main:active{transform: scale(0.98);}
@@ -85,19 +89,28 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 
   <main class="content"><div class="stage" id="stage"></div></main>
 
-  <div class="bar">
-    <button class="btn-prev" id="prev">上一步</button>
-    <button class="btn-main" id="next">下一步</button>
+  <div class="bottom-wrapper">
+    <!-- 🚨 新增：雅邻共忆 温馨提示 🚨 -->
+    <div class="tips-box">
+      <strong>温馨提示：雅邻共忆</strong>
+      <p>胡同更是居民的家，请轻声慢步，不外放不聚集；<br>做胡同里最温柔的过客。</p>
+    </div>
+
+    <div class="bar">
+      <button class="btn-prev" id="prev">上一步</button>
+      <button class="btn-main" id="next">下一步</button>
+    </div>
   </div>
 </div>
 
 <script>
+// 🚨 修改：去掉了手作体验，去掉了最后一道题（避开生活区）🚨
 var STEPS = [
   {key: 'theme', type: 'single', title: '你更想体验什么？', hint: '选一个最感兴趣的方向',
    opts: [
     {v: 'read',   i: '📖', t: '门楼探秘', d: '了解门楼形制与砖雕艺术'},
     {v: 'push',   i: '🏡', t: '院落故事', d: '走进胡同，感受老北京生活'},
-    {v: 'create', i: '🎨', t: '新颜共生', d: '体验茶饮、京剧、手作等新业态'},
+    {v: 'create', i: '🎨', t: '新颜共生', d: '体验茶饮、京剧等新业态'},
     {v: 'mixed',  i: '🌟', t: '综合体验', d: '文化、故事与创新，均衡感受'}]},
   {key: 'duration', type: 'single', title: '打算逛多久？', hint: '路线会按你的时间来安排站数',
    opts: [
@@ -115,17 +128,12 @@ var STEPS = [
    opts: [
     {v: 'architecture', i: '🏛', t: '古建筑',   d: '门楼形制、砖雕艺术'},
     {v: 'history',      i: '📜', t: '历史人文', d: '名人故居、院落故事'},
-    {v: 'handcraft',    i: '✋', t: '手作体验', d: '拓印、拼豆、脸谱绘制'},
     {v: 'food',         i: '🍵', t: '美食茶饮', d: '特色茶铺、胡同小馆'},
     {v: 'photo',        i: '📸', t: '摄影打卡', d: '最美角度、出片之地'},
-    {v: 'shopping',     i: '🛍', t: '文创购物', d: '门楼主题文创产品'}]},
-  {key: 'avoid', type: 'single', title: '要避开居民生活区吗？', hint: '尊重居民生活，也可以选择走进院落',
-   opts: [
-    {v: 'yes', i: '🤫', t: '避开，减少打扰', d: '优先公共空间和开放区域'},
-    {v: 'no',  i: '🏘', t: '不介意，想看真实生活', d: '愿意探访居民院落，感受原真性'}]}
+    {v: 'shopping',     i: '🛍', t: '文创购物', d: '门楼主题文创产品'}]}
 ];
 
-var ans = {theme: '', duration: '', profile: '', tags: [], avoid: ''};
+var ans = {theme: '', duration: '', profile: '', tags: []};
 var step = 0;
 var $ = function (id) { return document.getElementById(id); };
 
@@ -199,7 +207,7 @@ function choose(v) {
   ans[s.key] = v;
   document.querySelectorAll('.opt').forEach(function (el) { el.classList.toggle('sel', el.getAttribute('data-v') === v); });
   updateMain();
-  if (step < STEPS.length - 1 && STEPS[step].type === 'single') {      // 点选后自动进入下一题
+  if (step < STEPS.length - 1 && STEPS[step].type === 'single') {
     setTimeout(function () { step++; render(); }, 220);
   }
 }
@@ -214,13 +222,12 @@ function goBack() {
   if (step > 0) { step--; render(); } else { location.href = 'choose.html'; }
 }
 
-// 把答案通过地址参数交给地图页，由地图页生成并保存路线
 function submit() {
   $('next').disabled = true;
   $('next').textContent = '正在规划路线…';
   var q = new URLSearchParams({
     theme: ans.theme, duration: ans.duration, profile: ans.profile,
-    tags: ans.tags.join(','), avoid: ans.avoid === 'yes' ? '1' : '0'
+    tags: ans.tags.join(','), avoid: '0' // 默认设为 0 (已废弃原参数，但保留为了兼容老地图接口)
   });
   location.href = 'map.html?' + q.toString();
 }

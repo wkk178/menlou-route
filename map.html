@@ -59,9 +59,9 @@
         .compass{top: calc(env(safe-area-inset-top) + 12px); left: 12px; width: 40px; height: 40px;}
         .compass-arrow{border-left-width: 5px; border-right-width: 5px; border-bottom-width: 14px;}
 
-        /* 侧拉抽屉：默认收起，优先展示地图 */
+        /* 侧拉抽屉 */
         .map-controls{
-            width: var(--drawer-w); left: 0; top: calc(env(safe-area-inset-top) + 66px); max-height: min(50vh, 420px);
+            width: var(--drawer-w); left: 0; top: calc(env(safe-area-inset-top) + 66px); max-height: min(60vh, 520px);
             padding: 12px; border-radius: 0 14px 14px 0;
             transform: translateX(-102%); transition: transform 0.3s ease; z-index: 12;
         }
@@ -87,12 +87,11 @@
         .legend{bottom: 14px; left: 10px; padding: 6px 10px; font-size: 10px;}
         .legend-item{margin: 2px 0;}
         .dot{width: 10px; height: 10px;}
-        /* 自主游览缩小到低倍率时，只显示圆点，放大后再显示店名 */
         #map.low-zoom .marker-label{display: none;}
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
 
-    /* 老街坊智能体：自定义悬浮按钮与提示气泡 */
+    /* 老街坊智能体悬浮按钮 */
     #laojiefang-fab {
         position: absolute;
         right: 14px;
@@ -131,7 +130,6 @@
         animation: bounceBubble 3s infinite ease-in-out;
         pointer-events: none;
     }
-    /* 气泡尖角，指向头像 */
     #laojiefang-bubble::after {
         content: "";
         position: absolute;
@@ -151,7 +149,53 @@
         50% { transform: translateY(-4px); }
     }
 
+    /* =========================================================
+       🚨 修复: 强制控制气泡布局 + 防止面板高度顶穿屏幕 🚨
+       ========================================================= */
 
+    /* 用户消息靠右 */
+    #coze-web-sdk-container [class*="message-me"],
+    #coze-web-sdk-container [class*="message-user"] {
+        display: flex !important;
+        flex-direction: row-reverse !important;
+        justify-content: flex-start !important;
+        text-align: right !important;
+    }
+
+    /* AI 消息靠左 */
+    #coze-web-sdk-container [class*="message-bot"],
+    #coze-web-sdk-container [class*="message-ai"] {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+    }
+
+    /* 替换聊天气泡 AI 头像 */
+    #coze-web-sdk-container [class*="message-bot"] img,
+    #coze-web-sdk-container [class*="message-ai"] img {
+        content: url('./laojiefang_full.png') !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+    }
+
+    /* 限制对话面板高度防顶穿 */
+    @media screen and (max-width: 768px) {
+        div#coze-web-sdk-container {
+            z-index: 2147483647 !important;
+        }
+        #coze-web-sdk-container iframe,
+        #coze-web-sdk-container > div:last-child {
+            position: fixed !important;
+            bottom: 0 !important;
+            right: 0 !important;
+            width: 100vw !important;
+            /* 预留状态栏(灵动岛)高度 */
+            height: calc(100dvh - env(safe-area-inset-top, 50px) - 20px) !important;
+            max-height: 90vh !important;
+            border-radius: 20px 20px 0 0 !important;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
+        }
     }
   </style>
 </head>
@@ -166,6 +210,12 @@
     <button id="panel-tab" type="button" onclick="toggleDrawer()">景点列表</button>
     <div class="map-controls">
       <h3 class="control-title" id="panel-title">📍 漫步动线详情</h3>
+
+      <!-- 🚨 新增：雅邻共忆 温馨提示 🚨 -->
+      <div style="background: rgba(201, 168, 108, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 11px; color: #6B5B4F; line-height: 1.5; border-left: 3px solid #C9A86C;">
+        <strong>雅邻共忆温馨提示：</strong>胡同是居民的家，请轻声慢步，不外放不聚集；做胡同里最温柔的过客。
+      </div>
+
       <div class="info-box" id="info-box">
         <div class="info-row"><span>⏱ 总计用时</span><span class="info-val" id="r-time">--</span></div>
         <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
@@ -205,17 +255,8 @@
   </nav>
 
   <script>
-/**
- * 门楼层记·故事里 - 点位数据与路线生成引擎
- * 纯前端运行，不依赖后端服务。map.html、quiz.html、choose.html 共用此文件。
- *
- * window.MENLOU_NODES   全部景点数据
- * window.generateRoute  根据问卷答案生成路线
- */
 (function () {
   'use strict';
-
-  // 景点数据：theme 为"体验层·副标题"，interfere 为对居民的干扰度(0-1)，tags 为兴趣标签
   var NODES = [
     {id:"B1",name:"无问西东精酿",door:"北155号",theme:"创门·共生",type:"商业",stay:30,lat:39.92765,lng:116.37295,interfere:0.1,tags:["food","photo"],desc:"位于西四北大街北155号。提供门楼特调精酿，是文商融合的首站。"},
     {id:"B2",name:"易应茶舍",door:"西四北大街147号",theme:"创门·共生",type:"商业",stay:30,lat:39.92791,lng:116.37293,interfere:0.1,tags:["food"],desc:"西四北大街沿街茶舍，位于西四北三条路口南侧。"},
@@ -234,9 +275,9 @@
     {id:"N14",name:"胡同夜市",door:"50号",theme:"创门·共生",type:"商业",stay:30,lat:39.92829,lng:116.36632,interfere:0.35,tags:["food","photo"],desc:"烟火经济体验区（如意门）。"}
   ];
 
-  var ENTRANCE = {lat: 39.92795, lng: 116.37290};   // 西四北大街与三条路口，默认起点
-  var WALK_SPEED = 80;                              // 步行速度，米/分钟
-  var DIST_WEIGHT = 12;                             // 每多走 12 米，相当于少 1 分
+  var ENTRANCE = {lat: 39.92795, lng: 116.37290};
+  var WALK_SPEED = 80;
+  var DIST_WEIGHT = 12;
   var MAX_STOPS = 8;
   var THEME_KEY = {read: '读门', push: '推门', create: '创门'};
 
@@ -252,7 +293,6 @@
 
   function has(n, tag) { return n.tags.indexOf(tag) > -1; }
 
-  // 同行人员对不同点位的偏好
   var PROFILE = {
     family:      function (n) { return (has(n, 'architecture') || has(n, 'history') ? 8 : 0) + (has(n, 'handcraft') ? 12 : 0); },
     romantic:    function (n) { return (has(n, 'photo') ? 10 : 0) + (has(n, 'food') ? 6 : 0); },
@@ -261,8 +301,8 @@
   };
 
   function eligible(n, a) {
-    if (a.avoidResident && n.interfere > 0.35) return false;      // 避开居民生活区
-    if (a.profile === 'family' && n.name.indexOf('精酿') > -1) return false;   // 亲子出行不含酒类门店
+    if (a.avoidResident && n.interfere > 0.35) return false;
+    if (a.profile === 'family' && n.name.indexOf('精酿') > -1) return false;
     return true;
   }
 
@@ -271,14 +311,10 @@
     if (a.theme && a.theme !== 'mixed' && shortTheme(n.theme) === THEME_KEY[a.theme]) s += 40;
     (a.tags || []).forEach(function (t) { if (has(n, t)) s += 14; });
     if (PROFILE[a.profile]) s += PROFILE[a.profile](n);
-    if (a.avoidResident === false && n.interfere >= 0.3) s += 6;    // 愿意体验真实生活
+    if (a.avoidResident === false && n.interfere >= 0.3) s += 6;
     return s;
   }
 
-  /**
-   * answers: {theme, duration, profile, tags[], avoidResident}
-   * 返回与原后端接口一致的结构：{status, route, totalTime, distance, scores}
-   */
   function generateRoute(answers) {
     var a = answers || {};
     var duration = parseInt(a.duration, 10) || 90;
@@ -293,7 +329,7 @@
         var t = Math.round(d / WALK_SPEED) + n.stay;
         if (time + t > duration) continue;
         var v = scoreNode(n, a) - d / DIST_WEIGHT;
-        if (a.theme === 'mixed' && !seenThemes[shortTheme(n.theme)]) v += 12;   // 综合体验：鼓励覆盖不同体验层
+        if (a.theme === 'mixed' && !seenThemes[shortTheme(n.theme)]) v += 12;
         if (v > bestV) { bestV = v; best = n; bestD = d; bestT = t; }
       }
       if (!best) break;
@@ -303,10 +339,6 @@
       time += bestT; dist += bestD; cur = best;
     }
 
-    // 路线评分：三项指数各自独立计算（不再互补），且都大于 0
-    //   文化深度：文化点位计 1，商业点位同样带有门楼、曲艺、口述史等文化转译内容，计 0.4
-    //   商业体验：商业点位计 1，文化点位周边的沿街配套与文创体验计 0.3
-    //   居民友好度：100 减去平均干扰度，干扰度最高 0.4，因此不会低于 60
     var N = route.length || 1, cSum = 0, bSum = 0, iSum = 0;
     route.forEach(function (n) {
       var isCulture = n.type === '文化';
@@ -338,11 +370,12 @@
 })();
   </script>
   <script>
-    const allNodesMaster = window.MENLOU_NODES;   // 点位数据与路线引擎见上方脚本
+    const allNodesMaster = window.MENLOU_NODES;
     const QS = new URLSearchParams(location.search);
     const CAL = QS.get('calibrate') === '1';
-    const FREE = CAL || QS.get('mode') === 'free';   // 自主游览：显示全部景点
+    const FREE = CAL || QS.get('mode') === 'free';
     let map, markers = [], routeLine, currentRoute = [];
+
     function initMap() {
         map = L.map('map', {center: [39.92910, 116.3697], zoom: 16, zoomControl: false});
         map.on('click', () => { if (isMobile()) setDrawer(false); });
@@ -350,24 +383,17 @@
         L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}').addTo(map);
         document.getElementById('loading').style.display = 'none';
 
-        // 社区视觉聚焦：保留周边地图，降低其对比度；核心区用暖色轻柔提亮。
-        // 不画人工边框，避免出现与真实胡同走向不一致的几何线框。
+        // 🚨 反向遮罩 + 提亮边缘，不画突兀的红线 🚨
         const outerBounds = [
-            [-90, -360],
-            [90, -360],
-            [90, 360],
-            [-90, 360]
+            [-90, -360], [90, -360], [90, 360], [-90, 360]
         ];
-
         const innerBounds = [
-            [39.92705, 116.36650],
-            [39.93120, 116.36620],
-            [39.93130, 116.37280],
-            [39.92715, 116.37295],
+            [39.92705, 116.36650], [39.93120, 116.36620],
+            [39.93130, 116.37280], [39.92715, 116.37295],
             [39.92705, 116.36650]
         ];
 
-        // 周边轻度压低对比度，不再用过重的遮罩把地图盖灰。
+        // 1. 周边大范围轻微盖灰 (不突兀)
         L.polygon([outerBounds, innerBounds], {
             stroke: false,
             fillColor: '#F5F1E8',
@@ -375,7 +401,7 @@
             interactive: false
         }).addTo(map);
 
-        // 核心社区仅做暖金色叠色，不描边；街道底图仍可透出。
+        // 2. 核心区微微提亮发光
         L.polygon(innerBounds, {
             stroke: false,
             fillColor: '#D8A94F',
@@ -383,9 +409,9 @@
             interactive: false
         }).addTo(map);
 
-
         loadRoute();
     }
+
     function loadRoute() {
         if (FREE) {
             currentRoute = allNodesMaster.map(n => ({...n}));
@@ -395,14 +421,13 @@
             if (idx > -1) setTimeout(() => focusStop(idx), 300);
             return;
         }
-        // 问卷页/快速出发通过地址参数传入答案，在此生成路线并保存（供“我的路线”页使用）
         if (QS.get('theme')) {
             const fresh = window.generateRoute({
                 theme: QS.get('theme'),
                 duration: QS.get('duration'),
                 profile: QS.get('profile'),
                 tags: (QS.get('tags') || '').split(',').filter(Boolean),
-                avoidResident: QS.get('avoid') === '1'
+                avoidResident: true // 根据新版逻辑，强制所有自动路线都避让深度居民区
             });
             localStorage.setItem('routeData', JSON.stringify(fresh));
         }
@@ -419,6 +444,7 @@
         const fi = fid ? currentRoute.findIndex(n => n.id === fid) : -1;
         if (fi > -1) setTimeout(() => focusStop(fi), 300);
     }
+
     function renderMap(nodes, data) {
         markers.forEach(m => map.removeLayer(m));
         if (routeLine) map.removeLayer(routeLine);
@@ -451,6 +477,7 @@
         applyMode(nodes.length);
         updateLabels();
     }
+
     function applyMode(count) {
         const sw = document.getElementById('mode-switch');
         document.getElementById('info-box').style.display = FREE ? 'none' : '';
@@ -461,27 +488,20 @@
         document.getElementById('seg-route').classList.toggle('on', !FREE);
         setDrawer(false);
     }
-    const isMobile = () => true;   // 页面本身就是手机栏布局，抽屉始终启用
+
+    const isMobile = () => true;
     function setDrawer(open) {
         document.querySelector('.map-wrapper').classList.toggle('drawer-open', open);
         document.getElementById('panel-tab').textContent = open ? '收起' : (FREE ? '景点列表' : '路线详情');
     }
     function toggleDrawer() { setDrawer(!document.querySelector('.map-wrapper').classList.contains('drawer-open')); }
     function updateLabels() { if (map) map.getContainer().classList.toggle('low-zoom', FREE && map.getZoom() < 17); }
-    function showCal(node, p) {
-        let box = document.getElementById('cal-box');
-        if (!box) {
-            box = document.createElement('div');
-            box.id = 'cal-box';
-            box.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:10006;background:#fff;border:1px solid #C9A86C;border-radius:8px;padding:8px 12px;font-size:12px;line-height:1.6;max-width:90vw;user-select:all;box-shadow:0 2px 10px rgba(0,0,0,.2)';
-            document.body.appendChild(box);
-        }
-        box.textContent = node.name + ' lat: ' + p.lat.toFixed(5) + ', lng: ' + p.lng.toFixed(5);
-    }
+
     function resetMap() { if (currentRoute.length > 0) map.fitBounds(L.latLngBounds(currentRoute.map(n => [n.lat, n.lng])), {padding: [50, 50]}); }
     function focusStop(index) { const marker = markers[index]; if (marker) { if (isMobile()) setDrawer(false); map.setView(marker.getLatLng(), 18, {animate: true}); marker.openPopup(); document.querySelectorAll('.stop-item').forEach((el, i) => el.classList.toggle('active', i === index)); } }
     window.addEventListener('load', initMap);
-    // 手机端：在抽屉上向左滑动即可收起
+
+    // 抽屉滑动收起逻辑
     (function () {
         const panel = document.querySelector('.map-controls');
         let startX = null;
@@ -496,16 +516,12 @@
 
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
-    // 每次打开页面，强行删掉浏览器里 Coze 存的历史记录缓存
     for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
         if (key && key.indexOf('coze') > -1) {
             localStorage.removeItem(key);
         }
     }
-
-    // 强制给每台设备生成一段纯随机的乱码 ID
-    const randomUserUUID = 'tourist_' + new Date().getTime() + '_' + Math.random().toString(36).substring(2);
 
     const cozeClient = new CozeWebSDK.WebChatClient({
       config: {
@@ -518,24 +534,21 @@
           return 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR'
         }
       },
-      // 添加 UI 配置
       ui: {
         base: {
           icon: './laojiefang_full.png',
-          zIndex: 10005  ,
-
+          zIndex: 10005
         },
         asstBtn: {
-          isNeed: false                    // 隐藏官方默认悬浮按钮
+          isNeed: false
         },
         chatBot: {
-          title: '老街坊',                  // 对话框的标题
-          titleAvatar: './laojiefang_full.png', // 对话框内的头像
+          title: '老街坊',
+          titleAvatar: './laojiefang_full.png',
         }
       }
     });
 
-    // 点击自定义头像，打开对话框
     document.getElementById('laojiefang-fab').addEventListener('click', function () {
       cozeClient.showChatBot();
       this.classList.add('opened');
