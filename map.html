@@ -350,8 +350,8 @@
         L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}').addTo(map);
         document.getElementById('loading').style.display = 'none';
 
-        // 🚨 终极视觉优化：纯粹的反向遮罩 + 中心暖色提亮 🚨
-
+        // 社区视觉聚焦：保留周边地图，降低其对比度；核心区用暖色轻柔提亮。
+        // 不画人工边框，避免出现与真实胡同走向不一致的几何线框。
         const outerBounds = [
             [-90, -360],
             [90, -360],
@@ -367,21 +367,20 @@
             [39.92705, 116.36650]
         ];
 
-        // 1. 绘制反向遮罩，虚化周边区域
+        // 周边轻度压低对比度，不再用过重的遮罩把地图盖灰。
         L.polygon([outerBounds, innerBounds], {
-            color: 'none',
+            stroke: false,
             fillColor: '#F5F1E8',
-            fillOpacity: 0.85
+            fillOpacity: 0.58,
+            interactive: false
         }).addTo(map);
 
-        // 2. 利用一个极其微弱的边框(非红线，而是用深灰色模拟街道阴影边界)
-        // 这样不会显得突兀，而是顺着街道的轮廓给边界加深
+        // 核心社区仅做暖金色叠色，不描边；街道底图仍可透出。
         L.polygon(innerBounds, {
-            color: '#6B5B4F',       // 使用你 CSS 里的 door-gray (深灰/褐)
-            weight: 2,              // 极细的线，不抢眼，用来加深街道边界
-            opacity: 0.3,           // 透明度很低，融入地图
-            fillColor: '#C9A86C',   // 核心区域暖色提亮
-            fillOpacity: 0.15
+            stroke: false,
+            fillColor: '#D8A94F',
+            fillOpacity: 0.24,
+            interactive: false
         }).addTo(map);
 
 
@@ -443,7 +442,7 @@
             listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${FREE ? node.theme.charAt(0) : i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.theme} · ${node.stay}min</p></div></li>`;
         });
         if (latlngs.length > 1) {
-            if (!FREE) routeLine = L.polyline(latlngs, {color: '#6B5B4F', weight: 5, opacity: 0.7, dashArray: '10, 10'}).addTo(map);
+            if (!FREE) routeLine = L.polyline(latlngs, {color: '#A94A32', weight: 4, opacity: 0.92, lineCap: 'round', lineJoin: 'round'}).addTo(map);
             map.fitBounds(L.latLngBounds(latlngs), {padding: [50, 50]});
         }
         document.getElementById('r-time').textContent = (data.totalTime || 90) + '分钟';
