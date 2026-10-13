@@ -344,36 +344,53 @@
     const FREE = CAL || QS.get('mode') === 'free';   // 自主游览：显示全部景点
     let map, markers = [], routeLine, currentRoute = [];
     function initMap() {
-        map = L.map('map', {center: [39.92840, 116.3710], zoom: 17, zoomControl: false});
+        // 稍微缩小一点初始缩放比例(由17改为16)，让虚化的周边露出来，对比更强烈
+        map = L.map('map', {center: [39.92910, 116.3697], zoom: 16, zoomControl: false});
         map.on('click', () => { if (isMobile()) setDrawer(false); });
         map.on('zoomend', updateLabels);
         L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}').addTo(map);
         document.getElementById('loading').style.display = 'none';
-        const communityBounds = [
-            // 沿着西四北大街 (东边界) 从北向南
-            [39.93120, 116.37295], // 东北角：西四北大街与八条东口交界以北
-            [39.92725, 116.37295], // 东南角：西四北大街与二条东口交界附近
 
-            // 沿着胡同南边界 (二条与三条之间) 向西
-            [39.92715, 116.36850], // 中间过渡点，贴合胡同走向
-            [39.92720, 116.36530], // 西南角：赵登禹路与三条西口交界以南
-
-            // 沿着赵登禹路 (西边界) 从南向北
-            [39.93110, 116.36620], // 西北角：赵登禹路与八条西口交界以北
-
-            // 沿着胡同北边界向东闭合
-            [39.93120, 116.36850]  // 中间过渡点
+        // 1. 定义遮罩层的外圈（覆盖整个屏幕的巨大范围）
+        const outerBounds = [
+            [-90, -360],
+            [90, -360],
+            [90, 360],
+            [-90, 360]
         ];
 
-        // 创建多边形并添加到地图
-        L.polygon(communityBounds, {
-            color: '#B8382E',       // 边框使用故居红，醒目且有历史感
-            weight: 3,              // 边框加粗
-            opacity: 0.7,           // 边框透明度
-            fillColor: '#C9A86C',   // 填充色改为你CSS里带有的“鎏金色(accent-gold)”，比纯白底更显档次
-            fillOpacity: 0.15,      // 降低透明度，既能框出范围，又能看清底部的道路和文字
-            dashArray: '8, 6'       // 将虚线调得更大气一点
+        // 2. 定义内圈（精准沿着西四北大街、赵登禹路、八条北、三条南的街道走向）
+        const innerBounds = [
+            [39.92705, 116.36650], // 西南角: 赵登禹路与二条/三条之间
+            [39.93120, 116.36620], // 西北角: 赵登禹路与八条北
+            [39.93130, 116.37280], // 东北角: 西四北大街与八条北
+            [39.92715, 116.37295], // 东南角: 西四北大街与二条/三条之间
+            [39.92705, 116.36650]  // 闭合点
+        ];
+
+        // 3. 绘制反向遮罩，虚化周边区域 (类似参考图的蒙版效果)
+        L.polygon([outerBounds, innerBounds], {
+            color: 'none',          // 遮罩本身不要边框
+            fillColor: '#F5F1E8',   // 采用 UI 背景色的奶油白做蒙版，与主题呼应
+            fillOpacity: 0.85       // 85% 透明度，周边路网完全变淡虚化
         }).addTo(map);
+
+        // 4. 为核心区域加上实体的边界加粗线 (取代虚线，加深街道线条)
+        L.polyline(innerBounds, {
+            color: '#B8382E',       // 故居红，醒目的实线
+            weight: 4,              // 加粗线条
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round'
+        }).addTo(map);
+
+        // 5. 核心区域微微泛起暖色光晕 (着色更明显)
+        L.polygon(innerBounds, {
+            color: 'none',
+            fillColor: '#C9A86C',   // 鎏金色
+            fillOpacity: 0.15       // 微微着色
+        }).addTo(map);
+
         loadRoute();
     }
     function loadRoute() {
