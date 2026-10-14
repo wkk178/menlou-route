@@ -121,7 +121,6 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   <header class="hero">
     <div class="hero-bar">
       <span class="pill">📍 西四北三条 · 西城区</span>
-      <a class="pill" href="about.html">项目介绍 ›</a>
     </div>
     <div class="hero-text">
       <span class="hero-tag">社区文商活化计划</span>
@@ -143,7 +142,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
       <span class="mark">🎯</span>
       <span class="badge">约 1 分钟</span>
       <h2>智能推荐</h2>
-      <p>回答 5 个问题，为你定制专属步行路线</p>
+      <p>回答 4 个问题，为你定制专属步行路线</p>
       <span class="go">开始定制 ›</span>
     </a>
   </section>
@@ -178,7 +177,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   <section class="block">
     <div class="block-head"><h3>游览小贴士</h3></div>
     <div class="tips">
-      <div class="tip"><span class="n">1</span><span>胡同内多为居民住宅，请轻声慢行，勿打扰居民生活。</span></div>
+      <div class="tip"><span class="n">1</span><span>胡同更是居民的家，请轻声慢步，不外放不聚集；做胡同里最温柔的过客。</span></div>
       <div class="tip"><span class="n">2</span><span>全程步行，建议穿舒适的鞋，根据时间选择路线长度。</span></div>
       <div class="tip"><span class="n">3</span><span>在地图上点击点位，可查看简介并进入 3D 门楼档案。</span></div>
     </div>
@@ -210,12 +209,12 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 (function () {
   var $ = function (id) { return document.getElementById(id); };
 
-  // 快速出发：直接带着预设答案进入地图页，由地图页生成路线
+  // 🚨 修正：快速出发删除了原本含有“手作”的字段，并在 URL 生成中移除了 handcraft 标签 🚨
   var PRESETS = [
     {icon: '⏱', bg: '#F5E8CC', title: '一小时精华游', desc: '时间不多，走最值得看的门楼与老宅', time: '约 1 小时',
      q: 'theme=mixed&duration=60&profile=independent&tags=architecture,history&avoid=0'},
-    {icon: '👨‍👧', bg: '#DCE9E1', title: '亲子研学', desc: '认门楼、玩手作，适合带孩子', time: '约 1.5 小时',
-     q: 'theme=read&duration=90&profile=family&tags=architecture,handcraft,history&avoid=1'},
+    {icon: '👨‍👧', bg: '#DCE9E1', title: '亲子研学', desc: '认门楼、听故事，适合带孩子', time: '约 1.5 小时',
+     q: 'theme=read&duration=90&profile=family&tags=architecture,history&avoid=1'},
     {icon: '🍵', bg: '#F6E3DF', title: '美食茶饮', desc: '茶舍、小馆与拍照打卡', time: '约 1.5 小时',
      q: 'theme=create&duration=90&profile=romantic&tags=food,photo&avoid=1'},
     {icon: '🏛', bg: '#E4DED6', title: '深度读门', desc: '慢慢看建筑、故居与胡同声音', time: '约 3 小时',

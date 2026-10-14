@@ -8,31 +8,57 @@
 <style>
 :root{--red: #B8382E; --gray: #6B5B4F; --green: #4A6B5A; --gold: #C9A86C; --cream: #F5F1E8; --ink: #2C2420; --line: rgba(107,91,79,0.12);}
 *{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
-html{-webkit-text-size-adjust: 100%;}
+html{-webkit-text-size-adjust: 100%; scroll-behavior: smooth;}
 body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E6DFD0; color: var(--ink);}
 a{color: inherit; text-decoration: none;}
-.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--cream); position: relative; padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow: hidden;}
+.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--cream); position: relative; padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow-x: hidden;}
 
 /* 主视觉 */
-.hero{position: relative; height: 330px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0;
+.hero{position: relative; height: 360px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0;
       background: linear-gradient(rgba(44,36,32,0.25), rgba(44,36,32,0.72)), url('bg-hero.jpg') center / cover no-repeat, linear-gradient(135deg, #6B5B4F, #4A6B5A);}
 .hero-bar{display: flex; justify-content: space-between; align-items: center;}
 .pill{display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 20px; font-size: 13px; background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);}
-.hero-text{position: absolute; left: 18px; right: 18px; bottom: 66px;}
+.hero-text{position: absolute; left: 18px; right: 18px; bottom: 76px;}
 .hero-tag{display: inline-block; font-size: 11px; letter-spacing: 2px; padding: 3px 10px; border-radius: 4px; background: var(--red); margin-bottom: 10px;}
 .hero h1{font-size: 30px; line-height: 1.25; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.4);}
 .hero p{font-size: 13px; opacity: 0.92; margin-top: 6px; letter-spacing: 1px;}
 .cta{display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 11px 24px; border-radius: 24px; font-size: 15px; font-weight: 700; letter-spacing: 1px; background: linear-gradient(135deg, #A93027, #E0733B); box-shadow: 0 6px 16px rgba(184,56,46,0.4);}
 
-/* 快捷入口 */
-.quick{position: relative; z-index: 2; margin: -40px 16px 0; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-radius: 18px; padding: 16px 4px 12px; box-shadow: 0 10px 24px rgba(107,91,79,0.18);}
-.q-item{display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; transition: transform 0.15s;}
-.q-item:active{transform: scale(0.94);}
-.q-ic{width: 46px; height: 46px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 23px; color: #fff;}
-.c1{background: linear-gradient(145deg, #A93027, #E0733B);} .c2{background: linear-gradient(145deg, #3E5C4D, #6C917F);}
-.c3{background: linear-gradient(145deg, #6B5B4F, #A08A78);} .c4{background: linear-gradient(145deg, #B58E4A, #DDBF85);}
+/* ========== 四大核心功能模块 (横向滑动卡片) ========== */
+.func-slider-wrapper { margin: -50px 0 0 0; position: relative; z-index: 5; overflow: hidden; padding-bottom: 10px;}
+.func-slider { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0 16px 20px 16px; }
+.func-slider::-webkit-scrollbar { display: none; }
+.func-card { flex: 0 0 85%; scroll-snap-align: center; background: #fff; border-radius: 20px; padding: 22px 20px; box-shadow: 0 12px 28px rgba(107,91,79,0.16); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+/* 卡片装饰角 */
+.func-card::before { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.08; z-index: 0; }
+.fc-1::before { background: var(--red); }
+.fc-2::before { background: var(--green); }
+.fc-3::before { background: var(--gold); }
+.fc-4::before { background: var(--gray); }
 
-/* 护照入口 */
+.func-card > * { position: relative; z-index: 1; }
+.func-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px;}
+.func-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff;}
+.fc-1 .func-icon { background: linear-gradient(135deg, #A93027, #E0733B); }
+.fc-2 .func-icon { background: linear-gradient(135deg, #3E5C4D, #6C917F); }
+.fc-3 .func-icon { background: linear-gradient(135deg, #B58E4A, #DDBF85); }
+.fc-4 .func-icon { background: linear-gradient(135deg, #6B5B4F, #A08A78); }
+
+.func-title { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: 1px;}
+.func-desc { font-size: 13px; color: #7a6f66; line-height: 1.6; margin-bottom: 16px; flex: 1;}
+.func-btn { align-self: flex-start; padding: 8px 18px; border-radius: 18px; font-size: 13px; font-weight: 600; text-decoration: none; transition: transform 0.2s; }
+.func-btn:active { transform: scale(0.95); }
+.fc-1 .func-btn { background: #FFF7F4; color: var(--red); }
+.fc-2 .func-btn { background: #F1F6F3; color: var(--green); }
+.fc-3 .func-btn { background: #FCF8F2; color: #A8741A; }
+.fc-4 .func-btn { background: #F4F2EF; color: var(--gray); }
+
+/* 滑动指示器 */
+.slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: -10px; margin-bottom: 20px;}
+.slider-dot { width: 16px; height: 4px; border-radius: 2px; background: rgba(107,91,79,0.2); transition: all 0.3s;}
+.slider-dot.active { width: 24px; background: var(--gold); }
+
+/* 护照入口 (保持原样) */
 .pp{display: flex; align-items: center; gap: 14px; margin: 16px 16px 0; padding: 14px 16px; border-radius: 16px; color: #F3E3B8; background: radial-gradient(circle at 20% 20%, #3f6150, #27402F 75%); box-shadow: 0 8px 20px rgba(39,64,47,0.3); position: relative; overflow: hidden;}
 .pp::after{content: ''; position: absolute; right: 20px; top: 0; bottom: 0; width: 8px; background: linear-gradient(90deg, #7d2a22, #B8382E, #7d2a22); opacity: 0.85;}
 .pp .pi{flex: 0 0 46px; height: 46px; border-radius: 50%; border: 1.5px solid #E8CF8E; display: flex; align-items: center; justify-content: center;}
@@ -41,30 +67,50 @@ a{color: inherit; text-decoration: none;}
 .pp span{font-size: 12px; opacity: 0.85;}
 .pp .go{margin-left: auto; margin-right: 22px; font-size: 13px; font-weight: 700; color: #E8CF8E;}
 
-/* 区块 */
-.block{margin-top: 26px; padding: 0 16px;}
-.block-head{display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;}
-.block-head h2{font-size: 18px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1;}
-.block-desc{font-size: 13px; line-height: 1.7; color: #7a6f66; margin-bottom: 14px;}
+/* ========== 历史变迁与穿越感设计 ========== */
+.history-section { margin-top: 30px; padding: 0 16px; }
+.section-header { text-align: center; margin-bottom: 24px; }
+.section-header h2 { font-size: 22px; color: var(--ink); letter-spacing: 2px; margin-bottom: 6px; font-weight: 700;}
+.section-header p { font-size: 13px; color: var(--gray); letter-spacing: 1px;}
+.section-header .line { width: 40px; height: 3px; background: var(--red); margin: 12px auto 0; border-radius: 2px;}
 
-.exp{display: block; background: #fff; border-radius: 18px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(107,91,79,0.1);}
-.exp-top{height: 92px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #fff;}
-.exp-top b{font-size: 22px; letter-spacing: 3px;}
-.exp-top span{font-size: 44px; opacity: 0.9;}
-.e1{background: linear-gradient(135deg, #6B5B4F, #9A8574);} .e2{background: linear-gradient(135deg, #3E5C4D, #6C917F);} .e3{background: linear-gradient(135deg, #B58E4A, #DDBF85);}
-.exp-body{padding: 14px 16px 16px;}
-.exp-body p{font-size: 14px; line-height: 1.75; color: #4d433c;}
-.exp-go{display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--red);}
+.timeline-wrapper { position: relative; padding: 10px 0; }
+.timeline-wrapper::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, transparent, var(--gold), var(--red), var(--gray), transparent); }
 
-/* 理念卡片 */
-.vision{margin: 26px 16px 0; padding: 22px 20px; border-radius: 18px; color: #fff; text-align: center; background: linear-gradient(145deg, #6B5B4F, #4A6B5A);}
-.vision h3{font-size: 18px; letter-spacing: 3px; margin-bottom: 10px;}
-.vision p{font-size: 13px; line-height: 1.85; opacity: 0.9;}
-.vision a{display: inline-block; margin-top: 14px; padding: 8px 20px; border-radius: 18px; font-size: 13px; background: rgba(255,255,255,0.2);}
+.tl-item { position: relative; padding-left: 56px; margin-bottom: 40px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-year-badge { position: absolute; left: 0; top: 0; width: 50px; height: 50px; background: var(--cream); border: 2px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 2;}
+.tl-year-badge span { font-size: 10px; color: var(--gray); line-height: 1;}
+.tl-year-badge b { font-size: 16px; color: var(--red); font-family: Georgia, serif; line-height: 1.2;}
 
-.foot{text-align: center; font-size: 11px; color: #a39a91; margin: 24px 0 6px; line-height: 1.8;}
+.tl-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(107,91,79,0.12); }
+/* 使用CSS渐变模拟历史细节图，避免外部图片依赖 */
+.tl-img { height: 100px; width: 100%; position: relative; display: flex; align-items: flex-end; padding: 12px 16px; color: #fff;}
+.tl-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+.tl-img.yuan { background: linear-gradient(45deg, #534538, #8b7355); } /* 元代：厚重泥土色 */
+.tl-img.ming { background: linear-gradient(45deg, #7c2626, #b23a3a); } /* 明清：朱红色/宫墙红 */
+.tl-img.roc { background: linear-gradient(45deg, #4a5c68, #758a99); } /* 民国：青灰色砖瓦 */
+.tl-img.now { background: linear-gradient(45deg, #3E5C4D, #6C917F); } /* 当代：生机绿 */
+.tl-img-caption { position: relative; z-index: 1; font-size: 15px; font-weight: 700; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
 
-.reveal{opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease;}
+.tl-content { padding: 16px; }
+.tl-content p { font-size: 13px; color: #5a5048; line-height: 1.8; margin-bottom: 8px;}
+.tl-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(201,168,108,0.15); color: #8a6c32; }
+
+
+/* ========== 🚨 修正：项目愿景卡片（雅邻共忆文案） 🚨 ========== */
+.vision{margin: 40px 16px 20px; padding: 26px 20px; border-radius: 20px; color: #fff; text-align: center; background: linear-gradient(145deg, #6B5B4F, #4A6B5A); position: relative; overflow: hidden;}
+.vision::before { content: '🏛'; position: absolute; font-size: 120px; right: -20px; bottom: -30px; opacity: 0.1; }
+.vision h3{font-size: 20px; letter-spacing: 3px; margin-bottom: 12px; position: relative;}
+.vision p{font-size: 13px; line-height: 1.85; opacity: 0.9; position: relative; margin-bottom: 18px; text-align: justify; text-align-last: center;}
+.vision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative;}
+.v-item { background: rgba(255,255,255,0.1); padding: 12px 6px; border-radius: 12px; backdrop-filter: blur(4px);}
+.v-item b { display: block; font-size: 14px; margin-bottom: 4px;}
+.v-item span { font-size: 11px; opacity: 0.8;}
+
+.foot{text-align: center; font-size: 11px; color: #a39a91; margin: 30px 0 20px; line-height: 1.8; letter-spacing: 1px;}
+
+.reveal{opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);}
 .reveal.in{opacity: 1; transform: none;}
 
 /* 底部标签栏 */
@@ -81,60 +127,138 @@ a{color: inherit; text-decoration: none;}
   <header class="hero">
     <div class="hero-bar">
       <span class="pill">📍 西四北三条 · 西城区</span>
-      <a class="pill" href="about.html">项目介绍 ›</a>
     </div>
     <div class="hero-text">
       <span class="hero-tag">社区文商活化计划</span>
       <h1>层记西四 · 阅见古今</h1>
-      <p>西四北三条社区文商活化计划</p>
-      <a class="cta" href="choose.html">开启漫步路线 ›</a>
+      <p>推开一座门楼，走进一层时光。在城市微更新中寻找胡同的记忆。</p>
     </div>
   </header>
 
-  <nav class="quick">
-    <a class="q-item" href="quiz.html"><span class="q-ic c1">🎯</span>智能推荐</a>
-    <a class="q-item" href="map.html?mode=free"><span class="q-ic c2">🗺</span>自主游览</a>
-    <a class="q-item" href="gate-3d.html"><span class="q-ic c3">🏛</span>3D展厅</a>
-    <a class="q-item" href="route.html"><span class="q-ic c4">📋</span>我的路线</a>
-  </nav>
+  <!-- 横向滑动的核心功能区 -->
+  <div class="func-slider-wrapper">
+    <div class="func-slider" id="funcSlider">
 
-  <a class="pp" href="passport.html">
-    <span class="pi"><svg viewBox="0 0 48 48" fill="none" stroke="#E8CF8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L24 8l18 12"/><path d="M11 20v20M37 20v20"/><path d="M17 40V24h14v16"/><path d="M4 40h40"/></svg></span>
-    <div><b>胡同漫游护照</b><span id="ppText">打卡盖章，集齐领取漫游证书</span></div>
-    <span class="go">翻开 ›</span>
-  </a>
+      <!-- 卡片1：智能导览 -->
+      <div class="func-card fc-1">
+        <div class="func-card-header">
+          <div class="func-icon">🗺</div>
+          <div class="func-title">智能地图导览</div>
+        </div>
+        <p class="func-desc">回答简单问题，AI为你规划专属漫步路线。避开喧嚣，寻找胡同深处的文化彩蛋与隐秘风景。</p>
+        <a href="choose.html" class="func-btn">开启游览 ›</a>
+      </div>
 
-  <section class="block reveal">
-    <div class="block-head"><h2>核心体验：层记之旅</h2></div>
-    <p class="block-desc">我们将胡同肌理、门楼礼制、当代烟火视为可阅读的“文化地层”，通过 3D 数字档案与胡同声痕，为您解构时光的褶皱。</p>
+      <!-- 卡片2：智能体（老街坊） -->
+      <div class="func-card fc-2">
+        <div class="func-card-header">
+          <div class="func-icon">👴</div>
+          <div class="func-title">对话"老街坊"</div>
+        </div>
+        <p class="func-desc">我们引入了专属AI智能体“老街坊”。关于西四北的名人轶事、门楼讲究，你可以随时向他提问，支持语音朗读！</p>
+        <a href="map.html" class="func-btn">去找他聊聊 ›</a>
+      </div>
 
-    <a class="exp reveal" href="map.html?mode=free&focus=N1">
-      <div class="exp-top e1"><b>寻古轴</b><span>📖</span></div>
-      <div class="exp-body">
-        <p>利用 3D 实景模型与数字化档案，深度解构西四六种典型门楼形制。读懂程砚秋故居、圣祚隆长寺背后封建礼制与匠心砖雕的历史地层。</p>
-        <span class="exp-go">在地图上查看 ›</span>
+      <!-- 卡片3：3D 展厅 -->
+      <div class="func-card fc-3">
+        <div class="func-card-header">
+          <div class="func-icon">🏛</div>
+          <div class="func-title">3D 数字展厅</div>
+        </div>
+        <p class="func-desc">利用数字孪生技术，将胡同里的门楼1:1还原。滑动屏幕，即可360度观察广亮大门、金柱大门的绝美砖雕。</p>
+        <a href="gate-3d.html" class="func-btn">进入展厅 ›</a>
       </div>
-    </a>
-    <a class="exp reveal" href="map.html?mode=free&focus=L5">
-      <div class="exp-top e2"><b>阅巷轴</b><span>🏡</span></div>
-      <div class="exp-body">
-        <p>安静漫步西四北四条、五条。拿起手机轻碰 NFC 标签，戴上耳机聆听鸽哨、邻里日常与原住民口述史，在不扰民的前提下捕捉最原真的声痕。</p>
-        <span class="exp-go">在地图上查看 ›</span>
+
+      <!-- 卡片4：我的护照 -->
+      <div class="func-card fc-4">
+        <div class="func-card-header">
+          <div class="func-icon">📔</div>
+          <div class="func-title">胡同漫游护照</div>
+        </div>
+        <p class="func-desc">在线上或线下完成点位打卡，集齐专属电子印章，召唤你的西四北胡同漫游者专属证书。</p>
+        <a href="passport.html" class="func-btn">查看进度 ›</a>
       </div>
-    </a>
-    <a class="exp reveal" href="map.html?mode=free&focus=B1">
-      <div class="exp-top e3"><b>新颜带</b><span>🎨</span></div>
-      <div class="exp-body">
-        <p>在漫步终点的大街区域，体验“门楼系列”文化盲盒、特调精酿与主理人手作。通过新业态利润反哺社区，共同守护老旧门楼的记忆。</p>
-        <span class="exp-go">在地图上查看 ›</span>
+
+    </div>
+
+    <!-- 滚动指示点 -->
+    <div class="slider-dots">
+      <div class="slider-dot active"></div>
+      <div class="slider-dot"></div>
+      <div class="slider-dot"></div>
+      <div class="slider-dot"></div>
+    </div>
+  </div>
+
+  <!-- 穿越感的时间轴历史变迁 -->
+  <section class="history-section reveal">
+    <div class="section-header">
+      <h2>时光折叠 · 历史变迁</h2>
+      <p>阅读胡同生长的年轮</p>
+      <div class="line"></div>
+    </div>
+
+    <div class="timeline-wrapper">
+
+      <!-- 元代 -->
+      <div class="tl-item reveal">
+        <div class="tl-year-badge"><span>元代</span><b>1267</b></div>
+        <div class="tl-card">
+          <div class="tl-img yuan"><div class="tl-img-caption">平则门内 街巷初成</div></div>
+          <div class="tl-content">
+            <p>元大都建立，西四北三条区域始定格局。作为"平则门"（今阜成门）内的重要地带，最初的胡同肌理开始在泥土中生根。</p>
+            <span class="tl-tag">元大都胡同肌理</span>
+          </div>
+        </div>
       </div>
-    </a>
+
+      <!-- 明清 -->
+      <div class="tl-item reveal">
+        <div class="tl-year-badge"><span>明清</span><b>1592</b></div>
+        <div class="tl-card">
+          <div class="tl-img ming"><div class="tl-img-caption">寺庙林立 官宦聚居</div></div>
+          <div class="tl-content">
+            <p>明万历二十年，圣祚隆长寺建成。清代此地多为镶红旗驻地，达官贵人营建宅院，广亮大门与金柱大门拔地而起，门楼礼制极其森严。</p>
+            <span class="tl-tag">隆长寺</span> <span class="tl-tag">广亮大门</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 民国 -->
+      <div class="tl-item reveal">
+        <div class="tl-year-badge"><span>民国</span><b>1937</b></div>
+        <div class="tl-card">
+          <div class="tl-img roc"><div class="tl-img-caption">名流汇聚 中西合璧</div></div>
+          <div class="tl-content">
+            <p>封建礼制瓦解，报子胡同（三条旧称）迎来大批文化名流。程砚秋、傅增湘等在此定居。西式建筑元素传入，西洋门与如意门成为时代缩影。</p>
+            <span class="tl-tag">程砚秋故居</span> <span class="tl-tag">西洋门</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 当代 -->
+      <div class="tl-item reveal">
+        <div class="tl-year-badge"><span>当代</span><b>2024</b></div>
+        <div class="tl-card">
+          <div class="tl-img now"><div class="tl-img-caption">微光更新 文商共生</div></div>
+          <div class="tl-content">
+            <p>老胡同迎来“微更新”。传统院落与现代咖啡馆、精酿酒馆交织。在不扰民的前提下，老街坊与新游客在门楼下共享市井烟火。</p>
+            <span class="tl-tag">社区共建</span> <span class="tl-tag">新业态活化</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </section>
 
+  <!-- 🚨 修正：文商共荣 雅邻共忆 🚨 -->
   <section class="vision reveal">
     <h3>文商共荣 · 雅邻共忆</h3>
-    <p>设立“门楼公益金”，将导览收入回馈于老旧建筑的修缮维护与社区老年居民的福利。在这里的每一次驻足与消费，都是对古城记忆的一次共同守护。</p>
-    <a href="about.html">了解项目 ›</a>
+    <p>欢迎您走进西四北三条。<br>胡同是风景，更是居民的家。<br>请轻声慢步，不喧哗、不外放、不聚集；<br>门楼可驻足欣赏，未开放院落请勿擅自进入。<br>把好奇留在巷中，感谢您，做胡同里最温柔的过客。</p>
+    <div class="vision-grid">
+      <div class="v-item"><b>石老娘议事厅</b><span>居民共建自治</span></div>
+      <div class="v-item"><b>门楼公益金</b><span>反哺社区养老</span></div>
+    </div>
   </section>
 
   <p class="foot">门楼层记 · 故事里<br>让历史地层可阅读，让胡同烟火被听见</p>
@@ -159,8 +283,22 @@ a{color: inherit; text-decoration: none;}
 </nav>
 
 <script>
-// 护照进度
-try { var st = JSON.parse(localStorage.getItem('menlouStamps') || '{}'), n = Object.keys(st).length; if (n) document.getElementById('ppText').textContent = '已集印章 ' + n + ' / 15 枚'; } catch (e) {}
+// 滑动卡片指示点同步逻辑
+(function() {
+  const slider = document.getElementById('funcSlider');
+  const dots = document.querySelectorAll('.slider-dot');
+
+  slider.addEventListener('scroll', () => {
+    const scrollRatio = slider.scrollLeft / (slider.scrollWidth - slider.clientWidth);
+    let index = Math.round(scrollRatio * 3);
+    index = Math.max(0, Math.min(3, index));
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+  }, {passive: true});
+})();
+
 // 滚动入场动画
 (function () {
   var els = document.querySelectorAll('.reveal');
