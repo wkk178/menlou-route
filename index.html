@@ -1,5 +1,4 @@
-# Generating the final HTML merging the "Time Travel" section into the index.html
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -7,14 +6,28 @@ html_content = """<!DOCTYPE html>
 <meta name="theme-color" content="#6B5B4F">
 <title>门楼层记·故事里 | 层记西四 阅见古今</title>
 <style>
-:root{--door-gray:#6B5B4F;--brick-green:#4A6B5A;--accent-gold:#C9A86C;--bg-cream:#F5F1E8;--text-dark:#2C2420;--white:#FFFFFF;--red:#B8382E;
-      --serif:'Noto Serif SC','Songti SC','STSong','SimSun',serif;--kai:'STKaiti','KaiTi','Kaiti SC',serif; --line: rgba(107,91,79,0.12);}
+:root{
+  --door-gray:#6B5B4F;
+  --brick-green:#3E5C4D;
+  --accent-gold:#C9A86C;
+  --gold-light:#EFE2C6;
+  --bg-cream:#F4EFE6;
+  --card-cream:#FFFDF9;
+  --text-dark:#2C221E;
+  --text-muted:#7A6E65;
+  --white:#FFFFFF;
+  --red:#B8382E;
+  --red-dark:#8F241C;
+  --serif:'Noto Serif SC','Songti SC','STSong','SimSun',serif;
+  --kai:'STKaiti','KaiTi','Kaiti SC',serif;
+  --line:rgba(107,91,79,0.14);
+}
 *{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
 html{-webkit-text-size-adjust: 100%; scroll-behavior: smooth;}
-body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E6DFD0; color: var(--text-dark);}
+body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E3DBD0; color: var(--text-dark);}
 a{color: inherit; text-decoration: none;}
 button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
-.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg-cream); position: relative; padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow-x: hidden;}
+.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg-cream); position: relative; padding-bottom: calc(82px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow-x: hidden;}
 
 /* 主视觉 */
 .hero{position: relative; height: 360px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0;
@@ -27,11 +40,10 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .hero p{font-size: 13px; opacity: 0.92; margin-top: 6px; letter-spacing: 1px;}
 
 /* ========== 四大核心功能模块 (横向滑动卡片) ========== */
-.func-slider-wrapper { margin: -50px 0 0 0; position: relative; z-index: 5; overflow: hidden; padding-bottom: 10px;}
+.func-slider-wrapper { margin: -50px 0 0 0; position: relative; z-index: 5; overflow: hidden; padding-bottom: 6px;}
 .func-slider { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 0 16px 20px 16px; }
 .func-slider::-webkit-scrollbar { display: none; }
 .func-card { flex: 0 0 85%; scroll-snap-align: center; background: #fff; border-radius: 20px; padding: 22px 20px; box-shadow: 0 12px 28px rgba(107,91,79,0.16); position: relative; overflow: hidden; display: flex; flex-direction: column; }
-/* 卡片装饰角 */
 .func-card::before { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.08; z-index: 0; }
 .fc-1::before { background: var(--red); }
 .fc-2::before { background: var(--brick-green); }
@@ -56,32 +68,309 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .fc-4 .func-btn { background: #F4F2EF; color: var(--door-gray); }
 
 /* 滑动指示器 */
-.slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: -10px; margin-bottom: 20px;}
+.slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: -10px; margin-bottom: 12px;}
 .slider-dot { width: 16px; height: 4px; border-radius: 2px; background: rgba(107,91,79,0.2); transition: all 0.3s;}
-.slider-dot.active { width: 24px; background: var(--accent-gold); }
+.slider-dot.active { width: 24px; background: var(--red); }
 
 
-/* ========== 序章区 ========== */
-.intro{padding:40px 16px 30px;}
-.kicker{font-size:13px;letter-spacing:6px;color:var(--red);font-weight:700;margin-bottom:12px; text-align: center;}
-.intro h2{font-family:var(--serif);font-size:26px;color:var(--door-gray);line-height:1.35;margin-bottom:16px; text-align: center;}
-.intro .big{font-size:15px;line-height:1.8;color:#4a4039;margin-bottom:24px; text-align: center;}
-.intro .big strong{color:var(--red);font-weight:700;}
+/* ========== ✨ 升级版序章区（国潮小程序实用美学） ✨ ========== */
+.intro { padding: 8px 16px 28px; position: relative; }
 
-/* 序章内容卡片式重构，适应首页 */
-.intro-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px;}
-.intro-card { background: #fff; padding: 18px; border-radius: 16px; box-shadow: 0 4px 16px rgba(107,91,79,0.06); border-top: 3px solid var(--accent-gold);}
-.intro-card p { font-size: 14px; color: #6a5f57; line-height: 1.8;}
+/* 顶部小程序街区实况条 */
+.street-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFDF9;
+  border: 1px solid rgba(201, 168, 108, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(107, 91, 79, 0.06);
+}
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2E8B57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2);
+  animation: pulseDot 2s infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2); }
+  50% { box-shadow: 0 0 0 5px rgba(46, 139, 87, 0.08); }
+}
+.status-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(107, 91, 79, 0.2);
+}
+.status-sub {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--red);
+  background: rgba(184, 56, 46, 0.09);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(184, 56, 46, 0.2);
+  white-space: nowrap;
+}
 
-/* 数据统计 */
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
-.stat{background:#fff;border-radius:16px;padding:18px 12px;text-align:center;box-shadow:0 6px 20px rgba(107,91,79,.06);}
-.stat b{display:block;font-family:Georgia,var(--serif),serif;font-size:32px;color:var(--red);line-height:1.15; margin-bottom:4px;}
-.stat span{font-size:12px;color:#7a6f66;letter-spacing:1px;}
+/* 序章主牌匾卡（塔斯汀国潮风外框+内嵌数据看板） */
+.intro-plaque {
+  position: relative;
+  background: linear-gradient(180deg, #FFFDF9 0%, #FBF6EC 100%);
+  border-radius: 18px;
+  padding: 22px 18px 18px;
+  box-shadow: 0 10px 28px rgba(74, 55, 40, 0.09);
+  border: 1.5px solid #DEC79B;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+/* 国潮内线框装饰 */
+.intro-plaque::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(201, 168, 108, 0.35);
+  border-radius: 13px;
+  pointer-events: none;
+}
+/* 拟真朱砂印章装饰 */
+.seal-stamp {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 46px;
+  height: 46px;
+  border: 2px solid rgba(184, 56, 46, 0.75);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  padding: 3px;
+  color: var(--red);
+  font-family: var(--kai);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  place-items: center;
+  transform: rotate(8deg);
+  opacity: 0.82;
+  background: rgba(184, 56, 46, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(184, 56, 46, 0.35);
+  user-select: none;
+  pointer-events: none;
+}
 
-/* ========== 🚨 替换：时光穿越区 🚨 ========== */
-.journey{position:relative;background:#15191d;color:#f1e8d6; margin-top: 40px;}
-.journey-head{padding:60px 24px 20px;text-align:center;}
+.intro-header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--red);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 4px 10px;
+  border-radius: 6px 2px 6px 2px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 8px rgba(184, 56, 46, 0.25);
+}
+.intro-plaque h2 {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text-dark);
+  line-height: 1.35;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  padding-right: 52px;
+}
+.intro-plaque .big {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: #5A4E46;
+  margin-bottom: 18px;
+  text-align: justify;
+}
+.intro-plaque .big strong {
+  color: var(--red);
+  font-weight: 700;
+  background: linear-gradient(180deg, transparent 62%, rgba(184, 56, 46, 0.16) 0);
+  padding: 0 2px;
+}
+
+/* 嵌入式四栏国潮数据看板 */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #F4ECE0;
+  border: 1px solid rgba(201, 168, 108, 0.45);
+  border-radius: 12px;
+  padding: 12px 4px;
+  position: relative;
+  z-index: 1;
+}
+.stat {
+  text-align: center;
+  position: relative;
+  padding: 2px 4px;
+}
+.stat:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 18%;
+  height: 64%;
+  width: 1px;
+  background: rgba(107, 91, 79, 0.18);
+}
+.stat-num-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+  margin-bottom: 3px;
+}
+.stat b {
+  font-family: Georgia, var(--serif), serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.1;
+}
+.stat em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--door-gray);
+}
+.stat span {
+  display: block;
+  font-size: 11px;
+  color: #6E6259;
+  font-weight: 500;
+}
+
+/* 序章双卡重构：国潮杂志分栏卡 */
+.intro-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.intro-card {
+  background: var(--card-cream);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(107, 91, 79, 0.06);
+  border: 1px solid rgba(201, 168, 108, 0.32);
+  position: relative;
+  overflow: hidden;
+}
+.intro-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px dashed rgba(107, 91, 79, 0.16);
+}
+.ic-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ic-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+.ic-badge.b-wood { background: linear-gradient(135deg, #6B5B4F, #4A3E35); }
+.ic-badge.b-green { background: linear-gradient(135deg, #3E5C4D, #2B4237); }
+.ic-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: 0.5px;
+}
+.ic-tag {
+  font-size: 11px;
+  color: #8C6D3B;
+  background: #F9F2E4;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.intro-card p {
+  font-size: 13px;
+  color: #5E534B;
+  line-height: 1.75;
+  text-align: justify;
+}
+/* 四朝微缩时间轴条 */
+.mini-strata-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(107, 91, 79, 0.08);
+}
+.strata-pill {
+  background: #F5EFE4;
+  border-radius: 8px;
+  padding: 6px 4px;
+  text-align: center;
+  border: 1px solid rgba(201, 168, 108, 0.28);
+}
+.strata-pill strong {
+  display: block;
+  font-size: 11.5px;
+  color: var(--red);
+  font-family: var(--serif);
+  margin-bottom: 1px;
+}
+.strata-pill span {
+  display: block;
+  font-size: 10.5px;
+  color: #6E6259;
+}
+.ic-foot-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: #7A6E65;
+  background: #F6F1E7;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+
+/* ========== 🚨 时光穿越区 🚨 ========== */
+.journey{position:relative;background:#15191d;color:#f1e8d6; margin-top: 16px;}
+.journey-head{padding:52px 24px 20px;text-align:center;}
 .journey-head p{font-size:13px;letter-spacing:6px;color:#E8CF8E;margin-bottom:10px;}
 .journey-head h2{font-family:var(--serif);font-size:26px;letter-spacing:.2em;font-weight:700;}
 .journey-head span{display:block;margin-top:12px;font-size:12px;opacity:.7;letter-spacing:1px;}
@@ -91,7 +380,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .e-yuan{--prev:#15191d;--bg:#28343b;--next:#3a1d18;}
 .e-ming{--prev:#28343b;--bg:#3a1d18;--next:#37321f;}
 .e-minguo{--prev:#3a1d18;--bg:#37321f;--next:#141a30;}
-.e-now{--prev:#37321f;--bg:#141a30;--next:#F5F1E8;}
+.e-now{--prev:#37321f;--bg:#141a30;--next:#F4EFE6;}
 .era-mark{position:absolute;font-family:Georgia,var(--serif),serif;font-weight:700;font-size:180px;line-height:1;color:rgba(255,255,255,.045);right:-10%;top:2%;pointer-events:none;user-select:none;transform:translateX(calc(var(--p,0) * 40px));}
 .e-ming .era-mark,.e-now .era-mark{right:auto;left:-10%;}
 .era-inner{position:relative;padding:60px 24px;display:flex;flex-direction:column;gap:40px;align-items:center;}
@@ -148,39 +437,335 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .clock span{font-size:12px;letter-spacing:4px;opacity:.85;}
 
 
-/* ========== 回到今天 ========== */
-.bg-section{padding:50px 16px 20px;}
-.bg-section h2{font-family:var(--serif);font-size:24px;color:var(--door-gray);margin-bottom:16px;line-height:1.35; text-align: center;}
-.bg-section .lead{font-size:14px;color:#5a4f47;line-height:1.8;margin-bottom:12px; text-align: justify;}
+/* ========== ✨ 升级版底部区：文商共荣 · 雅邻共忆 + 便民服务（塔斯汀式国潮小程序质感） ✨ ========== */
+.bottom-hub {
+  padding: 20px 16px 12px;
+}
 
-.sub-h{font-family:var(--serif);font-size:18px;color:var(--door-gray);margin:36px 0 16px;padding-left:12px;border-left:4px solid var(--red);line-height:1.2;}
+/* 模块一：文商共荣·胡同漫游补给站（双栏实用服务卡） */
+.hub-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.hub-sec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.hub-sec-title::before {
+  content: '';
+  width: 4px;
+  height: 17px;
+  border-radius: 2px;
+  background: var(--red);
+}
+.hub-sec-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
 
-.axes{display:grid;grid-template-columns:1fr;gap:20px;}
-.axis{background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 14px 40px rgba(107,91,79,.1);display:flex;flex-direction:column;}
-.axis-top{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;color:#fff;}
-.axis-top h4{font-family:var(--serif);font-size:20px;letter-spacing:.14em;}
-.axis-top small{display:block;font-size:12px;opacity:.85;letter-spacing:3px;margin-top:2px;font-family:'PingFang SC','Microsoft YaHei',sans-serif;}
-.a1 .axis-top{background:linear-gradient(135deg,#6B5B4F,#9A8574);}.a2 .axis-top{background:linear-gradient(135deg,#3E5C4D,#6C917F);}.a3 .axis-top{background:linear-gradient(135deg,#B58E4A,#DDBF85);}
-.axis p{padding:20px 24px 26px;font-size:14px;line-height:1.95;color:#5a4f47;}
+.commerce-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.commerce-card {
+  background: var(--card-cream);
+  border-radius: 14px;
+  padding: 14px 12px;
+  border: 1px solid rgba(201, 168, 108, 0.35);
+  box-shadow: 0 5px 15px rgba(107, 91, 79, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.commerce-card:active {
+  transform: scale(0.98);
+}
+.cc-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-bottom: 7px;
+}
+.cc-tag.t-red { background: #FDECE9; color: var(--red); }
+.cc-tag.t-green { background: #E9F3EE; color: var(--brick-green); }
+.commerce-card h4 {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+.commerce-card p {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.cc-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--red);
+}
+.commerce-card.c-green .cc-action {
+  color: var(--brick-green);
+}
 
-/* 🚨 文商共荣 雅邻共忆 🚨 */
-.vision{margin: 50px 16px 20px; padding: 26px 20px; border-radius: 20px; color: #fff; text-align: center; background: linear-gradient(145deg, #6B5B4F, #4A6B5A); position: relative; overflow: hidden;}
-.vision::before { content: '🏛'; position: absolute; font-size: 120px; right: -20px; bottom: -30px; opacity: 0.1; }
-.vision h3{font-family:var(--serif); font-size: 20px; letter-spacing: 2px; margin-bottom: 16px; position: relative;}
-.vision p{font-size: 13px; line-height: 1.85; opacity: 0.95; position: relative; margin-bottom: 20px; text-align: justify; text-align-last: center;}
+/* 模块二：雅邻共忆·胡同漫游公约（国潮立体牌匾卡） */
+.vision {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(160deg, #3A2E27 0%, #261E19 100%);
+  color: #F7EFE2;
+  padding: 22px 16px 18px;
+  box-shadow: 0 14px 32px rgba(44, 34, 30, 0.22);
+  border: 1.5px solid #C9A86C;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+/* 国潮内金线框 */
+.vision::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(232, 207, 142, 0.22);
+  border-radius: 15px;
+  pointer-events: none;
+}
+/* 顶部牌匾横额 */
+.vision-plaque-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.plaque-ornament {
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #E8CF8E);
+}
+.plaque-ornament.right {
+  background: linear-gradient(90deg, #E8CF8E, transparent);
+}
+.vision-kicker {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #E8CF8E;
+  font-weight: 600;
+}
+.vision h3 {
+  font-family: var(--serif);
+  font-size: 21px;
+  letter-spacing: 2px;
+  text-align: center;
+  color: #FFF8EB;
+  margin-bottom: 8px;
+}
+.vision-lead {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: rgba(247, 239, 226, 0.85);
+  text-align: center;
+  margin-bottom: 16px;
+}
 
-.mech{display:grid;grid-template-columns:1fr;gap:14px;position: relative;}
-.mech div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:20px;text-align: left;}
-.mech b{display:block;font-size:16px;color:#F3D98F;margin-bottom:6px;letter-spacing:2px;}
-.mech span{font-size:13px;opacity:.88;line-height:1.7;}
+/* 2x2 雅邻公约四宫格 */
+.etiquette-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+.etiq-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(232, 207, 142, 0.2);
+  border-radius: 12px;
+  padding: 11px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+.etiq-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(232, 207, 142, 0.14);
+  border: 1px solid rgba(232, 207, 142, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.etiq-text b {
+  display: block;
+  font-size: 13px;
+  color: #F3D98F;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+.etiq-text span {
+  display: block;
+  font-size: 11px;
+  color: rgba(247, 239, 226, 0.75);
+  line-height: 1.35;
+}
 
-.foot{text-align: center; font-size: 11px; color: #a39a91; margin: 30px 0 20px; line-height: 1.8; letter-spacing: 1px;}
+/* 互动倡议打卡栏（小程序真实感） */
+.pledge-bar {
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.26);
+  border: 1px solid rgba(232, 207, 142, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pledge-info {
+  font-size: 11.5px;
+  color: rgba(247, 239, 226, 0.85);
+  line-height: 1.4;
+}
+.pledge-info strong {
+  color: #F3D98F;
+  font-family: Georgia, serif;
+  font-size: 13px;
+}
+.pledge-btn {
+  background: linear-gradient(135deg, #C83E33, #9E261C);
+  color: #FFF8EB;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 13px;
+  border-radius: 20px;
+  border: 1px solid rgba(243, 217, 143, 0.45);
+  box-shadow: 0 4px 12px rgba(184, 56, 46, 0.35);
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+.pledge-btn:active {
+  transform: scale(0.95);
+}
+.pledge-btn.signed {
+  background: linear-gradient(135deg, #D9B468, #B58B3E);
+  color: #261E19;
+  box-shadow: 0 4px 12px rgba(217, 180, 104, 0.3);
+}
+
+/* 模块三：小程序实用便民出行卡 */
+.practical-card {
+  background: var(--card-cream);
+  border-radius: 16px;
+  padding: 15px 16px;
+  border: 1px solid rgba(201, 168, 108, 0.32);
+  box-shadow: 0 4px 14px rgba(107, 91, 79, 0.05);
+  margin-bottom: 20px;
+}
+.prac-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(107, 91, 79, 0.15);
+}
+.prac-head b {
+  font-size: 13.5px;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.prac-head span {
+  font-size: 11px;
+  color: var(--brick-green);
+  background: #EBF3EE;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.prac-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.prac-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  color: #5E534B;
+  line-height: 1.5;
+}
+.prac-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 品牌压脚 */
+.foot {
+  text-align: center;
+  padding: 8px 16px 22px;
+  color: #9A8F85;
+}
+.foot-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.foot-divider::before,
+.foot-divider::after {
+  content: '';
+  width: 48px;
+  height: 1px;
+  background: rgba(107, 91, 79, 0.2);
+}
+.foot-diamond {
+  font-size: 10px;
+  color: var(--accent-gold);
+}
+.foot-brand {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--door-gray);
+  letter-spacing: 2px;
+  margin-bottom: 3px;
+}
+.foot-slogan {
+  font-size: 11px;
+  color: #9A8F85;
+  letter-spacing: 1px;
+}
 
 .reveal{opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);}
 .reveal.in{opacity: 1; transform: none;}
-.era .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease;}
-.era.in .reveal{opacity:1;transform:none;}
-.era.in .reveal:nth-child(2){transition-delay:.12s}.era.in .reveal:nth-child(3){transition-delay:.24s}.era.in .reveal:nth-child(4){transition-delay:.36s}.era.in .reveal:nth-child(5){transition-delay:.48s}.era.in .reveal:nth-child(6){transition-delay:.6s}
 
 /* 底部标签栏 */
 .tabbar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 50; display: flex;
@@ -259,30 +844,84 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     </div>
   </div>
 
-  <!-- 新版序章 -->
+  <!-- ✨ 升级版序章区：国潮牌匾档案卡 + 结构化双卡 ✨ -->
   <section class="intro reveal" id="intro">
-    <p class="kicker">序章</p>
-    <h2>这不是一条扁平化的“古街”</h2>
-    <p class="big">这是一部在元大都骨架上生长了七百年的<strong>“文化地层”</strong>。每一座门楼，都是时光留下的褶皱。</p>
-    
-    <div class="intro-cards">
-      <div class="intro-card">
-        <p>西四北三条位于北京老城的西城区，是西四北头条至八条这组东西向胡同中的一条，至今保留着棋盘式的胡同肌理，院落沿巷道两侧依次排开。</p>
+    <!-- 街区实况状态栏（增强小程序真实感） -->
+    <div class="street-status-bar">
+      <div class="status-left">
+        <i class="live-dot"></i>
+        <span>街区全天开放</span>
+        <span class="status-divider"></span>
+        <span class="status-sub">建议漫游 45 分钟</span>
       </div>
-      <div class="intro-card">
-        <p>在这里，胡同的尺度来自元代，门楼的礼制来自明清，名人的故事来自民国，而街角的茶香与鸽哨，来自今天。四个时代层层叠压，留在了同一条巷子里。</p>
+      <span class="status-badge">历史文化街区</span>
+    </div>
+
+    <!-- 国潮主牌匾卡 -->
+    <div class="intro-plaque">
+      <div class="seal-stamp" aria-hidden="true"><span>西</span><span>四</span><span>层</span><span>记</span></div>
+      <span class="intro-header-tag">序章 · 街巷档案</span>
+      <h2>这不是一条扁平化的“古街”</h2>
+      <p class="big">而是一部在元大都骨架上生长了七百年的<strong>“文化地层”</strong>。推开每一座门楼，都是时光留下的褶皱。</p>
+
+      <!-- 嵌入式四栏数据看板 -->
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num-wrap"><b data-n="700" data-suffix="+">0</b><em>年</em></div>
+          <span>胡同积淀</span>
+        </div>
+        <div class="stat">
+          <div class="stat-num-wrap"><b data-n="226">0</b><em>座</em></div>
+          <span>院落记忆</span>
+        </div>
+        <div class="stat">
+          <div class="stat-num-wrap"><b data-n="6">0</b><em>种</em></div>
+          <span>门楼形制</span>
+        </div>
+        <div class="stat">
+          <div class="stat-num-wrap"><b data-n="4">0</b><em>层</em></div>
+          <span>时代地层</span>
+        </div>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat"><b data-n="700" data-suffix="+">0</b><span>年的胡同积淀</span></div>
-      <div class="stat"><b data-n="226">0</b><span>个院落记忆</span></div>
-      <div class="stat"><b data-n="6">0</b><span>种门楼形制</span></div>
-      <div class="stat"><b data-n="4">0</b><span>个时代地层</span></div>
+    <!-- 结构化国潮双卡 -->
+    <div class="intro-cards">
+      <div class="intro-card">
+        <div class="intro-card-head">
+          <div class="ic-title-group">
+            <span class="ic-badge b-wood">肌</span>
+            <span class="ic-title">棋盘肌理 · 礼制街巷</span>
+          </div>
+          <span class="ic-tag">头条至八条</span>
+        </div>
+        <p>西四北三条位于北京老城西城区，是西四北头条至八条这组东西向平行胡同中的重要一脉，至今完整保留着元代棋盘式胡同肌理，传统四合院落沿巷道南北两侧依次排开。</p>
+        <div class="ic-foot-meta">
+          <span>🧭 走向：东西向规整巷陌</span>
+          <span>📏 全长：约 530 米</span>
+        </div>
+      </div>
+
+      <div class="intro-card">
+        <div class="intro-card-head">
+          <div class="ic-title-group">
+            <span class="ic-badge b-green">层</span>
+            <span class="ic-title">四代叠压 · 古今同巷</span>
+          </div>
+          <span class="ic-tag">活态文化</span>
+        </div>
+        <p>在这里，胡同的尺度来自元代，门楼的礼制来自明清，名人的故事来自民国，而街角的茶香与鸽哨来自今天。四个时代层层叠压，共同留在了同一条巷子里。</p>
+        <div class="mini-strata-bar">
+          <div class="strata-pill"><strong>元代</strong><span>胡同尺度</span></div>
+          <div class="strata-pill"><strong>明清</strong><span>门楼礼制</span></div>
+          <div class="strata-pill"><strong>民国</strong><span>名人书香</span></div>
+          <div class="strata-pill"><strong>今日</strong><span>茶香鸽哨</span></div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- 🚨 替换：时光穿越区 🚨 -->
+  <!-- 🚨 时光穿越区 🚨 -->
   <section class="journey" id="journey">
     <div class="journey-head">
       <p>TIME TRAVEL</p>
@@ -439,13 +1078,105 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     <div class="clock" id="clock"><b id="clockYear">1271</b><span id="clockLabel">元大都</span></div>
   </section>
 
-  <!-- 🚨 修正：文商共荣 雅邻共忆 🚨 -->
-  <section class="vision reveal">
-    <h3>文商共荣 · 雅邻共忆</h3>
-    <p>欢迎您走进西四北三条。<br>胡同是风景，更是居民的家。<br>请轻声慢步，不喧哗、不外放、不聚集；<br>门楼可驻足欣赏，未开放院落请勿擅自进入。<br>把好奇留在巷中，感谢您，做胡同里最温柔的过客。</p>
-  </section>
+  <!-- ✨ 升级版底部区：文商共荣 · 雅邻共忆 + 实用便民指南 ✨ -->
+  <div class="bottom-hub">
 
-  <p class="foot">门楼层记 · 故事里<br>让历史地层可阅读，让胡同烟火被听见</p>
+    <!-- 1. 文商共荣 · 街区漫游驿站 -->
+    <div class="hub-sec-head reveal">
+      <div class="hub-sec-title">文商共荣 · 街区驿站</div>
+      <span class="hub-sec-sub">新业态反哺老胡同</span>
+    </div>
+
+    <div class="commerce-grid reveal">
+      <a href="passport.html" class="commerce-card">
+        <div>
+          <span class="cc-tag t-red">漫游礼遇</span>
+          <h4>胡同茶歇 · 集章兑礼</h4>
+          <p>探访门楼收集电子印章，解锁沿街茶饮、文创小店专属礼遇。</p>
+        </div>
+        <span class="cc-action">去领护照 ›</span>
+      </a>
+
+      <a href="map.html" class="commerce-card c-green">
+        <div>
+          <span class="cc-tag t-green">无扰导览</span>
+          <h4>NFC 声痕 · 静音听古</h4>
+          <p>手机轻触门牌或线上点播，听“老街坊”细讲宅院故事。</p>
+        </div>
+        <span class="cc-action">打开地图 ›</span>
+      </a>
+    </div>
+
+    <!-- 2. 雅邻共忆 · 胡同漫游公约（国潮牌匾卡） -->
+    <section class="vision reveal">
+      <div class="vision-plaque-top">
+        <span class="plaque-ornament"></span>
+        <span class="vision-kicker">胡同漫游公约</span>
+        <span class="plaque-ornament right"></span>
+      </div>
+      <h3>文商共荣 · 雅邻共忆</h3>
+      <p class="vision-lead">欢迎走进西四北三条。胡同是风景，更是居民的家。<br>愿我们把好奇留在巷中，做胡同里最温柔的过客。</p>
+
+      <div class="etiquette-grid">
+        <div class="etiq-item">
+          <div class="etiq-icon">🤫</div>
+          <div class="etiq-text">
+            <b>轻声慢步</b>
+            <span>不喧哗、不外放、不聚集</span>
+          </div>
+        </div>
+        <div class="etiq-item">
+          <div class="etiq-icon">🚪</div>
+          <div class="etiq-text">
+            <b>私宅勿入</b>
+            <span>未开放院落请勿擅入</span>
+          </div>
+        </div>
+        <div class="etiq-item">
+          <div class="etiq-icon">📷</div>
+          <div class="etiq-text">
+            <b>温柔镜头</b>
+            <span>门楼可赏，勿对窗拍摄</span>
+          </div>
+        </div>
+        <div class="etiq-item">
+          <div class="etiq-icon">🍃</div>
+          <div class="etiq-text">
+            <b>净美街巷</b>
+            <span>垃圾随行，护佑胡同烟火</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 小程序级真实互动打卡栏 -->
+      <div class="pledge-bar">
+        <div class="pledge-info">
+          已有 <strong id="pledgeCount">1,428</strong> 位漫游者响应雅邻公约
+        </div>
+        <button type="button" class="pledge-btn" id="pledgeBtn">🤝 践行公约</button>
+      </div>
+    </section>
+
+    <!-- 3. 实用便民出行信息卡 -->
+    <div class="practical-card reveal">
+      <div class="prac-head">
+        <b>📌 街区漫游便民贴士</b>
+        <span>免费开放</span>
+      </div>
+      <ul class="prac-list">
+        <li><span class="prac-label">街区位置：</span><span>北京市西城区西四北三条（东起西四北大街）</span></li>
+        <li><span class="prac-label">地铁出行：</span><span>地铁 4 号线「西四站」B口/D口出，步行约 260 米</span></li>
+        <li><span class="prac-label">推荐时段：</span><span>09:00 - 19:30（午后斜阳映照门楼砖雕光影最佳）</span></li>
+      </ul>
+    </div>
+
+    <!-- 4. 国潮压脚 -->
+    <footer class="foot">
+      <div class="foot-divider"><span class="foot-diamond">◆</span></div>
+      <p class="foot-brand">门楼层记 · 故事里</p>
+      <p class="foot-slogan">让历史地层可阅读 · 让胡同烟火被听见</p>
+    </footer>
+  </div>
 </div>
 
 <nav class="tabbar">
@@ -495,6 +1226,34 @@ if ('IntersectionObserver' in window) {
       dot.classList.toggle('active', i === index);
     });
   }, {passive: true});
+})();
+
+// 雅邻公约互动打卡（增强小程序真实交互感）
+(function() {
+  var btn = document.getElementById('pledgeBtn');
+  var countEl = document.getElementById('pledgeCount');
+  if (!btn || !countEl) return;
+  var baseCount = 1428;
+  var signed = false;
+  try { signed = localStorage.getItem('xisi_pledge_signed') === '1'; } catch(e) {}
+
+  function renderState() {
+    if (signed) {
+      btn.textContent = '✨ 已点亮温柔过客';
+      btn.classList.add('signed');
+      countEl.textContent = (baseCount + 1).toLocaleString();
+    } else {
+      btn.textContent = '🤝 践行公约';
+      btn.classList.remove('signed');
+      countEl.textContent = baseCount.toLocaleString();
+    }
+  }
+  renderState();
+  btn.addEventListener('click', function() {
+    signed = !signed;
+    try { localStorage.setItem('xisi_pledge_signed', signed ? '1' : '0'); } catch(e) {}
+    renderState();
+  });
 })();
 
 // 滚动入场动画
@@ -565,9 +1324,4 @@ if ('IntersectionObserver' in window) {
 })();
 </script>
 </body>
-</html>"""
-
-with open("new_index_3.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-    
-print("done")
+</html>
