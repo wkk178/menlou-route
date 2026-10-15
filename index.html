@@ -775,6 +775,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 .tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
 .tab.active{color: var(--red); font-weight: 600;}
 </style>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <div class="app">
@@ -843,6 +844,23 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       <div class="slider-dot"></div>
     </div>
   </div>
+
+  <section class="home-hub" aria-labelledby="home-hub-title">
+    <h2 id="home-hub-title">从这里，开启胡同漫游</h2>
+    <p>核心功能一触即达，慢慢读懂西四门楼</p>
+    <div class="quick-grid">
+      <a class="quick-card" href="quiz.html" aria-label="智能推荐"><img src="assets/icons/recommend.jpg" alt=""></a>
+      <a class="quick-card" href="map.html" aria-label="数字导览"><img src="assets/icons/guide.jpg" alt=""></a>
+      <a class="quick-card" href="gate-3d.html" aria-label="3D 展厅"><img src="assets/icons/exhibition.jpg" alt=""></a>
+      <a class="quick-card" href="route.html" aria-label="我的路线"><img src="assets/icons/my-route.jpg" alt=""></a>
+    </div>
+    <div class="recommend-panel" aria-live="polite">
+      <div class="recommend-head"><h3>今日推荐</h3><div class="recommend-controls"><button id="recommendPrev" type="button" aria-label="上一条推荐">‹</button><span id="recommendCount">1 / 3</span><button id="recommendNext" type="button" aria-label="下一条推荐">›</button></div></div>
+      <article class="recommend-slide active"><span>门楼故事 · 读门</span><h4>从金柱大门读懂院落礼序</h4><p>看看门扇的位置、门前的尺度，如何藏着一座院子的旧日规矩。</p></article>
+      <article class="recommend-slide"><span>胡同漫游 · 阅巷</span><h4>沿着西四北三条，慢行一段旧时光</h4><p>结合数字导览与沿途点位，发现门楼、故居和邻里记忆。</p></article>
+      <article class="recommend-slide"><span>文化体验 · 新颜</span><h4>在传统街巷里遇见当代生活</h4><p>从门楼故事出发，继续探索胡同里的文化空间与社区新业态。</p></article>
+    </div>
+  </section>
 
   <!-- ✨ 升级版序章区：国潮牌匾档案卡 + 结构化双卡 ✨ -->
   <section class="intro reveal" id="intro">
@@ -1323,5 +1341,6 @@ if ('IntersectionObserver' in window) {
   });
 })();
 </script>
+<script src="assets/site.js"></script>
 </body>
 </html>

@@ -130,6 +130,7 @@ summary::-webkit-details-marker{display: none;}
   #map{height: 320px;}
 }
 </style>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 
@@ -436,5 +437,6 @@ if (sessionStorage.getItem('mlAdmin') === '1') enter();
 
 var tt; function toast(m) { var t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 1800); }
 </script>
+<script src="assets/site.js"></script>
 </body>
 </html>

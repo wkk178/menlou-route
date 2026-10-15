@@ -1,0 +1,115 @@
+:root {
+  --door-gray: #6B5B4F;
+  --brick-green: #4A6B5A;
+  --site-gold: #B99143;
+  --accent-gold: #B99143;
+  --site-paper: #F5F1E8;
+  --bg-cream: #F5F1E8;
+  --site-ink: #2C2420;
+  --text-dark: #2C2420;
+  --white: #FFFFFF;
+}
+
+h1, h2, h3, h4, .page-title, .hero-title, .section-title {
+  font-family: "STSong", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
+}
+
+.site-controls {
+  position: fixed;
+  z-index: 1200;
+  top: calc(env(safe-area-inset-top) + 8px);
+  right: max(12px, calc((100vw - 480px) / 2 + 12px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 5px;
+  border: 1px solid rgba(107, 91, 79, .14);
+  border-radius: 15px;
+  background: rgba(255, 253, 248, .92);
+  box-shadow: 0 4px 14px rgba(40, 30, 20, .12);
+  backdrop-filter: blur(10px);
+}
+
+.site-control {
+  min-width: 42px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid rgba(107, 91, 79, .22);
+  border-radius: 12px;
+  background: #fffdf8;
+  color: #55463a;
+  font: 600 14px/1.2 "PingFang SC", "Microsoft YaHei", sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.site-control:hover, .site-control:focus-visible {
+  border-color: var(--site-gold);
+  outline: 2px solid rgba(185, 145, 67, .25);
+  outline-offset: 1px;
+}
+
+#site-menu-toggle { display: none; }
+
+.safety-notice {
+  position: fixed;
+  z-index: 1100;
+  right: 16px;
+  top: 18px;
+  max-width: min(380px, calc(100% - 32px));
+  padding: 10px 14px;
+  border: 1px solid rgba(185, 145, 67, .35);
+  border-radius: 12px;
+  background: rgba(255, 253, 248, .95);
+  color: #493b2c;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: 0 4px 14px rgba(40, 30, 20, .12);
+}
+
+.home-hub { margin: 22px 14px 28px; padding: 28px 16px; border-radius: 22px; background: linear-gradient(rgba(247,244,237,.92),rgba(255,253,248,.95)),url('backgrounds/brick-relief.jpg') center 42%/cover; box-shadow: 0 8px 24px rgba(67,51,37,.08); }
+.home-hub h2,.home-hub h3 { text-align: center; color: var(--door-gray); }
+.home-hub h2 { margin-bottom: 7px; font-size: 24px; }
+.home-hub > p { margin-bottom: 20px; text-align: center; color: #74685f; }
+.quick-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.quick-card { display: flex; min-height: 150px; flex-direction: column; align-items: center; justify-content: center; padding: 8px; border: 1px solid rgba(107,91,79,.12); border-radius: 17px; background: rgba(255,255,255,.92); color: var(--door-gray); text-decoration: none; font-weight: 700; box-shadow: 0 5px 16px rgba(67,51,37,.07); }
+.quick-card img { width: 126px; height: 126px; object-fit: contain; }
+.recommend-panel { margin-top: 22px; padding: 18px; border: 1px solid rgba(185,145,67,.25); border-radius: 18px; background: rgba(255,255,255,.88); }
+.recommend-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.recommend-controls { display: flex; align-items: center; gap: 8px; color: #74685f; }
+.recommend-controls button { width: 38px; height: 38px; border-radius: 50%; background: #f2e8d5; color: #795b26; font-size: 22px; touch-action: manipulation; }
+.recommend-slide { display: none; min-height: 94px; padding: 16px; border-radius: 14px; background: linear-gradient(110deg,#f4ecdc,#fffaf1); }
+.recommend-slide.active { display: block; animation: siteFade .3s ease; }
+.recommend-slide span { color: #98722f; font-size: 12px; font-weight: 700; }
+.recommend-slide h4 { margin: 6px 0; color: #40352d; }
+.recommend-slide p { color: #71665d; line-height: 1.6; }
+@keyframes siteFade { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.stage { background: linear-gradient(rgba(255,255,255,.88),rgba(242,239,231,.9)),url('backgrounds/brick-relief.jpg') center/cover !important; }
+.loading::before { content: ""; display: block; width: 48px; height: 48px; margin: 0 auto 8px; background: url('branding/menlou-emblem.png') center/contain no-repeat; animation: loadingPulse 1.4s ease-in-out infinite; }
+@keyframes loadingPulse { 0%,100% { opacity: .65; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
+
+body.elderly-mode { font-size: 19px !important; }
+body.elderly-mode :is(h1, h2, h3, h4, h5, p, a, button, label, li, small, .info-row, .stop-info, .desc-content, .section-header, .mode-switch, .legend, .legend-item, .marker-label, .meta, .meta-tag, .stat-label, .tag) {
+  font-size: max(1.15em, 18px) !important;
+  line-height: 1.65 !important;
+}
+body.elderly-mode :is(button, a, .option-card, .stop-item, .quick-card) { min-height: 48px; }
+body.elderly-mode .site-control { min-height: 48px; min-width: 48px; font-size: 16px !important; }
+body.elderly-mode .safety-notice { font-size: 16px !important; }
+body.elderly-mode #map .custom-marker > div > div:first-child { width: 42px !important; height: 42px !important; font-size: 17px !important; }
+
+@media (max-width: 768px) {
+  .site-controls { gap: 5px; }
+  .site-control { min-width: 38px; min-height: 40px; padding: 0 8px; }
+  .home-hub { margin: 18px 10px 24px; padding: 22px 12px; }
+  .home-hub h2 { font-size: 22px; }
+  .quick-card { min-height: 136px; }
+  .quick-card img { width: 116px; height: 116px; }
+  .recommend-panel { padding: 14px; }
+  .safety-notice { top: calc(env(safe-area-inset-top) + 58px); right: 12px; max-width: min(300px, calc(100% - 24px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
