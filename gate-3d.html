@@ -33,6 +33,8 @@ model-viewer{width: 100%; height: 100%; outline: none; --poster-color: transpare
 
 /* 信息面板 */
 .sheet{flex: 0 0 auto; max-height: 46%; overflow-y: auto; background: #fff; margin-top: 12px; padding: 18px 18px 16px; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 24px rgba(107,91,79,0.1);}
+.model-picker{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--gray);font-size:13px;}
+.model-picker select{min-width:0;flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#f9f6f0;color:var(--ink);font:inherit;}
 .gate-title{display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 19px; color: var(--gray);}
 .demo-badge{font-size: 11px; background: var(--red); color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 400;}
 .audio-section{margin: 12px 0; padding: 10px 12px; background: #f9f6f0; border-radius: 12px; display: flex; flex-direction: column; gap: 5px;}
@@ -78,6 +80,9 @@ audio{width: 100%; height: 36px;}
   </div>
 
   <section class="sheet">
+    <label class="model-picker" for="model-select">门楼模型
+      <select id="model-select" aria-label="选择门楼模型"></select>
+    </label>
     <h2 class="gate-title">
       <span id="m-title">金柱大门 · 数字化档案</span>
       <span class="demo-badge">技术原型展示</span>
@@ -127,9 +132,13 @@ const db = {
     audio: "n3.mp3",
     desc: `金柱大门属于屋宇式大门，门扇设置在中柱与前檐柱之间的金柱上。相对于广亮大门宽绰的门前空间，金柱大门的门前空间较少，其形制等级低于广亮大门。\n\n<span class="section-header">文化典故：分寸之间</span>\n明嘉靖年间，西四胡同有位五品官建宅，工匠问门制，他指着金柱说：“门扉安此处，外浅内深——少张扬，多自省。”门成，刻“静以修身”。后来人见金柱门皆道：这门不在阔气，在分寸。\n\n<span class="section-header">胡同记忆：打水的故事</span>\n家里的自来水不出水，要去36号院打水。老师家访时正好看见我去拎水，第二天在全班表扬。那时候冬天窗户上都是冰花，中午才化。洗澡还要去领澡票。\n\n<span class="section-header">胡同记忆：邻居丁阿姨</span>\n邻居丁阿姨总说自己“没啥可讲”，但大家记她唱歌识谱，自带文艺气质。国庆演出时，她清亮的歌声回荡在整条胡同里，那是胡同里最动听的声音。`
   },
-  "B1": { title: "无问西东 (北155号)", audio: "n3.mp3", desc: "门楼文化的商业转译点。通过 3D 展示现代精酿空间与传统门楼结构的共生美学。" },
-  "N1": { title: "圣祚隆长寺山门", audio: "n3.mp3", desc: "明代山门。随墙门形制，内置乾隆诗碑的数字化复原展示。" },
-  "N2": { title: "马福祥宅 11 号院", audio: "n3.mp3", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的牡丹砖雕。" }
+  "B1": { title: "无问西东 (北155号)", audio: "", desc: "门楼文化的商业转译点。通过 3D 展示现代精酿空间与传统门楼结构的共生美学。" },
+  "N1": { title: "圣祚隆长寺山门", audio: "", desc: "明代山门。随墙门形制，内置乾隆诗碑的数字化复原展示。" },
+  "N2": { title: "马福祥宅 11 号院 · 广亮大门", audio: "", desc: "广亮大门形制模型。马福祥故居是西四北三条保存较好的传统宅院之一。" },
+  "N39": { title: "程砚秋故居 · 如意门", audio: "", desc: "如意门形制模型。程砚秋故居位于西四北三条，保留了胡同院落的传统风貌。" },
+  "N5": { title: "三条 41—43 号 · 蛮子门", audio: "", desc: "蛮子门形制模型。门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。" },
+  "N11": { title: "三条 23 号 · 西洋门", audio: "", desc: "西洋门形制模型，展示近代胡同建筑中中西合璧的门楼风貌。" },
+  "N10": { title: "三条 45 号 · 随墙门", audio: "", desc: "随墙门形制模型。门洞顺应院墙开辟，质朴亲切，体现老北京胡同民居风貌。" }
 };
 
 const missingContent = {
@@ -148,14 +157,29 @@ const player = document.getElementById('gate-audio');
 if (content.audio) player.src = content.audio;
 else { player.hidden = true; }
 
-// OBJ/MTL 已转换为自包含 GLB；没有专属模型的点位不再复用演示模型。
+// 六种门楼形制模型均为自包含 GLB；其他点位不复用这些模型。
 const viewer = document.getElementById('gate-viewer');
 const modelState = document.getElementById('model-state');
-const modelByPoint = { N3: 'assets/models/jinzhu-gate/Jinzhu_Gate.glb' };
-const modelPath = modelByPoint[id || 'N3'];
+const availableModels = [
+  { id: 'N3', label: '金柱大门', path: 'assets/models/jinzhu-gate/Jinzhu_Gate.glb' },
+  { id: 'N39', label: '如意门', path: 'assets/models/ruyi-gate/Ruyi_Gate.glb' },
+  { id: 'N2', label: '广亮大门', path: 'assets/models/guangliang-gate/Guangliang_Gate.glb' },
+  { id: 'N5', label: '蛮子门', path: 'assets/models/manzi-gate/Manzi_Gate.glb' },
+  { id: 'N11', label: '西洋门', path: 'assets/models/western-gate/Western_Gate.glb' },
+  { id: 'N10', label: '随墙门', path: 'assets/models/suiqiang-gate/Suiqiang_Gate.glb' }
+];
+const modelSelect = document.getElementById('model-select');
+modelSelect.innerHTML = '<option value="">选择已建模门楼</option>' + availableModels.map(model => `<option value="${model.id}">${model.label}</option>`).join('');
+modelSelect.value = availableModels.some(model => model.id === id) ? id : (id ? '' : 'N3');
+modelSelect.addEventListener('change', () => {
+  if (modelSelect.value) location.href = `gate-3d.html?id=${encodeURIComponent(modelSelect.value)}`;
+});
+const selectedModel = availableModels.find(model => model.id === (id || 'N3'));
+const modelPath = selectedModel && selectedModel.path;
 const badge = document.querySelector('.demo-badge');
 if (modelPath) {
-  badge.textContent = '金柱大门 · 三维模型';
+  badge.textContent = `${selectedModel.label} · 三维模型`;
+  viewer.alt = `${selectedModel.label}三维形制模型`;
   viewer.hidden = false;
   viewer.addEventListener('progress', (event) => {
     const percent = Math.round((event.detail.totalProgress || 0) * 100);

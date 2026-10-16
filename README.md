@@ -50,7 +50,7 @@ menlou-route
 ├── user_data.json        问卷与路线历史记录
 ├── requirements.txt      后端依赖清单
 ├── demo.glb              旧版演示模型（不用于点位展示）
-├── assets/models/jinzhu-gate/ 金柱大门 OBJ/MTL 源文件与展厅 GLB
+├── assets/models/               六种门楼形制的 OBJ 源文件与展厅 GLB
 ├── tools/obj-to-glb.js    OBJ/MTL 转 GLB 工具（Node.js，无第三方依赖）
 ├── n3.mp3                讲解音频
 ├── bg-hero.jpg           首页背景图
@@ -70,7 +70,7 @@ menlou-route
 | index.html | 系统首页，展示项目主题及四个功能入口，并连接各功能页面 |
 | quiz.html | 问卷页面，采集游客偏好并提交至后端，获取路线后跳转地图页 |
 | map.html | 地图导览页面，加载并绘制路线，展示点位信息，嵌入 AI 问答组件 |
-| gate-3d.html | 3D 展厅页面，为已提供模型的点位加载模型；其余点位显示待补提示 |
+| gate-3d.html | 3D 展厅页面，支持六种门楼形制模型切换；其余点位显示待补提示 |
 | route.html | 路线详情页面，展示路线评分与逐站行程 |
 | about.html | 项目介绍页面 |
 | original-index.html | 首页的早期版本，仅作留存，不参与当前页面跳转 |
@@ -78,8 +78,9 @@ menlou-route
 | config.json | 路线推荐所用的主题、标签、人群权重，由后端读取并自动更新 |
 | user_data.json | 游客问卷及生成路线的历史记录，由后端自动写入 |
 | requirements.txt | 后端运行所需的 Python 依赖 |
-| assets/models/jinzhu-gate/Jinzhu_Gate.glb | 金柱大门展厅模型，约 8 MB |
-| assets/models/jinzhu-gate/Jinzhu_Gate.obj、Jinzhu_Gate.mtl | 艺术同学提供的模型源文件 |
+| assets/models/*/*.glb | 六种门楼形制的展厅模型（自包含 GLB） |
+| assets/models/*/*.obj | 艺术同学提供的金柱门及五种门型 OBJ 源文件 |
+| assets/models/traditional-gate-materials.mtl | 压缩包未附其余五个 OBJ 所引用的 MTL；该共享材质表为模型提供一致的传统建筑色彩 |
 | tools/obj-to-glb.js | 不依赖第三方库的 OBJ/MTL 转 GLB 工具 |
 | demo.glb | 旧版演示素材，当前点位不使用 |
 | n3.mp3 | 3D 展厅使用的讲解音频 |
@@ -90,7 +91,7 @@ menlou-route
 
 首页在主视觉下方提供四个大尺寸功能入口与可手动滑动、自动切换的推荐卡片。首页和 3D 展厅使用美工提供的浅色砖雕背景。全站提供中英界面切换、可记忆的适老大字模式；地图与展厅显示步行和居民院落安全提示。移动端导航收纳在页眉菜单中。
 
-展厅现已接入美工提供的金柱大门 OBJ/MTL 模型，并转换为自包含 GLB 用于 N3（13 号院金柱大门）。六座门楼目前接入 1/6，尚缺另外 5 座的独立模型文件。转换源文件保存在 `assets/models/jinzhu-gate/`，可用 `node tools/obj-to-glb.js <model.obj> <model.mtl> <output.glb>` 重新生成。未提供模型的点位会显示“模型待补”，不会复用其他门楼模型。旧 `demo.glb` 暂保留作历史演示素材。
+展厅已接入六种门楼形制模型，并可通过展厅下拉菜单切换：N3 金柱大门、N39 如意门、N2 广亮大门、N5 蛮子门、N11 西洋门、N10 随墙门。除金柱门外，其余五个模型来自后续提供的压缩包；压缩包没有附带对应 MTL，项目为这些 OBJ 配套了共享材质表 `assets/models/traditional-gate-materials.mtl`。每个模型均转换为自包含 GLB。可使用 `node tools/obj-to-glb.js <model.obj> <material.mtl> <output.glb>` 重新生成；其他未匹配点位仍显示“模型待补”，不会误用不对应的模型。旧 `demo.glb` 暂保留作历史演示素材。
 
 ## 5 说明
 
