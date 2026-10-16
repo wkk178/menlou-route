@@ -1,0 +1,184 @@
+newmtl brick
+Kd 0.47 0.48 0.46
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl brick_light
+Kd 0.54 0.55 0.51
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl brick_dark
+Kd 0.42 0.44 0.42
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl mortar
+Kd 0.37 0.39 0.37
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl plaster
+Kd 0.85 0.83 0.75
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl stone
+Kd 0.66 0.65 0.59
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl stone_dark
+Kd 0.55 0.55 0.5
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl tile
+Kd 0.34 0.37 0.36
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl tile2
+Kd 0.38 0.4 0.38
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl ridge
+Kd 0.45 0.47 0.44
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl wood_frame
+Kd 0.39 0.16 0.11
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl wood_door
+Kd 0.53 0.2 0.14
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl wood_seam
+Kd 0.4 0.14 0.1
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl paint_trim
+Kd 0.32 0.39 0.32
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl paint_gold
+Kd 0.64 0.51 0.29
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl metal
+Kd 0.43 0.35 0.21
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl golden_column_ochre
+Kd 0.74 0.55 0.28
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl eave_column_ochre
+Kd 0.62 0.43 0.23
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl carved_brick
+Kd 0.56 0.57 0.53
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl relief_highlight
+Kd 0.64 0.64 0.58
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl carved_stone
+Kd 0.68 0.68 0.62
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl paint_blue
+Kd 0.23 0.34 0.36
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+
+newmtl dark_window
+Kd 0.19 0.24 0.22
+Ka 0.10 0.10 0.10
+Ks 0.03 0.03 0.03
+Ns 12
+d 1
+illum 2
+

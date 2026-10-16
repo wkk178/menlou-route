@@ -26,6 +26,9 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 /* 3D 视图 */
 .stage{flex: 1 1 auto; min-height: 200px; position: relative; margin: 0 12px; border-radius: 20px; overflow: hidden; background: radial-gradient(#ffffff, #e2ddd3);}
 model-viewer{width: 100%; height: 100%; outline: none; --poster-color: transparent;}
+.model-state{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;text-align:center;color:#6B5B4F;font-size:14px;line-height:1.6;pointer-events:none;}
+.model-state[hidden],model-viewer[hidden]{display:none;}
+.model-state::before{content:"";width:48px;height:48px;background:url('assets/branding/menlou-emblem.png') center/contain no-repeat;}
 .hint{position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font-size: 11px; color: #8a7f76; background: rgba(255,255,255,0.8); padding: 3px 12px; border-radius: 12px; pointer-events: none;}
 
 /* 信息面板 */
@@ -69,7 +72,8 @@ audio{width: 100%; height: 36px;}
   </header>
 
   <div class="stage">
-    <model-viewer id="gate-viewer" src="demo.glb" auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto"></model-viewer>
+    <model-viewer id="gate-viewer" hidden auto-rotate camera-controls shadow-intensity="1" ar loading="eager" interaction-prompt="auto" alt="金柱大门三维模型"></model-viewer>
+    <div class="model-state" id="model-state" role="status" aria-live="polite">正在准备门楼模型…</div>
     <span class="hint">单指旋转 · 双指缩放</span>
   </div>
 
@@ -116,7 +120,7 @@ audio{width: 100%; height: 36px;}
 const params = new URLSearchParams(window.location.search);
 const id = params.get('id');
 
-// 内容数据库：金柱大门作为终极兜底内容
+// 内容数据库：只为已核对的点位展示对应档案
 const db = {
   "N3": {
     title: "13号院 · 金柱大门",
@@ -128,19 +132,42 @@ const db = {
   "N2": { title: "马福祥宅 11 号院", audio: "n3.mp3", desc: "广亮大门典型。通过 3D 拆解可清晰查看门簪、雀替及极其考究的牡丹砖雕。" }
 };
 
-// 核心逻辑：如果找不到 ID 或没有 ID，统一指向 N3
-let content = db[id] ? db[id] : db["N3"];
+const missingContent = {
+  title: id ? "点位档案 · 模型待补" : db.N3.title,
+  audio: "",
+  desc: "该点位专属的门楼模型与讲解资料尚未导入。当前仅展示占位说明，请勿将其他门楼模型视为本点位实景。"
+};
+const content = id ? (db[id] || missingContent) : db.N3;
 
 // 渲染标题和文字
 document.getElementById('m-title').innerHTML = content.title;
 document.getElementById('m-desc').innerHTML = content.desc;
 
-// 强制加载音频
+// 只播放当前点位已登记的讲解音频
 const player = document.getElementById('gate-audio');
-player.src = content.audio;
+if (content.audio) player.src = content.audio;
+else { player.hidden = true; }
 
-// 强制加载模型
-document.getElementById('gate-viewer').src = "demo.glb";
+// OBJ/MTL 已转换为自包含 GLB；没有专属模型的点位不再复用演示模型。
+const viewer = document.getElementById('gate-viewer');
+const modelState = document.getElementById('model-state');
+const modelByPoint = { N3: 'assets/models/jinzhu-gate/Jinzhu_Gate.glb' };
+const modelPath = modelByPoint[id || 'N3'];
+const badge = document.querySelector('.demo-badge');
+if (modelPath) {
+  badge.textContent = '金柱大门 · 三维模型';
+  viewer.hidden = false;
+  viewer.addEventListener('progress', (event) => {
+    const percent = Math.round((event.detail.totalProgress || 0) * 100);
+    modelState.textContent = percent ? `门楼模型加载中 ${percent}%` : '门楼模型加载中…';
+  });
+  viewer.addEventListener('load', () => { modelState.hidden = true; });
+  viewer.addEventListener('error', () => { modelState.textContent = '模型加载失败，请检查网络或模型文件后重试。'; });
+  viewer.src = modelPath;
+} else {
+  badge.textContent = '模型资源待补';
+  modelState.textContent = '该点位的专属 3D 模型尚未提供，当前仅展示档案信息。';
+}
 
 // 返回：有来源页则回退，否则去全部景点地图
 function goBack() {

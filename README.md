@@ -49,13 +49,15 @@ menlou-route
 ├── config.json           推荐权重配置
 ├── user_data.json        问卷与路线历史记录
 ├── requirements.txt      后端依赖清单
-├── demo.glb              门楼 3D 模型
+├── demo.glb              旧版演示模型（不用于点位展示）
+├── assets/models/jinzhu-gate/ 金柱大门 OBJ/MTL 源文件与展厅 GLB
+├── tools/obj-to-glb.js    OBJ/MTL 转 GLB 工具（Node.js，无第三方依赖）
 ├── n3.mp3                讲解音频
 ├── bg-hero.jpg           首页背景图
 ├── assets/icons/         首页功能入口图
 ├── assets/backgrounds/   砖雕纹理背景
 ├── assets/branding/      门楼加载标识
-├── assets/site.css       全站字体、适老化与移动菜单样式
+├── assets/site.css       全站字体、适老化与移动端样式
 ├── assets/site.js        中英切换与适老化状态
 ├── assets/route-engine.js 离线示例路线生成
 └── hello.txt             测试文件
@@ -65,10 +67,10 @@ menlou-route
 
 | 文件 | 说明 |
 | --- | --- |
-| index.html | 系统首页，展示项目主题及三大体验入口，并连接各功能页面 |
+| index.html | 系统首页，展示项目主题及四个功能入口，并连接各功能页面 |
 | quiz.html | 问卷页面，采集游客偏好并提交至后端，获取路线后跳转地图页 |
 | map.html | 地图导览页面，加载并绘制路线，展示点位信息，嵌入 AI 问答组件 |
-| gate-3d.html | 3D 展厅页面，按点位编号加载对应的模型说明、音频与文字档案 |
+| gate-3d.html | 3D 展厅页面，为已提供模型的点位加载模型；其余点位显示待补提示 |
 | route.html | 路线详情页面，展示路线评分与逐站行程 |
 | about.html | 项目介绍页面 |
 | original-index.html | 首页的早期版本，仅作留存，不参与当前页面跳转 |
@@ -76,7 +78,10 @@ menlou-route
 | config.json | 路线推荐所用的主题、标签、人群权重，由后端读取并自动更新 |
 | user_data.json | 游客问卷及生成路线的历史记录，由后端自动写入 |
 | requirements.txt | 后端运行所需的 Python 依赖 |
-| demo.glb | 3D 展厅使用的门楼模型文件 |
+| assets/models/jinzhu-gate/Jinzhu_Gate.glb | 金柱大门展厅模型，约 8 MB |
+| assets/models/jinzhu-gate/Jinzhu_Gate.obj、Jinzhu_Gate.mtl | 艺术同学提供的模型源文件 |
+| tools/obj-to-glb.js | 不依赖第三方库的 OBJ/MTL 转 GLB 工具 |
+| demo.glb | 旧版演示素材，当前点位不使用 |
 | n3.mp3 | 3D 展厅使用的讲解音频 |
 | bg-hero.jpg | 首页背景图片 |
 | hello.txt | 测试文件 |
@@ -85,7 +90,7 @@ menlou-route
 
 首页在主视觉下方提供四个大尺寸功能入口与可手动滑动、自动切换的推荐卡片。首页和 3D 展厅使用美工提供的浅色砖雕背景。全站提供中英界面切换、可记忆的适老大字模式；地图与展厅显示步行和居民院落安全提示。移动端导航收纳在页眉菜单中。
 
-当前仓库只包含 `demo.glb` 一个门楼模型，文件约 8 MB，页面仅将其用于 13 号院金柱大门。其他门楼可以查看文字档案，但会提示专属模型待补；请补充每个门楼独立导出的 `.glb` 文件后再登记到 `gate-3d.html`，不要复用演示模型冒充对应建筑。
+展厅现已接入美工提供的金柱大门 OBJ/MTL 模型，并转换为自包含 GLB 用于 N3（13 号院金柱大门）。六座门楼目前接入 1/6，尚缺另外 5 座的独立模型文件。转换源文件保存在 `assets/models/jinzhu-gate/`，可用 `node tools/obj-to-glb.js <model.obj> <model.mtl> <output.glb>` 重新生成。未提供模型的点位会显示“模型待补”，不会复用其他门楼模型。旧 `demo.glb` 暂保留作历史演示素材。
 
 ## 5 说明
 
