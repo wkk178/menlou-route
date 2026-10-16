@@ -270,10 +270,6 @@
 (function () {
   'use strict';
 
-  // 全部 23 处蓝圈点位数据
-  // 已修正：
-  // 1) 易应茶舍(B2)、无问西东精酿(B1) 向右移至西四北大街路边 (lng: 116.37338~116.37342)
-  // 2) 叙杯(B3)、无名蹄花(B4) 向右移至赵登禹路右侧路边 (lng: 116.36765~116.36758)
   var NODES = [
     {
         "id": "W1",
@@ -619,21 +615,16 @@
     }
 ];
 
-  // =========================================================================
-  // 真实胡同路网步行导航引擎（解决直线穿墙问题，100%还原胡同+大街真实步行轨迹）
-  // =========================================================================
   var JUNCTIONS = {
-    // 西四北大街沿线节点（东侧主干道，由北向南）
     E_N:  {id: 'E_N',  lat: 39.92975, lng: 116.37332, street: 'xisi_ave'},
-    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'}, // 五条东口
-    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'}, // 四条东口
-    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'}, // 三条东口
+    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'},
+    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'},
+    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'},
     E_S:  {id: 'E_S',  lat: 39.92755, lng: 116.37340, street: 'xisi_ave'},
-    // 赵登禹路沿线节点（西侧主干道，由北向南）
     W_N:  {id: 'W_N',  lat: 39.92960, lng: 116.36772, street: 'zhaodengyu'},
-    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'}, // 五条西口
-    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'}, // 四条西口
-    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}  // 三条西口
+    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'},
+    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'},
+    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}
   };
 
   function haversine(a, b) {
@@ -644,7 +635,6 @@
     return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   }
 
-  // 构建真实路网拓扑图：东西向胡同仅连接各自东口与西口，南北向仅沿西四北大街和赵登禹路通行
   function buildRoadGraph() {
     var graphNodes = {};
     var adj = {};
@@ -661,23 +651,18 @@
     for (var k in JUNCTIONS) addN(k, JUNCTIONS[k]);
     NODES.forEach(function (n) { addN(n.id, n); });
 
-    // 1. 西四北五条：W5_W (西口) -> L5 -> W1 -> W5_E (东口)
     var wutiao = ['W5_W', 'L5', 'W1', 'W5_E'];
     for (var i = 0; i < wutiao.length - 1; i++) addEdge(wutiao[i], wutiao[i+1]);
 
-    // 2. 西四北四条：W4_W (西口) -> S4 -> S3 -> S2 -> S1 -> W4_E (东口)
-    var sitiao = ['W4_W', 'S4', 'S3', 'S2', 'S1', 'W4_E'];
+    var sitiao = ['W4_W', 'S_SUI', 'S_MAN', 'S4', 'S_JIN', 'S3', 'S2', 'S1', 'W4_E'];
     for (var i = 0; i < sitiao.length - 1; i++) addEdge(sitiao[i], sitiao[i+1]);
 
-    // 3. 西四北三条：W3_W (西口) -> N10 -> N5 -> N39 -> N4 -> N3 -> N11 -> N12 -> N2 -> N1 -> W3_E (东口)
-    var santiao = ['W3_W', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'W3_E'];
+    var santiao = ['W3_W', 'N39', 'N12', 'N2', 'N1', 'W3_E'];
     for (var i = 0; i < santiao.length - 1; i++) addEdge(santiao[i], santiao[i+1]);
 
-    // 4. 西四北大街（由北向南串联所有路口与沿街店铺）
     var xisi = ['E_N', 'B5', 'W5_E', 'B6', 'W4_E', 'B7', 'B8', 'W3_E', 'B2', 'B1', 'E_S'];
     for (var i = 0; i < xisi.length - 1; i++) addEdge(xisi[i], xisi[i+1]);
 
-    // 5. 赵登禹路（由北向南串联西口与沿街店铺）
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
@@ -686,7 +671,6 @@
 
   var ROAD_GRAPH = buildRoadGraph();
 
-  // 使用 Dijkstra 在真实胡同路网中计算任意两点间的步行导航路径与真实步行距离
   function findWalkingSegment(fromId, toId) {
     var G = ROAD_GRAPH;
     if (!G.nodes[fromId] || !G.nodes[toId]) return {dist: 0, path: []};
@@ -719,7 +703,6 @@
     return {dist: dist[toId], path: path};
   }
 
-  // 计算整条路线（多个站点依次串联）的完整步行导航轨迹和总步行距离
   function buildFullWalkingRoute(stopNodes) {
     if (!stopNodes || stopNodes.length < 2) {
       return {
@@ -732,15 +715,14 @@
       var seg = findWalkingSegment(stopNodes[i].id, stopNodes[i+1].id);
       totalDist += seg.dist;
       for (var j = 0; j < seg.path.length; j++) {
-        if (i > 0 && j === 0) continue; // 避免重复连接点
+        if (i > 0 && j === 0) continue;
         fullPath.push(seg.path[j]);
       }
     }
     return {distanceMeters: totalDist, path: fullPath};
   }
 
-  // 预设 5 条官方主题路线（支持通过 URL ?preset=1..5 直接调用）
-  var OFFICIAL_ROUTES = {
+var OFFICIAL_ROUTES = {
     '1': {
       title: '【门楼图鉴】古建寻访线',
       ids: ['S1', 'S2', 'S3', 'S_JIN', 'S4', 'S_MAN', 'S_SUI'],
@@ -768,8 +750,8 @@
     }
   };
 
-  var WALK_SPEED = 75;   // 胡同漫步速度：约 75 米/分钟
-  var DIST_WEIGHT = 12;  // 每多走 12 米真实胡同路网距离，折算扣 1 分
+  var WALK_SPEED = 75;
+  var DIST_WEIGHT = 12;
   var MAX_STOPS = 8;
   var THEME_KEY = {read: '读门', push: '推门', create: '创门'};
 
@@ -834,7 +816,6 @@
 
   function generateRoute(answers) {
     var a = answers || {};
-    // 若指定了 5 条官方主题路线编号，直接按该路线生成真实步行导航数据
     if (a.preset && OFFICIAL_ROUTES[a.preset]) {
       var presetCfg = OFFICIAL_ROUTES[a.preset];
       var presetNodes = presetCfg.ids.map(function (id) {
@@ -851,7 +832,6 @@
       var best = null, bestV = -Infinity, bestT = 0;
       for (var i = 0; i < pool.length; i++) {
         var n = pool[i];
-        // 使用真实胡同路网步行距离替代原本的直线距离！
         var d = findWalkingSegment(curId, n.id).dist;
         var t = Math.round(d / WALK_SPEED) + n.stay;
         if (time + t > duration) continue;
@@ -881,16 +861,11 @@
     const QS = new URLSearchParams(location.search);
     const CAL = QS.get('calibrate') === '1';
     const FREE = CAL || QS.get('mode') === 'free';
-    // 可选：如果你申请了高德 Web 服务 Key，填入此处即可额外请求高德云端步行 API；留空则自动使用内置胡同路网步行导航引擎
     const AMAP_WEB_KEY = '';
 
     let map, markers = [], routeLine, routeBgLine, currentRoute = [];
     let gpsMarker = null, gpsCircle = null, lastGpsPos = null, simTimer = null;
 
-    // =========================================================================
-    // WGS-84 (浏览器原始 GPS) 转 GCJ-02 (高德地图火星坐标系) 算法
-    // 解决国内地图定位偏移 500 米的核心问题
-    // =========================================================================
     function wgs84ToGcj02(lat, lng) {
       const a = 6378245.0, ee = 0.00669342162296594323;
       function transformLat(x, y) {
@@ -960,12 +935,11 @@
       gpsMarker.bindPopup(`<div style="font-size:13px;font-weight:600;color:#1677FF;">📍 ${labelText || '您的当前位置'}</div>`);
     }
 
-    // 启动实时定位小蓝点跟踪
     function startLiveLocation() {
       if (!navigator.geolocation) return;
       navigator.geolocation.watchPosition(
         pos => {
-          if (simTimer) return; // 如果正在演示胡同内模拟漫步，则不覆盖
+          if (simTimer) return;
           const gcj = wgs84ToGcj02(pos.coords.latitude, pos.coords.longitude);
           updateBlueDot(gcj.lat, gcj.lng, pos.coords.accuracy, '您的当前位置');
         },
@@ -974,7 +948,6 @@
       );
     }
 
-    // 点击右上角定位按钮：若用户在西四附近则直接居中定位；若在异地/室内则提供实时定位与胡同内漫步跟随演示
     function handleLocateClick() {
       const btn = document.getElementById('locate-btn');
       if (simTimer) {
@@ -995,7 +968,6 @@
         }
       }
 
-      // 若用户当前不在西四胡同现场（例如在学校/家中调试演示），开启胡同内实时移动蓝点跟随体验
       startSimulatedWalk();
     }
 
@@ -1004,7 +976,6 @@
       const pts = nav.path;
       if (!pts || pts.length < 2) return;
 
-      // 将路径细分为平滑步进点，模拟真实人走路时小蓝点平滑移动
       const dense = [];
       for (let i = 0; i < pts.length - 1; i++) {
         const a = pts[i], b = pts[i+1];
@@ -1099,7 +1070,6 @@
         if (fi > -1) setTimeout(() => focusStop(fi), 300);
     }
 
-    // 若配置了高德 Web 服务 Key，支持拉取高德步行导航 API 折线；默认使用内置胡同真实路网步行导航轨迹
     async function drawWalkingRouteLine(nodes, savedData) {
         if (routeLine) map.removeLayer(routeLine);
         if (routeBgLine) map.removeLayer(routeBgLine);
@@ -1136,7 +1106,6 @@
             } catch (e) {}
         }
 
-        // 绘制高德步行导航风格的双层路线（浅色描边底座 + 醒目主路线）
         routeBgLine = L.polyline(pathCoords, {
             color: '#FFFFFF',
             weight: 8,
