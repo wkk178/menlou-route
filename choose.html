@@ -211,16 +211,16 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   var $ = function (id) { return document.getElementById(id); };
 
   // 快速出发：直接带着预设答案进入地图页，由地图页生成路线
-    var PRESETS = [
-    {icon: '🏛', bg: '#F5E8CC', title: '路线一：门楼图鉴', desc: '古建寻访线 · 六大门楼与麒麟图门墩', time: '约 1-1.5小时',
+      var PRESETS = [
+    {icon: '🏛', bg: '#F5E8CC', title: '【门楼图鉴】', desc: '古建寻访线 · 六大门楼全解', time: '1-1.5小时',
      q: 'preset=1'},
-    {icon: '📜', bg: '#DCE9E1', title: '路线二：古巷寻踪', desc: '名人与历史线 · 故居与电影局旧址', time: '约 1.5-2小时',
+    {icon: '📜', bg: '#DCE9E1', title: '【古巷寻踪】', desc: '名人与历史线 · 读懂时代变迁', time: '1.5-2小时',
      q: 'preset=2'},
-    {icon: '🍵', bg: '#F6E3DF', title: '路线三：胡同烟火', desc: '文商体验线 · 茶社、蹄花与老字号', time: '约 1-1.5小时',
+    {icon: '🍵', bg: '#F6E3DF', title: '【胡同烟火】', desc: '文商体验线 · 品茶饮与老字号', time: '1-1.5小时',
      q: 'preset=3'},
-    {icon: '🧭', bg: '#E4DED6', title: '路线四：全景漫游', desc: '全览大环线 · 三条胡同一次走完', time: '约 2.5-3小时',
+    {icon: '🧭', bg: '#E4DED6', title: '【全景漫游】', desc: '三条胡同大环线 · 完整社区考察', time: '2.5-3小时',
      q: 'preset=4'},
-    {icon: '🍶', bg: '#E2E8F0', title: '路线五：微醺漫步', desc: '精酿清酒线 · 安静品鉴与茶舍收尾', time: '约 1-1.5小时',
+    {icon: '🍶', bg: '#E2E8F0', title: '【微醺漫步】', desc: '精酿清酒线 · 安静型品鉴体验', time: '1-1.5小时',
      q: 'preset=5'}
   ];
   PRESETS.forEach(function (p) {

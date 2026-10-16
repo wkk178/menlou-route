@@ -21,7 +21,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .summary::after{content: '🏮'; position: absolute; right: 14px; top: 8px; font-size: 54px; opacity: 0.22;}
 .summary small{font-size: 12px; opacity: 0.9; letter-spacing: 2px;}
 .summary h2{font-size: 21px; margin: 4px 0 16px; letter-spacing: 2px;}
-.nums{display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;}
+.nums{display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;}
 .num{background: rgba(255,255,255,0.18); border-radius: 12px; padding: 10px 4px; text-align: center;}
 .num b{display: block; font-size: 22px; line-height: 1.2;}
 .num b i{font-style: normal; font-size: 12px; font-weight: 400; margin-left: 2px;}
@@ -78,7 +78,6 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .tab svg{width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;}
 .tab.active{color: var(--red); font-weight: 600;}
 </style>
-<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <div class="app">
@@ -143,7 +142,8 @@ function loadRoute() {
 
   html += '<section class="summary"><small>基于您的偏好智能规划</small><h2>您的专属路线已生成</h2>' +
     '<div class="nums">' +
-    '<div class="num"><b>' + esc(data.totalTime) + '<i>分钟</i></b><span>预计用时</span></div>' +
+    '<div class="num"><b>' + esc(data.totalTime) + '<i>分钟</i></b><span>总计用时</span></div>' +
+    '<div class="num"><b>' + esc(stops.reduce(function(acc, n) { return acc + (n.stay || 15); }, 0)) + '<i>分钟</i></b><span>观光时间</span></div>' +
     '<div class="num"><b>' + esc(data.distance) + '<i>公里</i></b><span>步行距离</span></div>' +
     '<div class="num"><b>' + stops.length + '<i>处</i></b><span>途经景点</span></div></div></section>';
 
@@ -176,6 +176,5 @@ function loadRoute() {
 }
 loadRoute();
 </script>
-<script src="assets/site.js"></script>
 </body>
 </html>
