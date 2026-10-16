@@ -19,6 +19,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--cream); position: relative;
      padding-bottom: calc(78px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12);}
 
+/* ---------- 顶部主视觉 ---------- */
 .hero{position: relative; height: 250px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0;
       background: linear-gradient(rgba(44,36,32,0.30), rgba(44,36,32,0.70)), url('bg-hero.jpg') center / cover no-repeat, linear-gradient(135deg, #6B5B4F, #4A6B5A);}
 .hero-bar{display: flex; justify-content: space-between; align-items: center;}
@@ -28,6 +29,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .hero h1{font-size: 28px; line-height: 1.25; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.4);}
 .hero p{font-size: 13px; opacity: 0.9; margin-top: 6px; letter-spacing: 1px;}
 
+/* ---------- 两个主入口 ---------- */
 .entries{display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: -42px 16px 0; position: relative; z-index: 2;}
 .entry{position: relative; overflow: hidden; border-radius: 18px; padding: 16px 14px 14px; min-height: 158px; color: #fff; display: flex; flex-direction: column;
        box-shadow: 0 10px 24px rgba(107, 91, 79, 0.28); transition: transform 0.15s;}
@@ -42,6 +44,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .entry.free .go{color: #3E5C4D;}
 .entry.smart .go{color: #A93027;}
 
+/* ---------- 继续上次路线 ---------- */
 .resume{display: flex; align-items: center; gap: 12px; margin: 14px 16px 0; padding: 12px 14px; background: #fff; border-radius: 14px; box-shadow: 0 4px 14px rgba(107, 91, 79, 0.1);}
 .resume[hidden]{display: none;}
 .resume .ico{width: 40px; height: 40px; border-radius: 12px; background: #F6E3DF; color: var(--red); display: flex; align-items: center; justify-content: center; font-size: 20px;}
@@ -50,6 +53,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .resume .txt span{font-size: 12px; color: #8a7f76;}
 .resume .arrow{color: #b5aca3; font-size: 20px;}
 
+/* ---------- 护照入口 ---------- */
 .pp{display: flex; align-items: center; gap: 14px; margin: 14px 16px 0; padding: 14px 16px; border-radius: 16px; color: #F3E3B8; background: radial-gradient(circle at 20% 20%, #3f6150, #27402F 75%); box-shadow: 0 8px 20px rgba(39,64,47,0.28); position: relative; overflow: hidden;}
 .pp::after{content: ''; position: absolute; right: 20px; top: 0; bottom: 0; width: 8px; background: linear-gradient(90deg, #7d2a22, #B8382E, #7d2a22); opacity: 0.85;}
 .pp .pi{flex: 0 0 44px; height: 44px; border-radius: 50%; border: 1.5px solid #E8CF8E; display: flex; align-items: center; justify-content: center;}
@@ -58,11 +62,13 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .pp span{font-size: 12px; opacity: 0.85;}
 .pp .go{margin-left: auto; margin-right: 22px; font-size: 13px; font-weight: 700; color: #E8CF8E;}
 
+/* ---------- 区块 ---------- */
 .block{margin-top: 24px; padding: 0 16px;}
 .block-head{display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px;}
 .block-head h3{font-size: 17px; padding-left: 9px; border-left: 4px solid var(--red); line-height: 1.1;}
 .block-head small{font-size: 12px; color: #8a7f76;}
 
+/* 快速出发 */
 .presets{display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
 .preset{display: block; width: 100%; background: #fff; border-radius: 14px; padding: 13px 12px 11px; text-align: left; box-shadow: 0 3px 12px rgba(107, 91, 79, 0.08); transition: transform 0.15s;}
 .preset:active{transform: scale(0.97);}
@@ -73,6 +79,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .preset .meta{display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--gray);}
 .preset .meta i{font-style: normal; color: var(--red); font-weight: 600;}
 
+/* 热门景点 */
 .spots{display: flex; gap: 10px; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 8px; scroll-snap-type: x proximity; scrollbar-width: none;}
 .spots::-webkit-scrollbar{display: none;}
 .spot{flex: 0 0 132px; scroll-snap-align: start; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 12px rgba(107, 91, 79, 0.1); transition: transform 0.15s;}
@@ -85,6 +92,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 .spot .info b{display: block; font-size: 13px; line-height: 1.3; min-height: 34px;}
 .spot .info span{font-size: 11px; color: #8a7f76;}
 
+/* 小贴士 */
 .tips{background: #fff; border-radius: 14px; padding: 6px 14px; box-shadow: 0 3px 12px rgba(107, 91, 79, 0.08);}
 .tip{display: flex; gap: 10px; padding: 11px 0; font-size: 13px; line-height: 1.55; color: #4d433c;}
 .tip + .tip{border-top: 1px solid var(--line);}
@@ -92,6 +100,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 
 .foot{text-align: center; font-size: 11px; color: #a39a91; margin: 26px 0 6px;}
 
+/* ---------- 底部标签栏 ---------- */
 .tabbar{position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 480px; z-index: 50; display: flex;
         background: rgba(255,255,255,0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
         border-top: 1px solid var(--line); padding: 7px 0 calc(7px + env(safe-area-inset-bottom));}
@@ -104,14 +113,15 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   .entry h2{font-size: 19px;}
 }
 </style>
-<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <div class="app">
 
+  <!-- 主视觉 -->
   <header class="hero">
     <div class="hero-bar">
-      <span class="pill">📍 西四北三条至五条 · 西城区</span>
+      <span class="pill">📍 西四北三条 · 西城区</span>
+      <a class="pill" href="about.html">项目介绍 ›</a>
     </div>
     <div class="hero-text">
       <span class="hero-tag">社区文商活化计划</span>
@@ -120,49 +130,55 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
     </div>
   </header>
 
+  <!-- 两种游览方式 -->
   <section class="entries">
     <a class="entry free" href="map.html?mode=free">
       <span class="mark">🚶</span>
       <span class="badge">无需答题</span>
       <h2>自主游览</h2>
-      <p>地图上查看全部 <span id="nodeCount">23</span> 处景点，想去哪就去哪</p>
+      <p>地图上查看全部 <span id="nodeCount">15</span> 处景点，想去哪就去哪</p>
       <span class="go">立即进入 ›</span>
     </a>
     <a class="entry smart" href="quiz.html">
       <span class="mark">🎯</span>
       <span class="badge">约 1 分钟</span>
       <h2>智能推荐</h2>
-      <p>回答 4 个问题，为你定制专属步行路线</p>
+      <p>回答 5 个问题，为你定制专属步行路线</p>
       <span class="go">开始定制 ›</span>
     </a>
   </section>
 
+  <!-- 继续上次路线 -->
   <a class="resume" id="resume" href="map.html" hidden>
     <span class="ico">🧭</span>
     <span class="txt"><b>继续上次路线</b><span id="resumeMeta"></span></span>
     <span class="arrow">›</span>
   </a>
 
+  <!-- 电子护照 -->
   <a class="pp" href="passport.html">
     <span class="pi"><svg viewBox="0 0 48 48" fill="none" stroke="#E8CF8E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L24 8l18 12"/><path d="M11 20v20M37 20v20"/><path d="M17 40V24h14v16"/><path d="M4 40h40"/></svg></span>
     <div><b>胡同漫游护照</b><span id="ppText">打卡盖章，集齐领取漫游证书</span></div>
     <span class="go">翻开 ›</span>
   </a>
 
+  <!-- 快速出发 -->
   <section class="block">
     <div class="block-head"><h3>快速出发</h3><small>点一下，立即生成路线</small></div>
     <div class="presets" id="presets"></div>
   </section>
 
+  <!-- 热门景点 -->
   <section class="block">
     <div class="block-head"><h3>热门景点</h3><small>点击在地图上查看</small></div>
     <div class="spots" id="spots"></div>
   </section>
 
+  <!-- 小贴士 -->
   <section class="block">
     <div class="block-head"><h3>游览小贴士</h3></div>
     <div class="tips">
-      <div class="tip"><span class="n">1</span><span>胡同更是居民的家，请轻声慢步，不外放不聚集；做胡同里最温柔的过客。</span></div>
+      <div class="tip"><span class="n">1</span><span>胡同内多为居民住宅，请轻声慢行，勿打扰居民生活。</span></div>
       <div class="tip"><span class="n">2</span><span>全程步行，建议穿舒适的鞋，根据时间选择路线长度。</span></div>
       <div class="tip"><span class="n">3</span><span>在地图上点击点位，可查看简介并进入 3D 门楼档案。</span></div>
     </div>
@@ -171,6 +187,7 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   <p class="foot">门楼层记 · 故事里</p>
 </div>
 
+<!-- 底部标签栏 -->
 <nav class="tabbar">
   <a class="tab" href="index.html">
     <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>首页
@@ -193,15 +210,18 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 (function () {
   var $ = function (id) { return document.getElementById(id); };
 
-  var PRESETS = [
-    {icon: '⏱', bg: '#F5E8CC', title: '一小时精华游', desc: '时间不多，走最值得看的门楼与老宅', time: '约 1 小时',
-     q: 'theme=mixed&duration=60&profile=independent&tags=architecture,history&avoid=0'},
-    {icon: '👨‍👧', bg: '#DCE9E1', title: '亲子研学', desc: '认六种门楼、听故居故事，适合带孩子', time: '约 1.5 小时',
-     q: 'theme=read&duration=90&profile=family&tags=architecture,history&avoid=1'},
-    {icon: '🍵', bg: '#F6E3DF', title: '胡同烟火', desc: '茶社、老字号与微醺精酿品鉴', time: '约 1.5 小时',
-     q: 'theme=create&duration=90&profile=romantic&tags=food,photo&avoid=1'},
-    {icon: '🏛', bg: '#E4DED6', title: '深度读门', desc: '慢慢看建筑、故居与胡同声音', time: '约 3 小时',
-     q: 'theme=read&duration=180&profile=independent&tags=architecture,history,sound&avoid=0'}
+  // 快速出发：直接带着预设答案进入地图页，由地图页生成路线
+    var PRESETS = [
+    {icon: '🏛', bg: '#F5E8CC', title: '路线一：门楼图鉴', desc: '古建寻访线 · 六大门楼与麒麟图门墩', time: '约 1-1.5小时',
+     q: 'preset=1'},
+    {icon: '📜', bg: '#DCE9E1', title: '路线二：古巷寻踪', desc: '名人与历史线 · 故居与电影局旧址', time: '约 1.5-2小时',
+     q: 'preset=2'},
+    {icon: '🍵', bg: '#F6E3DF', title: '路线三：胡同烟火', desc: '文商体验线 · 茶社、蹄花与老字号', time: '约 1-1.5小时',
+     q: 'preset=3'},
+    {icon: '🧭', bg: '#E4DED6', title: '路线四：全景漫游', desc: '全览大环线 · 三条胡同一次走完', time: '约 2.5-3小时',
+     q: 'preset=4'},
+    {icon: '🍶', bg: '#E2E8F0', title: '路线五：微醺漫步', desc: '精酿清酒线 · 安静品鉴与茶舍收尾', time: '约 1-1.5小时',
+     q: 'preset=5'}
   ];
   PRESETS.forEach(function (p) {
     var a = document.createElement('a');
@@ -214,15 +234,15 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
     $('presets').appendChild(a);
   });
 
+  // 热门景点：点击后在自主游览地图中直接定位
   var HOT = [
-    {id: 'N39', name: '程砚秋故居 (如意门)', type: '文化', theme: '读门', stay: 25},
-    {id: 'W1',  name: '中央电影局旧址',     type: '文化', theme: '读门', stay: 20},
-    {id: 'L5',  name: '傅增湘故居',         type: '文化', theme: '阅巷', stay: 15},
-    {id: 'S2',  name: '麒麟图门墩',         type: '文化', theme: '读门', stay: 10},
-    {id: 'N1',  name: '圣祚隆长寺',         type: '文化', theme: '读门', stay: 15},
-    {id: 'N2',  name: '马福祥故居',         type: '文化', theme: '读门', stay: 15},
-    {id: 'N12', name: '拾光茶社',           type: '商业', theme: '创门', stay: 30},
-    {id: 'B6',  name: '大宇宙',             type: '商业', theme: '创门', stay: 30}
+    {id: 'N39', name: '程砚秋故居',     type: '文化', theme: '读门', stay: 20},
+    {id: 'N3',  name: '13号院金柱大门', type: '文化', theme: '读门', stay: 10},
+    {id: 'N1',  name: '隆长寺山门',     type: '文化', theme: '读门', stay: 15},
+    {id: 'N11', name: '京剧体验馆',     type: '商业', theme: '创门', stay: 40},
+    {id: 'B1',  name: '无问西东精酿',   type: '商业', theme: '创门', stay: 30},
+    {id: 'N12', name: '拾光茶铺',       type: '商业', theme: '创门', stay: 30},
+    {id: 'L5',  name: '傅增湘故居',     type: '文化', theme: '阅巷', stay: 15}
   ];
   HOT.forEach(function (n) {
     var a = document.createElement('a');
@@ -234,8 +254,10 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
     $('spots').appendChild(a);
   });
 
-  try { var st = JSON.parse(localStorage.getItem('menlouStamps') || '{}'), c = Object.keys(st).length; if (c) $('ppText').textContent = '已集印章 ' + c + ' / 23 枚'; } catch (e) {}
+  // 护照进度
+  try { var st = JSON.parse(localStorage.getItem('menlouStamps') || '{}'), c = Object.keys(st).length; if (c) $('ppText').textContent = '已集印章 ' + c + ' / 15 枚'; } catch (e) {}
 
+  // 继续上次路线
   try {
     var saved = JSON.parse(localStorage.getItem('routeData') || 'null');
     if (saved && saved.route && saved.route.length) {
@@ -245,6 +267,5 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
   } catch (e) {}
 })();
 </script>
-<script src="assets/site.js"></script>
 </body>
 </html>

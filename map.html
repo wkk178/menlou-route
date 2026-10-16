@@ -226,8 +226,10 @@
       </div>
 
       <div class="info-box" id="info-box">
+        <div class="info-row"><span>🚶 步行时间</span><span class="info-val" id="r-walk-time">--</span></div>
+        <div class="info-row"><span>🏛 观光时间</span><span class="info-val" id="r-stay-time">--</span></div>
         <div class="info-row"><span>⏱ 总计用时</span><span class="info-val" id="r-time">--</span></div>
-        <div class="info-row"><span>🚶 步行距离</span><span class="info-val" id="r-dist">--</span></div>
+        <div class="info-row"><span>📏 步行距离</span><span class="info-val" id="r-dist">--</span></div>
         <div class="info-row"><span>📊 文化深度</span><span class="info-val" id="r-score">--</span></div>
       </div>
       <a id="mode-switch" class="mode-switch" href="#"></a>
@@ -269,15 +271,25 @@
   'use strict';
 
   // 全部 23 处蓝圈点位数据
+  // 已修正：
+  // 1) 易应茶舍(B2)、无问西东精酿(B1) 向右移至西四北大街路边 (lng: 116.37338~116.37342)
+  // 2) 叙杯(B3)、无名蹄花(B4) 向右移至赵登禹路右侧路边 (lng: 116.36765~116.36758)
   var NODES = [
+    // --- 西四北五条（2处） ---
     {id:"W1", name:"中央电影局旧址", door:"五条15-19号", street:"wutiao", theme:"读门·寻古", type:"文化", stay:20, lat:39.92942, lng:116.37095, interfere:0.2, tags:["history","architecture"], desc:"新中国电影事业的摇篮，见证了中国电影早期发展的重要历史印记。"},
     {id:"L5", name:"傅增湘故居", door:"五条23号院", street:"wutiao", theme:"阅巷·生活", type:"文化", stay:15, lat:39.92946, lng:116.36945, interfere:0.25, tags:["sound","history"], desc:"近代著名藏书家傅增湘先生故居，收录有胡同鸽哨声痕，感知藏书大家的精神世界。"},
+
+    // --- 西四北四条（4处） ---
     {id:"S1", name:"如意门 (四条)", door:"四条2-4号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92868, lng:116.37245, interfere:0.2, tags:["architecture","photo"], desc:"【如意门】四条东口典型传统民居门楼，门楣砖雕精致，寓意吉祥如意。"},
     {id:"S2", name:"麒麟图门墩", door:"四条6号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92869, lng:116.37215, interfere:0.2, tags:["architecture","photo"], desc:"【门墩石雕】四条胡同珍贵的麒麟纹样抱鼓石门墩，雕工细腻，保存完好。"},
     {id:"S3", name:"广亮大门 (四条)", door:"四条20号院", street:"sitiao", theme:"读门·寻古", type:"文化", stay:12, lat:39.92872, lng:116.36975, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】四条中段高等级宅门代表，门扉退后于中柱之间，尽显古建规制。"},
     {id:"S4", name:"西洋门 (四条)", door:"四条22号附近", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92863, lng:116.36950, interfere:0.2, tags:["architecture","photo"], desc:"【西洋门】近代中西合璧建筑风格的门楼代表，带有浓郁的民国砖石装饰特色。"},
+
+    // --- 赵登禹路沿街（2处，已向右修正至道路右侧） ---
     {id:"B3", name:"叙杯", door:"赵登禹路144号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:25, lat:39.92912, lng:116.36765, interfere:0.1, tags:["food","photo"], desc:"赵登禹路东侧沿街特色空间，位于西四北五条与四条西口之间。"},
     {id:"B4", name:"无名蹄花", door:"赵登禹路148号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:35, lat:39.92888, lng:116.36758, interfere:0.1, tags:["food"], desc:"赵登禹路东侧人气餐饮小馆，临近西四北四条西口，充满胡同烟火气。"},
+
+    // --- 西四北三条（9处，由东向西） ---
     {id:"N1", name:"圣祚隆长寺", door:"三条1-3号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92803, lng:116.37245, interfere:0.2, tags:["architecture","history"], desc:"【随墙门/古寺山门】明万历年间圣祚隆长寺旧址，存有珍贵的历史遗存。"},
     {id:"N2", name:"马福祥故居", door:"三条11号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92818, lng:116.37080, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】民国名将马福祥故居，高级官宦宅门代表，牡丹缠枝砖雕极尽考究。"},
     {id:"N12", name:"拾光茶社", door:"三条19-21号", street:"santiao", theme:"创门·共生", type:"商业", stay:30, lat:39.92805, lng:116.37042, interfere:0.1, tags:["food","shopping"], desc:"【蛮子门】位于三条胡同内的一院一茗特调茶空间，古建形制与茶香共生。"},
@@ -287,6 +299,8 @@
     {id:"N39", name:"程砚秋故居 (如意门)", door:"三条39号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:25, lat:39.92814, lng:116.36798, interfere:0.25, tags:["history","architecture","photo"], desc:"【如意门】京剧大师、“四大名旦”之一程砚秋先生居住21年之故居。"},
     {id:"N5", name:"蛮子门 (三条)", door:"三条41-43号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92815, lng:116.36768, interfere:0.2, tags:["architecture","shopping"], desc:"【蛮子门】门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。"},
     {id:"N10", name:"随墙门 (三条)", door:"三条45号院", street:"santiao", theme:"推门·生活", type:"文化", stay:10, lat:39.92816, lng:116.36742, interfere:0.3, tags:["architecture","history"], desc:"【随墙门】直接顺应院墙开辟门洞，质朴亲切，展现老北京胡同原真民居风貌。"},
+
+    // --- 西四北大街沿街（6处，已向右修正对齐西四北大街路边） ---
     {id:"B5", name:"黑潮酿造", door:"西四北大街96-98号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92968, lng:116.37332, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街北段（五条与六条之间），安静型精酿品鉴空间首站。"},
     {id:"B6", name:"大宇宙", door:"西四北大街116-118号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92882, lng:116.37334, interfere:0.1, tags:["food","photo","shopping"], desc:"位于西四北大街（五条与四条之间），融合新消费与青年生活方式的潮流空间。"},
     {id:"B7", name:"紫光园", door:"西四北大街122号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92852, lng:116.37335, interfere:0.1, tags:["food"], desc:"西四北大街京城老字号风味餐饮，位于四条东口南侧，适合品尝地道京味小吃。"},
@@ -295,16 +309,21 @@
     {id:"B1", name:"无问西东精酿", door:"西四北大街155号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92765, lng:116.37340, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街155号，提供门楼主题特调精酿，是文商融合的代表站点。"}
   ];
 
+  // =========================================================================
+  // 真实胡同路网步行导航引擎（解决直线穿墙问题，100%还原胡同+大街真实步行轨迹）
+  // =========================================================================
   var JUNCTIONS = {
+    // 西四北大街沿线节点（东侧主干道，由北向南）
     E_N:  {id: 'E_N',  lat: 39.92975, lng: 116.37332, street: 'xisi_ave'},
-    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'},
-    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'},
-    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'},
+    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'}, // 五条东口
+    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'}, // 四条东口
+    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'}, // 三条东口
     E_S:  {id: 'E_S',  lat: 39.92755, lng: 116.37340, street: 'xisi_ave'},
+    // 赵登禹路沿线节点（西侧主干道，由北向南）
     W_N:  {id: 'W_N',  lat: 39.92960, lng: 116.36772, street: 'zhaodengyu'},
-    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'},
-    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'},
-    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}
+    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'}, // 五条西口
+    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'}, // 四条西口
+    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}  // 三条西口
   };
 
   function haversine(a, b) {
@@ -315,6 +334,7 @@
     return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   }
 
+  // 构建真实路网拓扑图：东西向胡同仅连接各自东口与西口，南北向仅沿西四北大街和赵登禹路通行
   function buildRoadGraph() {
     var graphNodes = {};
     var adj = {};
@@ -331,18 +351,23 @@
     for (var k in JUNCTIONS) addN(k, JUNCTIONS[k]);
     NODES.forEach(function (n) { addN(n.id, n); });
 
+    // 1. 西四北五条：W5_W (西口) -> L5 -> W1 -> W5_E (东口)
     var wutiao = ['W5_W', 'L5', 'W1', 'W5_E'];
     for (var i = 0; i < wutiao.length - 1; i++) addEdge(wutiao[i], wutiao[i+1]);
 
+    // 2. 西四北四条：W4_W (西口) -> S4 -> S3 -> S2 -> S1 -> W4_E (东口)
     var sitiao = ['W4_W', 'S4', 'S3', 'S2', 'S1', 'W4_E'];
     for (var i = 0; i < sitiao.length - 1; i++) addEdge(sitiao[i], sitiao[i+1]);
 
+    // 3. 西四北三条：W3_W (西口) -> N10 -> N5 -> N39 -> N4 -> N3 -> N11 -> N12 -> N2 -> N1 -> W3_E (东口)
     var santiao = ['W3_W', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'W3_E'];
     for (var i = 0; i < santiao.length - 1; i++) addEdge(santiao[i], santiao[i+1]);
 
+    // 4. 西四北大街（由北向南串联所有路口与沿街店铺）
     var xisi = ['E_N', 'B5', 'W5_E', 'B6', 'W4_E', 'B7', 'B8', 'W3_E', 'B2', 'B1', 'E_S'];
     for (var i = 0; i < xisi.length - 1; i++) addEdge(xisi[i], xisi[i+1]);
 
+    // 5. 赵登禹路（由北向南串联西口与沿街店铺）
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
@@ -351,6 +376,7 @@
 
   var ROAD_GRAPH = buildRoadGraph();
 
+  // 使用 Dijkstra 在真实胡同路网中计算任意两点间的步行导航路径与真实步行距离
   function findWalkingSegment(fromId, toId) {
     var G = ROAD_GRAPH;
     if (!G.nodes[fromId] || !G.nodes[toId]) return {dist: 0, path: []};
@@ -383,6 +409,7 @@
     return {dist: dist[toId], path: path};
   }
 
+  // 计算整条路线（多个站点依次串联）的完整步行导航轨迹和总步行距离
   function buildFullWalkingRoute(stopNodes) {
     if (!stopNodes || stopNodes.length < 2) {
       return {
@@ -395,13 +422,14 @@
       var seg = findWalkingSegment(stopNodes[i].id, stopNodes[i+1].id);
       totalDist += seg.dist;
       for (var j = 0; j < seg.path.length; j++) {
-        if (i > 0 && j === 0) continue;
+        if (i > 0 && j === 0) continue; // 避免重复连接点
         fullPath.push(seg.path[j]);
       }
     }
     return {distanceMeters: totalDist, path: fullPath};
   }
 
+  // 预设 5 条官方主题路线（支持通过 URL ?preset=1..5 直接调用）
   var OFFICIAL_ROUTES = {
     '1': {
       title: '【门楼图鉴】古建寻访线',
@@ -430,8 +458,8 @@
     }
   };
 
-  var WALK_SPEED = 75;
-  var DIST_WEIGHT = 12;
+  var WALK_SPEED = 75;   // 胡同漫步速度：约 75 米/分钟
+  var DIST_WEIGHT = 12;  // 每多走 12 米真实胡同路网距离，折算扣 1 分
   var MAX_STOPS = 8;
   var THEME_KEY = {read: '读门', push: '推门', create: '创门'};
 
@@ -496,6 +524,7 @@
 
   function generateRoute(answers) {
     var a = answers || {};
+    // 若指定了 5 条官方主题路线编号，直接按该路线生成真实步行导航数据
     if (a.preset && OFFICIAL_ROUTES[a.preset]) {
       var presetCfg = OFFICIAL_ROUTES[a.preset];
       var presetNodes = presetCfg.ids.map(function (id) {
@@ -512,6 +541,7 @@
       var best = null, bestV = -Infinity, bestT = 0;
       for (var i = 0; i < pool.length; i++) {
         var n = pool[i];
+        // 使用真实胡同路网步行距离替代原本的直线距离！
         var d = findWalkingSegment(curId, n.id).dist;
         var t = Math.round(d / WALK_SPEED) + n.stay;
         if (time + t > duration) continue;
@@ -541,11 +571,16 @@
     const QS = new URLSearchParams(location.search);
     const CAL = QS.get('calibrate') === '1';
     const FREE = CAL || QS.get('mode') === 'free';
+    // 可选：如果你申请了高德 Web 服务 Key，填入此处即可额外请求高德云端步行 API；留空则自动使用内置胡同路网步行导航引擎
     const AMAP_WEB_KEY = '';
 
     let map, markers = [], routeLine, routeBgLine, currentRoute = [];
     let gpsMarker = null, gpsCircle = null, lastGpsPos = null, simTimer = null;
 
+    // =========================================================================
+    // WGS-84 (浏览器原始 GPS) 转 GCJ-02 (高德地图火星坐标系) 算法
+    // 解决国内地图定位偏移 500 米的核心问题
+    // =========================================================================
     function wgs84ToGcj02(lat, lng) {
       const a = 6378245.0, ee = 0.00669342162296594323;
       function transformLat(x, y) {
@@ -615,11 +650,12 @@
       gpsMarker.bindPopup(`<div style="font-size:13px;font-weight:600;color:#1677FF;">📍 ${labelText || '您的当前位置'}</div>`);
     }
 
+    // 启动实时定位小蓝点跟踪
     function startLiveLocation() {
       if (!navigator.geolocation) return;
       navigator.geolocation.watchPosition(
         pos => {
-          if (simTimer) return;
+          if (simTimer) return; // 如果正在演示胡同内模拟漫步，则不覆盖
           const gcj = wgs84ToGcj02(pos.coords.latitude, pos.coords.longitude);
           updateBlueDot(gcj.lat, gcj.lng, pos.coords.accuracy, '您的当前位置');
         },
@@ -628,6 +664,7 @@
       );
     }
 
+    // 点击右上角定位按钮：若用户在西四附近则直接居中定位；若在异地/室内则提供实时定位与胡同内漫步跟随演示
     function handleLocateClick() {
       const btn = document.getElementById('locate-btn');
       if (simTimer) {
@@ -648,6 +685,7 @@
         }
       }
 
+      // 若用户当前不在西四胡同现场（例如在学校/家中调试演示），开启胡同内实时移动蓝点跟随体验
       startSimulatedWalk();
     }
 
@@ -656,6 +694,7 @@
       const pts = nav.path;
       if (!pts || pts.length < 2) return;
 
+      // 将路径细分为平滑步进点，模拟真实人走路时小蓝点平滑移动
       const dense = [];
       for (let i = 0; i < pts.length - 1; i++) {
         const a = pts[i], b = pts[i+1];
@@ -750,6 +789,7 @@
         if (fi > -1) setTimeout(() => focusStop(fi), 300);
     }
 
+    // 若配置了高德 Web 服务 Key，支持拉取高德步行导航 API 折线；默认使用内置胡同真实路网步行导航轨迹
     async function drawWalkingRouteLine(nodes, savedData) {
         if (routeLine) map.removeLayer(routeLine);
         if (routeBgLine) map.removeLayer(routeBgLine);
@@ -786,6 +826,7 @@
             } catch (e) {}
         }
 
+        // 绘制高德步行导航风格的双层路线（浅色描边底座 + 醒目主路线）
         routeBgLine = L.polyline(pathCoords, {
             color: '#FFFFFF',
             weight: 8,
@@ -810,6 +851,8 @@
         const totalMin = staySum + walkMin;
         const km = Math.max(0.2, Math.round(totalMeters / 10) / 100);
 
+        document.getElementById('r-walk-time').textContent = walkMin + '分钟';
+        document.getElementById('r-stay-time').textContent = staySum + '分钟';
         document.getElementById('r-time').textContent = totalMin + '分钟';
         document.getElementById('r-dist').textContent = km + '公里';
     }
