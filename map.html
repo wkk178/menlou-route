@@ -6,6 +6,7 @@
   <title>数字导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
@@ -203,13 +204,7 @@
         }
     }
 
-    /* 步行导航路线动画 (高德/百度风格) */
-    .walking-route-anim {
-        stroke-dasharray: 12 12 !important;
-        animation: routeFlow 1s linear infinite;
-    }
-    @keyframes routeFlow {
-        from { stroke-dashoffset: 24; }
+
         to { stroke-dashoffset: 0; }
     }
 
@@ -692,6 +687,11 @@
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
+    // 6. 增加内部穿插捷径，避免每次都要走到最远的主街上绕路
+    addEdge('W1', 'S3');      // 五条中部 连 四条中部
+    addEdge('S_MAN', 'N39');  // 四条西部 连 三条西部
+    addEdge('S1', 'N11');     // 四条东部 连 三条东部
+
     return {nodes: graphNodes, adj: adj};
   }
 
@@ -870,13 +870,13 @@
     // 可选：如果你申请了高德 Web 服务 Key，填入此处即可额外请求高德云端步行 API；留空则自动使用内置胡同路网步行导航引擎
     const AMAP_WEB_KEY = '';
 
-    let map, markers = [], routeLine, routeBgLine, currentRoute = [];
+    let map, markers = [], routeLine, routeBgLine, routeArrows, currentRoute = [];
     let gpsMarker = null, gpsCircle = null, lastGpsPos = null, simTimer = null;
 
-
+    // =========================================================================
     // WGS-84 (浏览器原始 GPS) 转 GCJ-02 (高德地图火星坐标系) 算法
     // 解决国内地图定位偏移 500 米的核心问题
-
+    // =========================================================================
     function wgs84ToGcj02(lat, lng) {
       const a = 6378245.0, ee = 0.00669342162296594323;
       function transformLat(x, y) {
@@ -990,7 +990,7 @@
       const pts = nav.path;
       if (!pts || pts.length < 2) return;
 
-
+      // 将路径细分为平滑步进点，模拟真实人走路时小蓝点平滑移动
       const dense = [];
       for (let i = 0; i < pts.length - 1; i++) {
         const a = pts[i], b = pts[i+1];
@@ -1007,13 +1007,13 @@
       let idx = 0;
       const btn = document.getElementById('locate-btn');
       btn.classList.add('Simulating');
-      showMapToast('已开启定位实时跟随（再次点击可关闭）');
-      updateBlueDot(dense[0][0], dense[0][1], 12, '漫步导航中 · 实时定位');
+      showMapToast('已开启定位小蓝点实时跟随（再次点击可关闭）');
+      updateBlueDot(dense[0][0], dense[0][1], 12, '漫步导航中 · 实时定位小蓝点');
       map.panTo(dense[0], {animate: true});
 
       simTimer = setInterval(() => {
         idx = (idx + 1) % dense.length;
-        updateBlueDot(dense[idx][0], dense[idx][1], 12, '漫步导航中 · 实时定位');
+        updateBlueDot(dense[idx][0], dense[idx][1], 12, '漫步导航中 · 实时定位小蓝点');
       }, 700);
     }
 
@@ -1089,6 +1089,7 @@
     async function drawWalkingRouteLine(nodes, savedData) {
         if (routeLine) map.removeLayer(routeLine);
         if (routeBgLine) map.removeLayer(routeBgLine);
+        if (routeArrows) map.removeLayer(routeArrows);
         if (FREE || nodes.length < 2) return;
 
         let nav = window.buildFullWalkingRoute(nodes);
@@ -1122,10 +1123,10 @@
             } catch (e) {}
         }
 
-
+        // 高德步行导航风格：白色底座 + 绿色实线 + 箭头指向
         routeBgLine = L.polyline(pathCoords, {
             color: '#FFFFFF',
-            weight: 9,
+            weight: 10,
             opacity: 0.9,
             lineCap: 'round',
             lineJoin: 'round',
@@ -1134,11 +1135,17 @@
 
         routeLine = L.polyline(pathCoords, {
             color: '#00B578', // 高德标准步行绿
-            weight: 5,
+            weight: 6,
             opacity: 1,
             lineCap: 'round',
-            lineJoin: 'round',
-            className: 'walking-route-anim'
+            lineJoin: 'round'
+        }).addTo(map);
+
+        // 添加路线箭头指示（Amap风格）
+        routeArrows = L.polylineDecorator(routeLine, {
+            patterns: [
+                { offset: 25, repeat: 60, symbol: L.Symbol.arrowHead({pixelSize: 12, polygon: false, pathOptions: {stroke: true, weight: 2.5, color: '#FFFFFF', opacity: 1}}) }
+            ]
         }).addTo(map);
 
         map.fitBounds(L.latLngBounds(pathCoords), {padding: [45, 45]});
@@ -1158,6 +1165,7 @@
         markers.forEach(m => map.removeLayer(m));
         if (routeLine) map.removeLayer(routeLine);
         if (routeBgLine) map.removeLayer(routeBgLine);
+        if (routeArrows) map.removeLayer(routeArrows);
         markers = [];
         const listEl = document.getElementById('stop-list');
         listEl.innerHTML = '';
