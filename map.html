@@ -752,41 +752,24 @@ var OFFICIAL_ROUTES = {
 
   var WALK_SPEED = 75;
   var DIST_WEIGHT = 12;
-  var MAX_STOPS = 8;
-  var THEME_KEY = {read: '读门', push: '推门', create: '创门'};
 
-  function shortTheme(t) { return String(t).split('·')[0]; }
-  function has(n, tag) { return n.tags.indexOf(tag) > -1; }
+  function generateRoute(answers) {
+    var a = answers || {};
+    var p = a.preset || '4';
+    if (!OFFICIAL_ROUTES[p]) p = '4';
 
-  var PROFILE = {
-    family:      function (n) { return (has(n, 'architecture') || has(n, 'history') ? 10 : 0); },
-    romantic:    function (n) { return (has(n, 'photo') ? 10 : 0) + (has(n, 'food') ? 6 : 0); },
-    independent: function (n) { return (has(n, 'sound') ? 10 : 0) + (has(n, 'history') ? 6 : 0) + (has(n, 'architecture') ? 4 : 0); },
-    social:      function (n) { return (has(n, 'food') ? 8 : 0) + (n.type === '商业' ? 6 : 0); }
-  };
+    var presetCfg = OFFICIAL_ROUTES[p];
+    var presetNodes = presetCfg.ids.map(function (id) {
+      return NODES.filter(function (n) { return n.id === id; })[0];
+    }).filter(Boolean);
 
-  function eligible(n, a) {
-    if (a.avoidResident && n.interfere > 0.35) return false;
-    if (a.profile === 'family' && (n.name.indexOf('精酿') > -1 || n.name.indexOf('酿造') > -1)) return false;
-    return true;
-  }
-
-  function scoreNode(n, a) {
-    var s = 10;
-    if (a.theme && a.theme !== 'mixed' && shortTheme(n.theme) === THEME_KEY[a.theme]) s += 40;
-    (a.tags || []).forEach(function (t) { if (has(n, t)) s += 14; });
-    if (PROFILE[a.profile]) s += PROFILE[a.profile](n);
-    return s;
-  }
-
-  function computeScoresAndFormat(route, a, routeTitle) {
-    var nav = buildFullWalkingRoute(route);
+    var nav = buildFullWalkingRoute(presetNodes);
     var walkMinutes = Math.round(nav.distanceMeters / WALK_SPEED);
-    var stayMinutes = route.reduce(function (acc, n) { return acc + (n.stay || 15); }, 0);
+    var stayMinutes = presetNodes.reduce(function (acc, n) { return acc + (n.stay || 15); }, 0);
     var totalTime = walkMinutes + stayMinutes;
 
-    var N = route.length || 1, cSum = 0, bSum = 0, iSum = 0;
-    route.forEach(function (n) {
+    var N = presetNodes.length || 1, cSum = 0, bSum = 0, iSum = 0;
+    presetNodes.forEach(function (n) {
       var isCulture = n.type === '文化';
       cSum += isCulture ? 1 : 0.4;
       bSum += isCulture ? 0.3 : 1;
@@ -795,10 +778,10 @@ var OFFICIAL_ROUTES = {
 
     return {
       status: 'success',
-      title: routeTitle || '专属定制漫步路线',
-      route: route.map(function (n) {
+      title: presetCfg.title || '专属定制漫步路线',
+      route: presetNodes.map(function (n) {
         var o = {}; for (var k in n) o[k] = n[k];
-        o.theme = shortTheme(n.theme);
+        o.theme = String(n.theme).split('·')[0];
         return o;
       }),
       walkingPath: nav.path,
@@ -812,42 +795,6 @@ var OFFICIAL_ROUTES = {
       request: a,
       generatedAt: new Date().toISOString()
     };
-  }
-
-  function generateRoute(answers) {
-    var a = answers || {};
-    if (a.preset && OFFICIAL_ROUTES[a.preset]) {
-      var presetCfg = OFFICIAL_ROUTES[a.preset];
-      var presetNodes = presetCfg.ids.map(function (id) {
-        return NODES.filter(function (n) { return n.id === id; })[0];
-      }).filter(Boolean);
-      return computeScoresAndFormat(presetNodes, a, presetCfg.title);
-    }
-
-    var duration = parseInt(a.duration, 10) || 90;
-    var pool = NODES.filter(function (n) { return eligible(n, a); });
-    var curId = 'W3_E', time = 0, route = [], seenThemes = {};
-
-    while (pool.length && route.length < MAX_STOPS) {
-      var best = null, bestV = -Infinity, bestT = 0;
-      for (var i = 0; i < pool.length; i++) {
-        var n = pool[i];
-        var d = findWalkingSegment(curId, n.id).dist;
-        var t = Math.round(d / WALK_SPEED) + n.stay;
-        if (time + t > duration) continue;
-        var v = scoreNode(n, a) - d / DIST_WEIGHT;
-        if (a.theme === 'mixed' && !seenThemes[shortTheme(n.theme)]) v += 12;
-        if (v > bestV) { bestV = v; best = n; bestT = t; }
-      }
-      if (!best) break;
-      route.push(best);
-      pool.splice(pool.indexOf(best), 1);
-      seenThemes[shortTheme(best.theme)] = true;
-      time += bestT;
-      curId = best.id;
-    }
-
-    return computeScoresAndFormat(route, a);
   }
 
   window.MENLOU_NODES = NODES;
@@ -1045,17 +992,20 @@ var OFFICIAL_ROUTES = {
             if (idx > -1) setTimeout(() => focusStop(idx), 300);
             return;
         }
-        if (QS.get('preset') || QS.get('theme')) {
-            const fresh = window.generateRoute({
-                preset: QS.get('preset'),
-                theme: QS.get('theme'),
-                duration: QS.get('duration'),
-                profile: QS.get('profile'),
-                tags: (QS.get('tags') || '').split(',').filter(Boolean),
-                avoidResident: true
-            });
-            localStorage.setItem('routeData', JSON.stringify(fresh));
+
+        // 🚨 强制收束为只生成 5 条官方路线 🚨
+        let p = QS.get('preset');
+        if (!p) {
+          const t = QS.get('theme');
+          if (t === 'read') p = '1';
+          else if (t === 'push') p = '2';
+          else if (t === 'create') p = '3';
+          else p = '4'; // 默认全景
         }
+
+        const fresh = window.generateRoute({ preset: p });
+        localStorage.setItem('routeData', JSON.stringify(fresh));
+
         const savedData = localStorage.getItem('routeData');
         let routeData = null;
         try { routeData = savedData ? JSON.parse(savedData) : null; } catch (e) {}
@@ -1088,7 +1038,7 @@ var OFFICIAL_ROUTES = {
                     const dest = `${nodes[i+1].lng.toFixed(6)},${nodes[i+1].lat.toFixed(6)}`;
                     const res = await fetch(`https://restapi.amap.com/v3/direction/walking?origin=${orig}&destination=${dest}&key=${AMAP_WEB_KEY}`);
                     const json = await res.json();
-                    const pathObj = json?.route?.paths?.[0];
+                    const pathObj = (json && json.route && json.route.paths && json.route.paths.length > 0) ? json.route.paths[0] : null;
                     if (pathObj && pathObj.steps) {
                         amapDist += parseFloat(pathObj.distance || 0);
                         pathObj.steps.forEach(st => {
@@ -1161,7 +1111,7 @@ var OFFICIAL_ROUTES = {
             listEl.innerHTML += `<li class="stop-item" onclick="focusStop(${i})"><div class="stop-num">${FREE ? node.theme.charAt(0) : i+1}</div><div class="stop-info"><h5>${node.name}</h5><p>${node.door} · ${node.stay}min</p></div></li>`;
         });
 
-        document.getElementById('r-score').textContent = (data.scores?.culture ?? 90) + '%';
+        document.getElementById('r-score').textContent = (data && data.scores && data.scores.culture ? data.scores.culture : 90) + '%';
         if (FREE && nodes.length > 1) {
             map.fitBounds(L.latLngBounds(nodes.map(n => [n.lat, n.lng])), {padding: [45, 45]});
         } else {
@@ -1255,6 +1205,5 @@ var OFFICIAL_ROUTES = {
       this.classList.add('opened');
     });
   </script>
-<script src="assets/site.js"></script>
 </body>
 </html>
