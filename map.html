@@ -6,7 +6,6 @@
   <title>数字导览 | 门楼层记·故事里</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
@@ -17,7 +16,7 @@
 
     /* 顶部切换条 */
     .seg{position: absolute; top: calc(env(safe-area-inset-top) + 12px); left: 50%; transform: translateX(-50%); z-index: 14; display: flex; background: rgba(255,255,255,0.95); border-radius: 20px; padding: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.18);}
-    .seg a{padding: 7px 16px; border-radius: 17px; font-size: 13px; font-weight: 600; color: var(--door-gray); white-space: nowrap; text-decoration: none;}
+    .seg a{padding: 7px 16px; border-radius: 17px; font-size: 13px; font-weight: 600; color: var(--door-gray); white-space: nowrap; text-decoration: none; transition: 0.2s;}
     .seg a.on{background: linear-gradient(135deg, #A93027, #E0733B); color: #fff;}
 
     /* 底部标签栏 */
@@ -46,6 +45,9 @@
     .gps-dot-halo{position: absolute; width: 24px; height: 24px; border-radius: 50%; background: rgba(22, 119, 255, 0.35); animation: gpsPulse 2s infinite ease-out;}
     .gps-dot-core{position: relative; width: 14px; height: 14px; border-radius: 50%; background: #1677FF; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.35); z-index: 2;}
     @keyframes gpsPulse{0%{transform: scale(0.8); opacity: 0.9;} 100%{transform: scale(2.4); opacity: 0;}}
+
+    /* 路线导航方向箭头样式（高德风格） */
+    .route-dir-arrow{pointer-events: none; display: flex; align-items: center; justify-content: center;}
 
     /* 顶部轻提示 Toast */
     .map-toast{position: absolute; top: calc(env(safe-area-inset-top) + 58px); left: 50%; transform: translateX(-50%); z-index: 20; background: rgba(44,36,32,0.9); color: #fff; padding: 7px 14px; border-radius: 18px; font-size: 12px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.25s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
@@ -166,7 +168,6 @@
         50% { transform: translateY(-4px); }
     }
 
-    /* 强制控制气泡布局 + 防止面板高度顶穿屏幕 */
     #coze-web-sdk-container [class*="message-me"],
     #coze-web-sdk-container [class*="message-user"] {
         display: flex !important;
@@ -274,377 +275,47 @@
 (function () {
   'use strict';
 
+  // 严格只保留原图中的 23 个蓝圈点位，坐标 1:1 对齐原图院落位置
   var NODES = [
-    {
-        "id": "W1",
-        "name": "中央电影局旧址",
-        "door": "五条15-19号",
-        "street": "wutiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 20,
-        "lat": 39.92942,
-        "lng": 116.37095,
-        "interfere": 0.2,
-        "tags": ["history", "architecture"],
-        "desc": "新中国电影事业的摇篮，见证了中国电影早期发展的重要历史印记。"
-    },
-    {
-        "id": "L5",
-        "name": "傅增湘故居",
-        "door": "五条23号院",
-        "street": "wutiao",
-        "theme": "阅巷·生活",
-        "type": "文化",
-        "stay": 15,
-        "lat": 39.92946,
-        "lng": 116.36945,
-        "interfere": 0.25,
-        "tags": ["sound", "history"],
-        "desc": "近代著名藏书家傅增湘先生故居，收录有胡同鸽哨声痕，感知藏书大家的精神世界。"
-    },
-    {
-        "id": "S1",
-        "name": "如意门",
-        "door": "四条东段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92868,
-        "lng": 116.37245,
-        "interfere": 0.2,
-        "tags": ["architecture"],
-        "desc": "【如意门】四条东口典型传统民居门楼，门楣砖雕精致，寓意吉祥如意。"
-    },
-    {
-        "id": "S2",
-        "name": "麒麟图门墩",
-        "door": "四条东段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92869,
-        "lng": 116.37175,
-        "interfere": 0.2,
-        "tags": ["architecture"],
-        "desc": "【门墩石雕】四条胡同珍贵的麒麟纹样抱鼓石门墩，雕工细腻，保存完好。"
-    },
-    {
-        "id": "S3",
-        "name": "广亮大门",
-        "door": "四条中段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92871,
-        "lng": 116.37095,
-        "interfere": 0.25,
-        "tags": ["architecture"],
-        "desc": "【广亮大门】四条中段高等级宅门代表，门扉退后于中柱之间，尽显古建规制。"
-    },
-    {
-        "id": "S_JIN",
-        "name": "金柱大门",
-        "door": "四条中段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92870,
-        "lng": 116.37015,
-        "interfere": 0.25,
-        "tags": ["architecture"],
-        "desc": "【金柱大门】等级仅次于广亮大门，门扇安在金柱位置，完整保留清末民初规制。"
-    },
-    {
-        "id": "S4",
-        "name": "西洋门",
-        "door": "四条中西段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92866,
-        "lng": 116.36940,
-        "interfere": 0.2,
-        "tags": ["architecture"],
-        "desc": "【西洋门】近代中西合璧建筑风格的门楼代表，带有浓郁的民国砖石装饰特色。"
-    },
-    {
-        "id": "S_MAN",
-        "name": "蛮子门",
-        "door": "四条西段",
-        "street": "sitiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92865,
-        "lng": 116.36868,
-        "interfere": 0.2,
-        "tags": ["architecture"],
-        "desc": "【蛮子门】门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。"
-    },
-    {
-        "id": "S_SUI",
-        "name": "随墙门",
-        "door": "四条西口",
-        "street": "sitiao",
-        "theme": "推门·生活",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92866,
-        "lng": 116.36802,
-        "interfere": 0.3,
-        "tags": ["architecture"],
-        "desc": "【随墙门】直接顺应院墙开辟门洞，质朴亲切，展现老北京胡同原真民居风貌。"
-    },
-    {
-        "id": "B3",
-        "name": "叙杯",
-        "door": "赵登禹路144号",
-        "street": "zhaodengyu",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 25,
-        "lat": 39.92912,
-        "lng": 116.36765,
-        "interfere": 0.1,
-        "tags": ["food", "photo"],
-        "desc": "赵登禹路东侧沿街特色空间，位于西四北五条与四条西口之间。"
-    },
-    {
-        "id": "B4",
-        "name": "无名蹄花",
-        "door": "赵登禹路148号",
-        "street": "zhaodengyu",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 35,
-        "lat": 39.92888,
-        "lng": 116.36758,
-        "interfere": 0.1,
-        "tags": ["food"],
-        "desc": "赵登禹路东侧人气餐饮小馆，临近西四北四条西口，充满胡同烟火气。"
-    },
-    {
-        "id": "N10",
-        "name": "随墙门 (三条)",
-        "door": "三条45号院",
-        "street": "santiao",
-        "theme": "推门·生活",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92816,
-        "lng": 116.36742,
-        "interfere": 0.3,
-        "tags": ["architecture", "history"],
-        "desc": "【随墙门】直接顺应院墙开辟门洞，质朴亲切，展现老北京胡同原真民居风貌。"
-    },
-    {
-        "id": "N5",
-        "name": "蛮子门 (三条)",
-        "door": "三条41-43号",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92815,
-        "lng": 116.36768,
-        "interfere": 0.2,
-        "tags": ["architecture", "shopping"],
-        "desc": "【蛮子门】门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。"
-    },
-    {
-        "id": "N39",
-        "name": "程砚秋故居",
-        "door": "三条39号院",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 25,
-        "lat": 39.92814,
-        "lng": 116.36802,
-        "interfere": 0.25,
-        "tags": ["history", "architecture", "photo"],
-        "desc": "【如意门】京剧大师、“四大名旦”之一程砚秋先生居住21年之故居。"
-    },
-    {
-        "id": "N4",
-        "name": "广亮大门 (三条)",
-        "door": "三条35-37号",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92812,
-        "lng": 116.36855,
-        "interfere": 0.25,
-        "tags": ["architecture"],
-        "desc": "【广亮大门】三条西段保存完好的广亮大门形制，梁架宽敞，气势庄重。"
-    },
-    {
-        "id": "N3",
-        "name": "金柱大门 (三条)",
-        "door": "三条31号院",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 10,
-        "lat": 39.92810,
-        "lng": 116.36905,
-        "interfere": 0.25,
-        "tags": ["architecture"],
-        "desc": "【金柱大门】等级仅次于广亮大门，门扇安在金柱位置，完整保留清末民初规制。"
-    },
-    {
-        "id": "N11",
-        "name": "西洋门 (三条23号)",
-        "door": "三条23号院",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 15,
-        "lat": 39.92808,
-        "lng": 116.36960,
-        "interfere": 0.2,
-        "tags": ["architecture", "photo"],
-        "desc": "【西洋门】三条胡同中段西洋门形制代表院落，展现近代胡同建筑风貌演变。"
-    },
-    {
-        "id": "N1",
-        "name": "圣祚隆长寺",
-        "door": "三条中段",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 15,
-        "lat": 39.92806,
-        "lng": 116.37025,
-        "interfere": 0.2,
-        "tags": ["architecture", "history"],
-        "desc": "【古寺山门】明万历年间圣祚隆长寺旧址，存有珍贵的历史遗存。"
-    },
-    {
-        "id": "N2",
-        "name": "马福祥故居",
-        "door": "三条11号院",
-        "street": "santiao",
-        "theme": "读门·寻古",
-        "type": "文化",
-        "stay": 15,
-        "lat": 39.92805,
-        "lng": 116.37120,
-        "interfere": 0.25,
-        "tags": ["architecture", "history"],
-        "desc": "【广亮大门】民国名将马福祥故居，高级官宦宅门代表，牡丹缠枝砖雕极尽考究。"
-    },
-    {
-        "id": "N12",
-        "name": "拾光茶社",
-        "door": "三条东段",
-        "street": "santiao",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92803,
-        "lng": 116.37220,
-        "interfere": 0.1,
-        "tags": ["food", "shopping"],
-        "desc": "【蛮子门】位于三条胡同内的一院一茗特调茶空间，古建形制与茶香共生。"
-    },
-    {
-        "id": "B5",
-        "name": "黑潮酿造",
-        "door": "西四北大街96-98号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92968,
-        "lng": 116.37332,
-        "interfere": 0.1,
-        "tags": ["food", "photo"],
-        "desc": "位于西四北大街北段（五条与六条之间），安静型精酿品鉴空间首站。"
-    },
-    {
-        "id": "B6",
-        "name": "大宇宙",
-        "door": "西四北大街116-118号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92882,
-        "lng": 116.37334,
-        "interfere": 0.1,
-        "tags": ["food", "photo", "shopping"],
-        "desc": "位于西四北大街（五条与四条之间），融合新消费与青年生活方式的潮流空间。"
-    },
-    {
-        "id": "B7",
-        "name": "紫光园",
-        "door": "西四北大街122号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92852,
-        "lng": 116.37335,
-        "interfere": 0.1,
-        "tags": ["food"],
-        "desc": "西四北大街京城老字号风味餐饮，位于四条东口南侧，适合品尝地道京味小吃。"
-    },
-    {
-        "id": "B8",
-        "name": "蝗虫精酿",
-        "door": "西四北大街128号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92832,
-        "lng": 116.37336,
-        "interfere": 0.1,
-        "tags": ["food", "photo"],
-        "desc": "位于西四北大街中段（四条与三条之间），主打慢品轻聊的社区精酿体验店。"
-    },
-    {
-        "id": "B2",
-        "name": "易应茶舍",
-        "door": "西四北大街147号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92791,
-        "lng": 116.37338,
-        "interfere": 0.1,
-        "tags": ["food"],
-        "desc": "西四北大街沿街静谧茶舍，紧邻西四北三条东口南侧，是漫步收尾的品茗佳处。"
-    },
-    {
-        "id": "B1",
-        "name": "无问西东精酿",
-        "door": "西四北大街155号",
-        "street": "xisi_ave",
-        "theme": "创门·共生",
-        "type": "商业",
-        "stay": 30,
-        "lat": 39.92765,
-        "lng": 116.37340,
-        "interfere": 0.1,
-        "tags": ["food", "photo"],
-        "desc": "位于西四北大街155号，提供门楼主题特调精酿，是文商融合的代表站点。"
-    }
+    // --- 西四北五条（2处蓝圈） ---
+    {id:"L5", name:"傅增湘故居", door:"五条23号院", street:"wutiao", theme:"阅巷·生活", type:"文化", stay:15, lat:39.92946, lng:116.36945, interfere:0.25, tags:["sound","history"], desc:"近代著名藏书家傅增湘先生故居，收录有胡同鸽哨声痕，感知藏书大家的精神世界。"},
+    {id:"W1", name:"中央电影局旧址", door:"五条15-19号", street:"wutiao", theme:"读门·寻古", type:"文化", stay:20, lat:39.92942, lng:116.37095, interfere:0.2, tags:["history","architecture"], desc:"新中国电影事业的摇篮，见证了中国电影早期发展的重要历史印记。"},
+
+    // --- 西四北四条（严格仅保留原图4处蓝圈：如意门、麒麟图门墩、广亮大门、西洋门） ---
+    {id:"S1", name:"如意门 (四条)", door:"四条2-4号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92868, lng:116.37245, interfere:0.2, tags:["architecture","photo"], desc:"【如意门】四条东口典型传统民居门楼，门楣砖雕精致，寓意吉祥如意。"},
+    {id:"S2", name:"麒麟图门墩", door:"四条6号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92869, lng:116.37215, interfere:0.2, tags:["architecture","photo"], desc:"【门墩石雕】四条胡同珍贵的麒麟纹样抱鼓石门墩，雕工细腻，保存完好。"},
+    {id:"S3", name:"广亮大门 (四条)", door:"四条20号院", street:"sitiao", theme:"读门·寻古", type:"文化", stay:12, lat:39.92872, lng:116.36975, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】四条中段高等级宅门代表，门扉退后于中柱之间，尽显古建规制。"},
+    {id:"S4", name:"西洋门 (四条)", door:"四条22-24号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92864, lng:116.36948, interfere:0.2, tags:["architecture","photo"], desc:"【西洋门】近代中西合璧建筑风格的门楼代表，带有浓郁的民国砖石装饰特色。"},
+
+    // --- 赵登禹路沿街（2处蓝圈，位于道路右侧） ---
+    {id:"B3", name:"叙杯", door:"赵登禹路144号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:25, lat:39.92912, lng:116.36765, interfere:0.1, tags:["food","photo"], desc:"赵登禹路东侧沿街特色空间，位于西四北五条与四条西口之间。"},
+    {id:"B4", name:"无名蹄花", door:"赵登禹路148号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:35, lat:39.92888, lng:116.36758, interfere:0.1, tags:["food"], desc:"赵登禹路东侧人气餐饮小馆，临近西四北四条西口，充满胡同烟火气。"},
+
+    // --- 西四北三条（严格对应原图9处蓝圈，由东向西排列） ---
+    {id:"N1", name:"圣祚隆长寺", door:"三条1-3号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92803, lng:116.37245, interfere:0.2, tags:["architecture","history"], desc:"【古寺山门】明万历年间圣祚隆长寺旧址，存有珍贵的历史遗存。"},
+    {id:"N2", name:"马福祥故居", door:"三条11号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92818, lng:116.37080, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】民国名将马福祥故居，高级官宦宅门代表，牡丹缠枝砖雕极尽考究。"},
+    {id:"N12", name:"拾光茶社", door:"三条15-19号", street:"santiao", theme:"创门·共生", type:"商业", stay:30, lat:39.92805, lng:116.37042, interfere:0.1, tags:["food","shopping"], desc:"【蛮子门】位于三条胡同内的一院一茗特调茶空间，古建形制与茶香共生。"},
+    {id:"N11", name:"西洋门 (三条23号)", door:"三条23号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92807, lng:116.36945, interfere:0.2, tags:["architecture","photo"], desc:"【西洋门】三条胡同中段西洋门形制代表院落，展现近代胡同建筑风貌演变。"},
+    {id:"N3", name:"金柱大门 (三条)", door:"三条31号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92809, lng:116.36878, interfere:0.25, tags:["architecture"], desc:"【金柱大门】等级仅次于广亮大门，门扇安在金柱位置，完整保留清末民初规制。"},
+    {id:"N4", name:"广亮大门 (三条)", door:"三条35-37号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92811, lng:116.36835, interfere:0.25, tags:["architecture"], desc:"【广亮大门】三条西段保存完好的广亮大门形制，梁架宽敞，气势庄重。"},
+    {id:"N39", name:"程砚秋故居 (如意门)", door:"三条39号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:25, lat:39.92814, lng:116.36798, interfere:0.25, tags:["history","architecture","photo"], desc:"【如意门】京剧大师、“四大名旦”之一程砚秋先生居住21年之故居。"},
+    {id:"N5", name:"蛮子门 (三条)", door:"三条41-43号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92815, lng:116.36768, interfere:0.2, tags:["architecture","shopping"], desc:"【蛮子门】门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。"},
+    {id:"N10", name:"随墙门 (三条)", door:"三条45号院", street:"santiao", theme:"推门·生活", type:"文化", stay:10, lat:39.92816, lng:116.36742, interfere:0.3, tags:["architecture","history"], desc:"【随墙门】直接顺应院墙开辟门洞，质朴亲切，展现老北京胡同原真民居风貌。"},
+
+    // --- 西四北大街沿街（6处蓝圈，位于道路右侧） ---
+    {id:"B5", name:"黑潮酿造", door:"西四北大街96-98号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92968, lng:116.37332, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街北段（五条与六条之间），安静型精酿品鉴空间首站。"},
+    {id:"B6", name:"大宇宙", door:"西四北大街116-118号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92882, lng:116.37334, interfere:0.1, tags:["food","photo","shopping"], desc:"位于西四北大街（五条与四条之间），融合新消费与青年生活方式的潮流空间。"},
+    {id:"B7", name:"紫光园", door:"西四北大街122号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92852, lng:116.37335, interfere:0.1, tags:["food"], desc:"西四北大街京城老字号风味餐饮，位于四条东口南侧，适合品尝地道京味小吃。"},
+    {id:"B8", name:"蝗虫精酿", door:"西四北大街128号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92832, lng:116.37336, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街中段（四条与三条之间），主打慢品轻聊的社区精酿体验店。"},
+    {id:"B2", name:"易应茶舍", door:"西四北大街147号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92791, lng:116.37338, interfere:0.1, tags:["food"], desc:"西四北大街沿街静谧茶舍，紧邻西四北三条东口南侧，是漫步收尾的品茗佳处。"},
+    {id:"B1", name:"无问西东精酿", door:"西四北大街155号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92765, lng:116.37340, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街155号，提供门楼主题特调精酿，是文商融合的代表站点。"}
   ];
 
+  // 胡同路口与内部南北向最近连接点
   var JUNCTIONS = {
     E_N:   {id: 'E_N',   lat: 39.92975, lng: 116.37332},
     W5_E:  {id: 'W5_E',  lat: 39.92940, lng: 116.37333},
-    W5_M:  {id: 'W5_M',  lat: 39.92941, lng: 116.37245},
+    W5_M:  {id: 'W5_M',  lat: 39.92941, lng: 116.37245}, // 五条东段支巷口（就近南下四条S1，不经过16大宇宙）
     W4_E:  {id: 'W4_E',  lat: 39.92866, lng: 116.37335},
     W3_E:  {id: 'W3_E',  lat: 39.92801, lng: 116.37337},
     E_S:   {id: 'E_S',   lat: 39.92755, lng: 116.37340},
@@ -679,24 +350,29 @@
     for (var k in JUNCTIONS) addN(k, JUNCTIONS[k]);
     NODES.forEach(function (n) { addN(n.id, n); });
 
+    // 1. 西四北五条：西口 -> 傅增湘故居 -> 中央电影局旧址 -> 东段支巷 -> 东口
     var wutiao = ['W5_W', 'L5', 'W1', 'W5_M', 'W5_E'];
     for (var i = 0; i < wutiao.length - 1; i++) addEdge(wutiao[i], wutiao[i+1]);
 
-    var sitiao = ['W4_W', 'S_SUI', 'S_MAN', 'S4', 'S_JIN', 'S3', 'S2', 'S1', 'W4_E'];
+    // 2. 西四北四条：西口 -> 西洋门 -> 广亮大门 -> 麒麟图门墩 -> 如意门 -> 东口
+    var sitiao = ['W4_W', 'S4', 'S3', 'S2', 'S1', 'W4_E'];
     for (var i = 0; i < sitiao.length - 1; i++) addEdge(sitiao[i], sitiao[i+1]);
 
-    var santiao = ['W3_W', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N1', 'N2', 'N12', 'W3_E'];
+    // 3. 西四北三条：西口 -> 随墙门 -> 蛮子门 -> 程砚秋故居 -> 广亮大门 -> 金柱大门 -> 西洋门 -> 拾光茶社 -> 马福祥故居 -> 圣祚隆长寺 -> 东口
+    var santiao = ['W3_W', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'W3_E'];
     for (var i = 0; i < santiao.length - 1; i++) addEdge(santiao[i], santiao[i+1]);
 
+    // 4. 西四北大街
     var xisi = ['E_N', 'B5', 'W5_E', 'B6', 'W4_E', 'B7', 'B8', 'W3_E', 'B2', 'B1', 'E_S'];
     for (var i = 0; i < xisi.length - 1; i++) addEdge(xisi[i], xisi[i+1]);
 
+    // 5. 赵登禹路
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
-    addEdge('W5_M', 'S1');
-    addEdge('S_SUI', 'N39');
-    addEdge('S4', 'N39');
+    // 6. 就近穿插通道（避免绕去最远端）
+    addEdge('W5_M', 'S1'); // 五条去四条S1走东段最近通道，不经过大宇宙(B6)
+    addEdge('S4', 'N3');   // 四条中段就近南下三条金柱大门
 
     return {nodes: graphNodes, adj: adj};
   }
@@ -754,26 +430,27 @@
     return {distanceMeters: totalDist, path: fullPath};
   }
 
+  // 严格只使用原图中的蓝圈点位组成 5 条官方主题路线
   var OFFICIAL_ROUTES = {
     '1': {
       title: '【门楼图鉴】古建寻访线',
-      ids: ['S1', 'S2', 'S3', 'S_JIN', 'S4', 'S_MAN', 'S_SUI'],
-      desc: '四条东口进→如意门→麒麟图门墩→广亮大门→金柱大门→西洋门→蛮子门→随墙门→四条西口出，单向不折返。'
+      ids: ['S1', 'S2', 'S3', 'S4', 'N3', 'N4', 'N39', 'N5', 'N10'],
+      desc: '四条东口进→如意门→麒麟图门墩→广亮大门→西洋门→三条金柱大门→广亮大门→程砚秋故居(如意门)→蛮子门→随墙门，看全六大门楼形制。'
     },
     '2': {
       title: '【古巷寻踪】名人与历史线',
-      ids: ['L5', 'W1', 'N39', 'N1', 'N2'],
-      desc: '五条西口进→傅增湘故居→中央电影局旧址→程砚秋故居→圣祚隆长寺→马福祥故居→三条东口出，单向不折返。'
+      ids: ['L5', 'W1', 'N39', 'N2', 'N1'],
+      desc: '五条西口进→傅增湘故居→中央电影局旧址→三条程砚秋故居→马福祥故居→圣祚隆长寺→三条东口出，单向不折返。'
     },
     '3': {
       title: '【胡同烟火】文商体验线',
       ids: ['B2', 'N12', 'B4', 'B7', 'B6'],
-      desc: '三条东口易应茶舍→拾光茶社→三条西口出→无名蹄花→紫光园→大宇宙，单向不折返。'
+      desc: '易应茶舍→三条拾光茶社→三条西口出→赵登禹路无名蹄花→转西四北大街→紫光园→大宇宙，单向不折返。'
     },
     '4': {
       title: '【全景漫游】三条胡同全览大环线',
-      ids: ['L5', 'W1', 'S1', 'S2', 'S3', 'S_JIN', 'S4', 'S_MAN', 'S_SUI', 'N39', 'N1', 'N2', 'N12', 'B2', 'B7', 'B6'],
-      desc: '五条、四条、三条核心点位一次走完。五条西口进→四条门楼群→三条古迹与茶社→西四北大街，全程单向不折返。'
+      ids: ['L5', 'W1', 'S1', 'S2', 'S3', 'S4', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'B2', 'B7', 'B6'],
+      desc: '五条、四条、三条蓝圈核心点位一次走完。五条西口进→四条东进西出→三条西进东出→西四北大街收尾，全程单向不折返！'
     },
     '5': {
       title: '【微醺漫步】精酿清酒线',
