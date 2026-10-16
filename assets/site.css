@@ -85,7 +85,7 @@ h1, h2, h3, h4, .page-title, .hero-title, .section-title {
 .recommend-slide h4 { margin: 6px 0; color: #40352d; }
 .recommend-slide p { color: #71665d; line-height: 1.6; }
 @keyframes siteFade { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.stage { background: linear-gradient(rgba(255,255,255,.88),rgba(242,239,231,.9)),url('backgrounds/brick-relief.jpg') center/cover !important; }
+.stage { background: linear-gradient(rgba(245,241,232,.28),rgba(245,241,232,.42)),url('backgrounds/brick-relief.jpg') center 42%/cover #e9e2d6 !important; }
 .loading::before { content: ""; display: block; width: 48px; height: 48px; margin: 0 auto 8px; background: url('branding/menlou-emblem.png') center/contain no-repeat; animation: loadingPulse 1.4s ease-in-out infinite; }
 @keyframes loadingPulse { 0%,100% { opacity: .65; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
 

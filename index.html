@@ -52,11 +52,8 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 
 .func-card > * { position: relative; z-index: 1; }
 .func-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px;}
-.func-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff;}
-.fc-1 .func-icon { background: linear-gradient(135deg, #A93027, #E0733B); }
-.fc-2 .func-icon { background: linear-gradient(135deg, #3E5C4D, #6C917F); }
-.fc-3 .func-icon { background: linear-gradient(135deg, #B58E4A, #DDBF85); }
-.fc-4 .func-icon { background: linear-gradient(135deg, #6B5B4F, #A08A78); }
+.func-icon { width: 44px; height: 44px; border: 1px solid rgba(185,145,67,.18); border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; flex: 0 0 44px; background: #fff; }
+.func-icon img { position: absolute; top: -7%; left: -21%; width: 142%; height: 142%; max-width: none; object-fit: contain; }
 
 .func-title { font-size: 18px; font-weight: 700; color: var(--text-dark); letter-spacing: 1px;}
 .func-desc { font-size: 13px; color: #7a6f66; line-height: 1.6; margin-bottom: 16px; flex: 1;}
@@ -797,7 +794,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       <!-- 卡片1：智能导览 -->
       <div class="func-card fc-1">
         <div class="func-card-header">
-          <div class="func-icon">🗺</div>
+          <div class="func-icon"><img src="assets/icons/guide.jpg" alt="" aria-hidden="true"></div>
           <div class="func-title">智能地图导览</div>
         </div>
         <p class="func-desc">回答简单问题，AI为你规划专属漫步路线。避开喧嚣，寻找胡同深处的文化彩蛋与隐秘风景。</p>
@@ -807,7 +804,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       <!-- 卡片2：智能体（老街坊） -->
       <div class="func-card fc-2">
         <div class="func-card-header">
-          <div class="func-icon">👴</div>
+          <div class="func-icon"><img src="assets/icons/recommend.jpg" alt="" aria-hidden="true"></div>
           <div class="func-title">对话"老街坊"</div>
         </div>
         <p class="func-desc">我们引入了专属AI智能体“老街坊”。关于西四北的名人轶事、门楼讲究，你可以随时向他提问，支持语音朗读！</p>
@@ -817,7 +814,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       <!-- 卡片3：3D 展厅 -->
       <div class="func-card fc-3">
         <div class="func-card-header">
-          <div class="func-icon">🏛</div>
+          <div class="func-icon"><img src="assets/icons/exhibition.jpg" alt="" aria-hidden="true"></div>
           <div class="func-title">3D 数字展厅</div>
         </div>
         <p class="func-desc">利用数字孪生技术，将胡同里的门楼1:1还原。滑动屏幕，即可360度观察广亮大门、金柱大门的绝美砖雕。</p>
@@ -827,7 +824,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
       <!-- 卡片4：我的护照 -->
       <div class="func-card fc-4">
         <div class="func-card-header">
-          <div class="func-icon">📔</div>
+          <div class="func-icon"><img src="assets/icons/my-route.jpg" alt="" aria-hidden="true"></div>
           <div class="func-title">胡同漫游护照</div>
         </div>
         <p class="func-desc">在线上或线下完成点位打卡，集齐专属电子印章，召唤你的西四北胡同漫游者专属证书。</p>
