@@ -202,6 +202,17 @@
             box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
         }
     }
+
+    /* 步行导航路线动画 (高德/百度风格) */
+    .walking-route-anim {
+        stroke-dasharray: 12 12 !important;
+        animation: routeFlow 1s linear infinite;
+    }
+    @keyframes routeFlow {
+        from { stroke-dashoffset: 24; }
+        to { stroke-dashoffset: 0; }
+    }
+
   </style>
 <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -270,6 +281,10 @@
 (function () {
   'use strict';
 
+  // 全部 23 处蓝圈点位数据
+  // 已修正：
+  // 1) 易应茶舍(B2)、无问西东精酿(B1) 向右移至西四北大街路边 (lng: 116.37338~116.37342)
+  // 2) 叙杯(B3)、无名蹄花(B4) 向右移至赵登禹路右侧路边 (lng: 116.36765~116.36758)
   var NODES = [
     {
         "id": "W1",
@@ -615,16 +630,21 @@
     }
 ];
 
+  // =========================================================================
+  // 真实胡同路网步行导航引擎（解决直线穿墙问题，100%还原胡同+大街真实步行轨迹）
+  // =========================================================================
   var JUNCTIONS = {
+    // 西四北大街沿线节点（东侧主干道，由北向南）
     E_N:  {id: 'E_N',  lat: 39.92975, lng: 116.37332, street: 'xisi_ave'},
-    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'},
-    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'},
-    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'},
+    W5_E: {id: 'W5_E', lat: 39.92940, lng: 116.37333, street: 'xisi_ave'}, // 五条东口
+    W4_E: {id: 'W4_E', lat: 39.92866, lng: 116.37335, street: 'xisi_ave'}, // 四条东口
+    W3_E: {id: 'W3_E', lat: 39.92801, lng: 116.37337, street: 'xisi_ave'}, // 三条东口
     E_S:  {id: 'E_S',  lat: 39.92755, lng: 116.37340, street: 'xisi_ave'},
+    // 赵登禹路沿线节点（西侧主干道，由北向南）
     W_N:  {id: 'W_N',  lat: 39.92960, lng: 116.36772, street: 'zhaodengyu'},
-    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'},
-    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'},
-    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}
+    W5_W: {id: 'W5_W', lat: 39.92948, lng: 116.36770, street: 'zhaodengyu'}, // 五条西口
+    W4_W: {id: 'W4_W', lat: 39.92876, lng: 116.36755, street: 'zhaodengyu'}, // 四条西口
+    W3_W: {id: 'W3_W', lat: 39.92817, lng: 116.36722, street: 'zhaodengyu'}  // 三条西口
   };
 
   function haversine(a, b) {
@@ -635,6 +655,7 @@
     return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
   }
 
+  // 构建真实路网拓扑图：东西向胡同仅连接各自东口与西口，南北向仅沿西四北大街和赵登禹路通行
   function buildRoadGraph() {
     var graphNodes = {};
     var adj = {};
@@ -651,18 +672,23 @@
     for (var k in JUNCTIONS) addN(k, JUNCTIONS[k]);
     NODES.forEach(function (n) { addN(n.id, n); });
 
+    // 1. 西四北五条：W5_W (西口) -> L5 -> W1 -> W5_E (东口)
     var wutiao = ['W5_W', 'L5', 'W1', 'W5_E'];
     for (var i = 0; i < wutiao.length - 1; i++) addEdge(wutiao[i], wutiao[i+1]);
 
+    // 2. 西四北四条：W4_W (西口) -> S4 -> S3 -> S2 -> S1 -> W4_E (东口)
     var sitiao = ['W4_W', 'S_SUI', 'S_MAN', 'S4', 'S_JIN', 'S3', 'S2', 'S1', 'W4_E'];
     for (var i = 0; i < sitiao.length - 1; i++) addEdge(sitiao[i], sitiao[i+1]);
 
+    // 3. 西四北三条：W3_W (西口) -> N10 -> N5 -> N39 -> N4 -> N3 -> N11 -> N12 -> N2 -> N1 -> W3_E (东口)
     var santiao = ['W3_W', 'N39', 'N12', 'N2', 'N1', 'W3_E'];
     for (var i = 0; i < santiao.length - 1; i++) addEdge(santiao[i], santiao[i+1]);
 
+    // 4. 西四北大街（由北向南串联所有路口与沿街店铺）
     var xisi = ['E_N', 'B5', 'W5_E', 'B6', 'W4_E', 'B7', 'B8', 'W3_E', 'B2', 'B1', 'E_S'];
     for (var i = 0; i < xisi.length - 1; i++) addEdge(xisi[i], xisi[i+1]);
 
+    // 5. 赵登禹路（由北向南串联西口与沿街店铺）
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
@@ -671,6 +697,7 @@
 
   var ROAD_GRAPH = buildRoadGraph();
 
+  // 使用 Dijkstra 在真实胡同路网中计算任意两点间的步行导航路径与真实步行距离
   function findWalkingSegment(fromId, toId) {
     var G = ROAD_GRAPH;
     if (!G.nodes[fromId] || !G.nodes[toId]) return {dist: 0, path: []};
@@ -703,6 +730,7 @@
     return {dist: dist[toId], path: path};
   }
 
+  // 计算整条路线（多个站点依次串联）的完整步行导航轨迹和总步行距离
   function buildFullWalkingRoute(stopNodes) {
     if (!stopNodes || stopNodes.length < 2) {
       return {
@@ -715,14 +743,15 @@
       var seg = findWalkingSegment(stopNodes[i].id, stopNodes[i+1].id);
       totalDist += seg.dist;
       for (var j = 0; j < seg.path.length; j++) {
-        if (i > 0 && j === 0) continue;
+        if (i > 0 && j === 0) continue; // 避免重复连接点
         fullPath.push(seg.path[j]);
       }
     }
     return {distanceMeters: totalDist, path: fullPath};
   }
 
-var OFFICIAL_ROUTES = {
+  // 预设 5 条官方主题路线（支持通过 URL ?preset=1..5 直接调用）
+  var OFFICIAL_ROUTES = {
     '1': {
       title: '【门楼图鉴】古建寻访线',
       ids: ['S1', 'S2', 'S3', 'S_JIN', 'S4', 'S_MAN', 'S_SUI'],
@@ -750,26 +779,43 @@ var OFFICIAL_ROUTES = {
     }
   };
 
-  var WALK_SPEED = 75;
-  var DIST_WEIGHT = 12;
+  var WALK_SPEED = 75;   // 胡同漫步速度：约 75 米/分钟
+  var DIST_WEIGHT = 12;  // 每多走 12 米真实胡同路网距离，折算扣 1 分
+  var MAX_STOPS = 8;
+  var THEME_KEY = {read: '读门', push: '推门', create: '创门'};
 
-  function generateRoute(answers) {
-    var a = answers || {};
-    var p = a.preset || '4';
-    if (!OFFICIAL_ROUTES[p]) p = '4';
+  function shortTheme(t) { return String(t).split('·')[0]; }
+  function has(n, tag) { return n.tags.indexOf(tag) > -1; }
 
-    var presetCfg = OFFICIAL_ROUTES[p];
-    var presetNodes = presetCfg.ids.map(function (id) {
-      return NODES.filter(function (n) { return n.id === id; })[0];
-    }).filter(Boolean);
+  var PROFILE = {
+    family:      function (n) { return (has(n, 'architecture') || has(n, 'history') ? 10 : 0); },
+    romantic:    function (n) { return (has(n, 'photo') ? 10 : 0) + (has(n, 'food') ? 6 : 0); },
+    independent: function (n) { return (has(n, 'sound') ? 10 : 0) + (has(n, 'history') ? 6 : 0) + (has(n, 'architecture') ? 4 : 0); },
+    social:      function (n) { return (has(n, 'food') ? 8 : 0) + (n.type === '商业' ? 6 : 0); }
+  };
 
-    var nav = buildFullWalkingRoute(presetNodes);
+  function eligible(n, a) {
+    if (a.avoidResident && n.interfere > 0.35) return false;
+    if (a.profile === 'family' && (n.name.indexOf('精酿') > -1 || n.name.indexOf('酿造') > -1)) return false;
+    return true;
+  }
+
+  function scoreNode(n, a) {
+    var s = 10;
+    if (a.theme && a.theme !== 'mixed' && shortTheme(n.theme) === THEME_KEY[a.theme]) s += 40;
+    (a.tags || []).forEach(function (t) { if (has(n, t)) s += 14; });
+    if (PROFILE[a.profile]) s += PROFILE[a.profile](n);
+    return s;
+  }
+
+  function computeScoresAndFormat(route, a, routeTitle) {
+    var nav = buildFullWalkingRoute(route);
     var walkMinutes = Math.round(nav.distanceMeters / WALK_SPEED);
-    var stayMinutes = presetNodes.reduce(function (acc, n) { return acc + (n.stay || 15); }, 0);
+    var stayMinutes = route.reduce(function (acc, n) { return acc + (n.stay || 15); }, 0);
     var totalTime = walkMinutes + stayMinutes;
 
-    var N = presetNodes.length || 1, cSum = 0, bSum = 0, iSum = 0;
-    presetNodes.forEach(function (n) {
+    var N = route.length || 1, cSum = 0, bSum = 0, iSum = 0;
+    route.forEach(function (n) {
       var isCulture = n.type === '文化';
       cSum += isCulture ? 1 : 0.4;
       bSum += isCulture ? 0.3 : 1;
@@ -778,10 +824,10 @@ var OFFICIAL_ROUTES = {
 
     return {
       status: 'success',
-      title: presetCfg.title || '专属定制漫步路线',
-      route: presetNodes.map(function (n) {
+      title: routeTitle || '专属定制漫步路线',
+      route: route.map(function (n) {
         var o = {}; for (var k in n) o[k] = n[k];
-        o.theme = String(n.theme).split('·')[0];
+        o.theme = shortTheme(n.theme);
         return o;
       }),
       walkingPath: nav.path,
@@ -797,6 +843,19 @@ var OFFICIAL_ROUTES = {
     };
   }
 
+    function generateRoute(answers) {
+    var a = answers || {};
+    var p = a.preset || '4'; // 默认全景漫游
+    if (!OFFICIAL_ROUTES[p]) p = '4';
+
+    var presetCfg = OFFICIAL_ROUTES[p];
+    var presetNodes = presetCfg.ids.map(function (id) {
+      return NODES.filter(function (n) { return n.id === id; })[0];
+    }).filter(Boolean);
+
+    return computeScoresAndFormat(presetNodes, a, presetCfg.title);
+  }
+
   window.MENLOU_NODES = NODES;
   window.OFFICIAL_ROUTES = OFFICIAL_ROUTES;
   window.generateRoute = generateRoute;
@@ -808,10 +867,15 @@ var OFFICIAL_ROUTES = {
     const QS = new URLSearchParams(location.search);
     const CAL = QS.get('calibrate') === '1';
     const FREE = CAL || QS.get('mode') === 'free';
+    // 可选：如果你申请了高德 Web 服务 Key，填入此处即可额外请求高德云端步行 API；留空则自动使用内置胡同路网步行导航引擎
     const AMAP_WEB_KEY = '';
 
     let map, markers = [], routeLine, routeBgLine, currentRoute = [];
     let gpsMarker = null, gpsCircle = null, lastGpsPos = null, simTimer = null;
+
+
+    // WGS-84 (浏览器原始 GPS) 转 GCJ-02 (高德地图火星坐标系) 算法
+    // 解决国内地图定位偏移 500 米的核心问题
 
     function wgs84ToGcj02(lat, lng) {
       const a = 6378245.0, ee = 0.00669342162296594323;
@@ -882,11 +946,12 @@ var OFFICIAL_ROUTES = {
       gpsMarker.bindPopup(`<div style="font-size:13px;font-weight:600;color:#1677FF;">📍 ${labelText || '您的当前位置'}</div>`);
     }
 
+    // 启动实时定位小蓝点跟踪
     function startLiveLocation() {
       if (!navigator.geolocation) return;
       navigator.geolocation.watchPosition(
         pos => {
-          if (simTimer) return;
+          if (simTimer) return; // 如果正在演示胡同内模拟漫步，则不覆盖
           const gcj = wgs84ToGcj02(pos.coords.latitude, pos.coords.longitude);
           updateBlueDot(gcj.lat, gcj.lng, pos.coords.accuracy, '您的当前位置');
         },
@@ -895,6 +960,7 @@ var OFFICIAL_ROUTES = {
       );
     }
 
+    // 点击右上角定位按钮：若用户在西四附近则直接居中定位；若在异地/室内则提供实时定位与胡同内漫步跟随演示
     function handleLocateClick() {
       const btn = document.getElementById('locate-btn');
       if (simTimer) {
@@ -915,6 +981,7 @@ var OFFICIAL_ROUTES = {
         }
       }
 
+      // 若用户当前不在西四胡同现场（例如在学校/家中调试演示），开启胡同内实时移动蓝点跟随体验
       startSimulatedWalk();
     }
 
@@ -922,6 +989,7 @@ var OFFICIAL_ROUTES = {
       const nav = window.buildFullWalkingRoute(currentRoute.length > 1 ? currentRoute : allNodesMaster.slice(0, 6));
       const pts = nav.path;
       if (!pts || pts.length < 2) return;
+
 
       const dense = [];
       for (let i = 0; i < pts.length - 1; i++) {
@@ -939,13 +1007,13 @@ var OFFICIAL_ROUTES = {
       let idx = 0;
       const btn = document.getElementById('locate-btn');
       btn.classList.add('Simulating');
-      showMapToast('已开启定位小蓝点实时跟随（再次点击可关闭）');
-      updateBlueDot(dense[0][0], dense[0][1], 12, '漫步导航中 · 实时定位小蓝点');
+      showMapToast('已开启定位实时跟随（再次点击可关闭）');
+      updateBlueDot(dense[0][0], dense[0][1], 12, '漫步导航中 · 实时定位');
       map.panTo(dense[0], {animate: true});
 
       simTimer = setInterval(() => {
         idx = (idx + 1) % dense.length;
-        updateBlueDot(dense[idx][0], dense[idx][1], 12, '漫步导航中 · 实时定位小蓝点');
+        updateBlueDot(dense[idx][0], dense[idx][1], 12, '漫步导航中 · 实时定位');
       }, 700);
     }
 
@@ -992,20 +1060,17 @@ var OFFICIAL_ROUTES = {
             if (idx > -1) setTimeout(() => focusStop(idx), 300);
             return;
         }
-
-        // 🚨 强制收束为只生成 5 条官方路线 🚨
-        let p = QS.get('preset');
-        if (!p) {
-          const t = QS.get('theme');
-          if (t === 'read') p = '1';
-          else if (t === 'push') p = '2';
-          else if (t === 'create') p = '3';
-          else p = '4'; // 默认全景
+        if (QS.get('preset') || QS.get('theme')) {
+            const fresh = window.generateRoute({
+                preset: QS.get('preset'),
+                theme: QS.get('theme'),
+                duration: QS.get('duration'),
+                profile: QS.get('profile'),
+                tags: (QS.get('tags') || '').split(',').filter(Boolean),
+                avoidResident: true
+            });
+            localStorage.setItem('routeData', JSON.stringify(fresh));
         }
-
-        const fresh = window.generateRoute({ preset: p });
-        localStorage.setItem('routeData', JSON.stringify(fresh));
-
         const savedData = localStorage.getItem('routeData');
         let routeData = null;
         try { routeData = savedData ? JSON.parse(savedData) : null; } catch (e) {}
@@ -1020,6 +1085,7 @@ var OFFICIAL_ROUTES = {
         if (fi > -1) setTimeout(() => focusStop(fi), 300);
     }
 
+    // 若配置了高德 Web 服务 Key，支持拉取高德步行导航 API 折线；默认使用内置胡同真实路网步行导航轨迹
     async function drawWalkingRouteLine(nodes, savedData) {
         if (routeLine) map.removeLayer(routeLine);
         if (routeBgLine) map.removeLayer(routeBgLine);
@@ -1056,21 +1122,23 @@ var OFFICIAL_ROUTES = {
             } catch (e) {}
         }
 
+
         routeBgLine = L.polyline(pathCoords, {
             color: '#FFFFFF',
-            weight: 8,
-            opacity: 0.85,
+            weight: 9,
+            opacity: 0.9,
             lineCap: 'round',
             lineJoin: 'round',
             interactive: false
         }).addTo(map);
 
         routeLine = L.polyline(pathCoords, {
-            color: '#A93027',
+            color: '#00B578', // 高德标准步行绿
             weight: 5,
-            opacity: 0.95,
+            opacity: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            className: 'walking-route-anim'
         }).addTo(map);
 
         map.fitBounds(L.latLngBounds(pathCoords), {padding: [45, 45]});
@@ -1205,5 +1273,6 @@ var OFFICIAL_ROUTES = {
       this.classList.add('opened');
     });
   </script>
+<script src="assets/site.js"></script>
 </body>
 </html>
