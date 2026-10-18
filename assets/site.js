@@ -200,6 +200,8 @@
     }
     const observer = new MutationObserver((records) => {
       records.forEach((record) => {
+        if (record.target.nodeType === Node.ELEMENT_NODE && record.target.closest('.site-controls')) return;
+        if (record.target.parentElement?.closest('.site-controls')) return;
         if (record.type === 'characterData') {
           if (state.lang === 'en' && record.target.nodeValue !== appliedText.get(record.target)) {
             originalText.set(record.target, record.target.nodeValue);
@@ -213,7 +215,6 @@
           else if (node.nodeType === Node.ELEMENT_NODE) translateText(node, EN, 'en');
         });
       });
-      updateControls();
     });
     observer.observe(document.body, { childList: true, characterData: true, subtree: true });
   });
