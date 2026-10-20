@@ -1,0 +1,38 @@
+[33mcommit 4ac135c40b4c639874d0f5e92b3263c2a9a4d5f6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Aitian-1 <309975254+Altian-1@users.noreply.github.com>
+Date:   Fri Oct 16 22:32:34 2026 +0800
+
+    Polish gate gallery and bilingual homepage
+
+ assets/site.css |   2 [32m+[m[31m-[m
+ assets/site.js  | 116 [32m++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------[m
+ index.html      |  15 [32m+++[m[31m-----[m
+ 3 files changed, 104 insertions(+), 29 deletions(-)
+
+[33mcommit 638098b10bebc7d947a589b5b8b69f71cd4fb5d1[m
+Merge: 2da4584 d5f70e7
+Author: Aitian-1 <309975254+Altian-1@users.noreply.github.com>
+Date:   Fri Oct 16 22:03:23 2026 +0800
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 2da4584211ea491055144c25c56cd256215be16c[m
+Author: Aitian-1 <309975254+Altian-1@users.noreply.github.com>
+Date:   Fri Oct 16 21:47:06 2026 +0800
+
+    Add five gate type 3D models
+
+ README.md                                         |     11 [32m+[m[31m-[m
+ assets/models/guangliang-gate/Guangliang_Gate.glb |    Bin [31m0[m -> [32m1179224[m bytes
+ assets/models/guangliang-gate/Guangliang_Gate.obj |  17506 [32m+++[m
+ assets/models/manzi-gate/Manzi_Gate.glb           |    Bin [31m0[m -> [32m5483664[m bytes
+ assets/models/manzi-gate/Manzi_Gate.obj           | 112768 [32m+++++++++++++++++++[m
+ assets/models/ruyi-gate/Ruyi_Gate.glb             |    Bin [31m0[m -> [32m554708[m bytes
+ assets/models/ruyi-gate/Ruyi_Gate.obj             |   9124 [32m++[m
+ assets/models/suiqiang-gate/Suiqiang_Gate.glb     |    Bin [31m0[m -> [32m750364[m bytes
+ assets/models/suiqiang-gate/Suiqiang_Gate.obj     |  12364 [32m++[m
+ assets/models/traditional-gate-materials.mtl      |     65 [32m+[m
+ assets/models/western-gate/Western_Gate.glb       |    Bin [31m0[m -> [32m358408[m bytes
+ assets/models/western-gate/Western_Gate.obj       |   6904 [32m++[m
+ gate-3d.html                                      |     38 [32m+[m[31m-[m
+ 13 files changed, 158768 insertions(+), 12 deletions(-)
