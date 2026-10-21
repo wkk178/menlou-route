@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#6B5B4F">
-<title>门楼层记·故事里 | 层记西四 阅见古今</title>
+<title>西四云境·门里乾坤 | 门楼层记·故事里</title>
 <style>
 :root{
   --door-gray:#6B5B4F;
@@ -24,20 +24,27 @@
 }
 *{margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
 html{-webkit-text-size-adjust: 100%; scroll-behavior: smooth;}
-body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E3DBD0; color: var(--text-dark);}
+body{font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #E3DBD0 url('assets/backgrounds/paper-texture.jpg') center top / 480px auto repeat; color: var(--text-dark);}
 a{color: inherit; text-decoration: none;}
 button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
-.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg-cream); position: relative; padding-bottom: calc(82px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow-x: hidden;}
+.app{max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--bg-cream) url('assets/backgrounds/paper-texture.jpg') center top / 480px auto repeat; position: relative; padding-bottom: calc(82px + env(safe-area-inset-bottom)); box-shadow: 0 0 40px rgba(0,0,0,0.12); overflow-x: hidden;}
 
 /* 主视觉 */
-.hero{position: relative; height: 360px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0;
-      background: linear-gradient(rgba(44,36,32,0.25), rgba(44,36,32,0.72)), url('bg-hero.jpg') center / cover no-repeat, linear-gradient(135deg, #6B5B4F, #4A6B5A);}
+.hero{position: relative; height: 360px; color: #fff; padding: calc(env(safe-area-inset-top) + 14px) 18px 0; isolation:isolate; background:linear-gradient(135deg, #6B5B4F, #4A6B5A);}
+.hero::before,.hero::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;}
+.hero::before{background:var(--hero-photo, url('assets/backgrounds/hero-gate-ornate.jpg')) center / cover no-repeat;transition:opacity .8s ease;}
+.hero::after{background:linear-gradient(rgba(44,36,32,0.25), rgba(44,36,32,0.72));}
+.hero-bar,.hero-text{position:absolute;z-index:1;}
+.hero-bar{left:18px;right:18px;top:calc(env(safe-area-inset-top) + 14px);}
 .hero-bar{display: flex; justify-content: space-between; align-items: center;}
 .pill{display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 20px; font-size: 13px; background: rgba(255,255,255,0.18); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);}
-.hero-text{position: absolute; left: 18px; right: 18px; bottom: 76px;}
+.hero-text{left:18px;right:18px;bottom:76px;}
 .hero-tag{display: inline-block; font-size: 11px; letter-spacing: 2px; padding: 3px 10px; border-radius: 4px; background: var(--red); margin-bottom: 10px;}
 .hero h1{font-size: 30px; line-height: 1.25; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.4);}
 .hero p{font-size: 13px; opacity: 0.92; margin-top: 6px; letter-spacing: 1px;}
+.opening-cover{position:fixed;inset:0;z-index:2000;display:grid;place-items:end center;padding:24px 20px calc(34px + env(safe-area-inset-bottom));background:#f5f1e8 url('assets/backgrounds/cover-xisi-cloud.jpg') center/cover no-repeat;transition:opacity .55s ease,visibility .55s ease;}
+.opening-cover.is-hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.opening-enter{padding:13px 30px;border:1px solid rgba(107,91,79,.4);border-radius:28px;background:rgba(255,253,249,.9);color:#392c25;font-size:16px;font-weight:700;letter-spacing:3px;box-shadow:0 6px 24px rgba(44,36,32,.16);}
 
 /* ========== 四大核心功能模块 (横向滑动卡片) ========== */
 .func-slider-wrapper { margin: -50px 0 0 0; position: relative; z-index: 5; overflow: hidden; padding-bottom: 6px;}
@@ -775,6 +782,9 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
+<div class="opening-cover" id="openingCover" role="dialog" aria-label="西四云境·门里乾坤">
+  <button class="opening-enter" id="openingEnter" type="button">推门入巷</button>
+</div>
 <div class="app">
   <header class="hero">
     <div class="hero-bar">
@@ -782,7 +792,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
     </div>
     <div class="hero-text">
       <span class="hero-tag">社区文商活化计划</span>
-      <h1>层记西四 · 阅见古今</h1>
+      <h1>西四云境·门里乾坤</h1>
       <p>推开一座门楼，走进一层时光。在城市微更新中寻找胡同的记忆。</p>
     </div>
   </header>
@@ -801,14 +811,14 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
         <a href="choose.html" class="func-btn">开启游览 ›</a>
       </div>
 
-      <!-- 卡片2：智能体（老街坊） -->
+      <!-- 卡片2：点位故事检索 -->
       <div class="func-card fc-2">
         <div class="func-card-header">
           <div class="func-icon"><img src="assets/icons/recommend.jpg" alt="" aria-hidden="true"></div>
-          <div class="func-title">对话"老街坊"</div>
+          <div class="func-title">点位故事检索</div>
         </div>
-        <p class="func-desc">我们引入了专属AI智能体“老街坊”。关于西四北的名人轶事、门楼讲究，你可以随时向他提问，支持语音朗读！</p>
-        <a href="map.html" class="func-btn">去找他聊聊 ›</a>
+        <p class="func-desc">输入门楼名称或门牌号，查找西四街巷的建筑形制、历史人物与社区记忆。</p>
+        <a href="map.html" class="func-btn">打开故事检索 ›</a>
       </div>
 
       <!-- 卡片3：3D 展厅 -->
@@ -1067,7 +1077,7 @@ button{font-family:inherit;border:none;background:none;cursor:pointer;color:inhe
           <h3 class="reveal">胡同声痕与新颜</h3>
           <div class="reveal">
             <p>鸽哨掠过、邻里问候、精酿茶歇。我们在数字化交互中保留这些市井烟火，并以新商业业态为老街区注入可持续的活力。</p>
-            <p>今天，3D 数字档案、NFC 声痕与 AI 老街坊，让游客不必打扰居民，也能“读”到每一座门楼；沿街新业态的收益，则反哺老街区的修缮与社区福利。</p>
+            <p>今天，3D 数字档案、NFC 声痕与点位故事检索，让游客不必打扰居民，也能“读”到每一座门楼；沿街新业态的收益，则反哺老街区的修缮与社区福利。</p>
           </div>
           <ul class="tags reveal"><li>3D 数字档案</li><li>NFC 声痕</li><li>新业态共创</li></ul>
           <a class="go reveal" href="quiz.html">开启漫步路线 ›</a>
@@ -1218,6 +1228,26 @@ var st = document.querySelector('.stats');
 if ('IntersectionObserver' in window) {
   new IntersectionObserver(function (l, o) { if (l[0].isIntersecting) { countUp(); o.disconnect(); } }, {threshold: 0.4}).observe(st);
 } else { countUp(); }
+
+// 开屏封面与首页照片轮播
+(function () {
+  var cover = document.getElementById('openingCover');
+  var enter = document.getElementById('openingEnter');
+  if (cover && enter) {
+    if (sessionStorage.getItem('xisi-cover-seen') === '1') cover.classList.add('is-hidden');
+    enter.addEventListener('click', function () {
+      sessionStorage.setItem('xisi-cover-seen', '1');
+      cover.classList.add('is-hidden');
+    });
+  }
+  var hero = document.querySelector('.hero');
+  var photos = ['assets/backgrounds/hero-gate-ornate.jpg', 'assets/backgrounds/hero-red-gate.jpg', 'bg-hero.jpg'];
+  var photoIndex = 0;
+  if (hero) window.setInterval(function () {
+    photoIndex = (photoIndex + 1) % photos.length;
+    hero.style.setProperty('--hero-photo', 'url("' + photos[photoIndex] + '")');
+  }, 5000);
+})();
 
 // 滑动卡片指示点同步逻辑
 (function() {

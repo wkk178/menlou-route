@@ -110,7 +110,7 @@
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
 
-    /* 老街坊智能体悬浮按钮 */
+    /* 老街坊点位故事检索入口 */
     #laojiefang-fab {
         position: absolute;
         right: 14px;
@@ -163,47 +163,21 @@
     }
     #laojiefang-fab.opened #laojiefang-bubble { display: none; }
 
+    #local-guide{position:fixed;right:16px;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 92px);z-index:10003;width:min(350px,calc(100vw - 32px));max-height:min(62vh,520px);overflow:auto;padding:16px;background:#fffdf8;border:1px solid rgba(201,168,108,.55);border-radius:18px;box-shadow:0 12px 36px rgba(35,27,21,.24);display:none}
+    #local-guide.visible{display:block}
+    .local-guide-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#3c3028;font-weight:700}
+    #local-guide-close{font-size:24px;line-height:1;padding:2px 8px;color:#76685d}
+    #local-guide p{font-size:12px;color:#786c62;line-height:1.55;margin-bottom:10px}
+    #local-guide-form{display:flex;gap:7px}
+    #local-guide-query{min-width:0;flex:1;border:1px solid #d8c8aa;border-radius:10px;padding:10px;font:inherit;background:white}
+    #local-guide-form button{padding:0 14px;border-radius:10px;background:#3E5C4D;color:#fff;font-weight:700}
+    #local-guide-result{margin-top:12px;font-size:13px;line-height:1.7;color:#42362f;white-space:pre-wrap}
+
     @keyframes bounceBubble {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-4px); }
     }
 
-    #coze-web-sdk-container [class*="message-me"],
-    #coze-web-sdk-container [class*="message-user"] {
-        display: flex !important;
-        flex-direction: row-reverse !important;
-        justify-content: flex-start !important;
-        text-align: right !important;
-    }
-    #coze-web-sdk-container [class*="message-bot"],
-    #coze-web-sdk-container [class*="message-ai"] {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-start !important;
-        text-align: left !important;
-    }
-    #coze-web-sdk-container [class*="message-bot"] img,
-    #coze-web-sdk-container [class*="message-ai"] img {
-        content: url('./laojiefang_full.png') !important;
-        border-radius: 50% !important;
-        background: transparent !important;
-    }
-    @media screen and (max-width: 768px) {
-        div#coze-web-sdk-container {
-            z-index: 2147483647 !important;
-        }
-        #coze-web-sdk-container iframe,
-        #coze-web-sdk-container > div:last-child {
-            position: fixed !important;
-            bottom: 0 !important;
-            right: 0 !important;
-            width: 100vw !important;
-            height: calc(100dvh - env(safe-area-inset-top, 50px) - 20px) !important;
-            max-height: 90vh !important;
-            border-radius: 20px 20px 0 0 !important;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
-        }
-    }
   </style>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -249,9 +223,15 @@
   </div>
   <div id="laojiefang-fab" title="老街坊">
     <div id="laojiefang-bubble">老街坊
-路线问我！</div>
+点位故事</div>
     <img src="./laojiefang_full.png" alt="老街坊">
   </div>
+  <section id="local-guide" aria-label="点位故事查询">
+    <div class="local-guide-head"><span>老街坊 · 点位故事</span><button id="local-guide-close" type="button" aria-label="关闭">×</button></div>
+    <p>在线问答暂不可用时，可输入点位名称或门牌号，查询已整理的街区介绍。</p>
+    <form id="local-guide-form"><input id="local-guide-query" type="search" placeholder="如：金柱大门、隆长寺" autocomplete="off"><button type="submit">查找</button></form>
+    <div id="local-guide-result" aria-live="polite">试试搜索“广亮大门”或“程砚秋故居”。</div>
+  </section>
   </div>
   <nav class="tabbar">
     <a class="tab" href="index.html">
@@ -278,29 +258,29 @@
   // 严格只保留原图中的 23 个蓝圈点位，坐标 1:1 对齐原图院落位置
   var NODES = [
     // --- 西四北五条（2处蓝圈） ---
-    {id:"L5", name:"傅增湘故居", door:"五条23号院", street:"wutiao", theme:"阅巷·生活", type:"文化", stay:15, lat:39.92946, lng:116.36945, interfere:0.25, tags:["sound","history"], desc:"近代著名藏书家傅增湘先生故居，收录有胡同鸽哨声痕，感知藏书大家的精神世界。"},
-    {id:"W1", name:"中央电影局旧址", door:"五条15-19号", street:"wutiao", theme:"读门·寻古", type:"文化", stay:20, lat:39.92942, lng:116.37095, interfere:0.2, tags:["history","architecture"], desc:"新中国电影事业的摇篮，见证了中国电影早期发展的重要历史印记。"},
+    {id:"L5", name:"傅增湘故居 · 藏园", door:"五条7号", street:"wutiao", theme:"阅巷·生活", type:"文化", stay:15, lat:39.92946, lng:116.36945, interfere:0.25, tags:["sound","history"], desc:"傅增湘1918年购得的四合院，曾设藏书楼“双鉴楼”，收藏、校勘古籍。"},
+    {id:"W1", name:"中央电影局旧址", door:"五条15-19号", street:"wutiao", theme:"读门·寻古", type:"文化", stay:20, lat:39.92942, lng:116.37095, interfere:0.2, tags:["history","architecture"], desc:"北京电影学院前身所在地，1950年开设表演班与编剧班，培养早期电影创作者。"},
 
     // --- 西四北四条（严格仅保留原图4处蓝圈：如意门、麒麟图门墩、广亮大门、西洋门） ---
-    {id:"S1", name:"如意门 (四条)", door:"四条2-4号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92868, lng:116.37245, interfere:0.2, tags:["architecture","photo"], desc:"【如意门】四条东口典型传统民居门楼，门楣砖雕精致，寓意吉祥如意。"},
-    {id:"S2", name:"麒麟图门墩", door:"四条6号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92869, lng:116.37215, interfere:0.2, tags:["architecture","photo"], desc:"【门墩石雕】四条胡同珍贵的麒麟纹样抱鼓石门墩，雕工细腻，保存完好。"},
-    {id:"S3", name:"广亮大门 (四条)", door:"四条20号院", street:"sitiao", theme:"读门·寻古", type:"文化", stay:12, lat:39.92872, lng:116.36975, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】四条中段高等级宅门代表，门扉退后于中柱之间，尽显古建规制。"},
-    {id:"S4", name:"西洋门 (四条)", door:"四条22-24号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92864, lng:116.36948, interfere:0.2, tags:["architecture","photo"], desc:"【西洋门】近代中西合璧建筑风格的门楼代表，带有浓郁的民国砖石装饰特色。"},
+    {id:"S1", name:"如意门 (四条)", door:"四条2-4号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92868, lng:116.37245, interfere:0.2, tags:["architecture","photo"], desc:"门洞两侧饰有对称如意形砖雕（又称“象鼻枭”），门簪常刻“如意”二字，寓意吉祥。"},
+    {id:"S2", name:"麒麟图门墩", door:"四条6号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92869, lng:116.37215, interfere:0.2, tags:["architecture","photo"], desc:"麒麟纹样抱鼓石门墩，既支撑门轴，也寄托祥瑞、文运兴盛与家宅平安的愿望。"},
+    {id:"S3", name:"广亮大门 (四条)", door:"四条20号院", street:"sitiao", theme:"读门·寻古", type:"文化", stay:12, lat:39.92872, lng:116.36975, interfere:0.25, tags:["architecture","history"], desc:"传统高等级宅门形制，门扉设于门庑中柱，门前空间宽阔。"},
+    {id:"S4", name:"西洋门 (四条)", door:"四条22-24号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92864, lng:116.36948, interfere:0.2, tags:["architecture","photo"], desc:"将传统中式门框与西式建筑构图相结合的近代门楼。"},
 
     // --- 赵登禹路沿街（2处蓝圈，位于道路右侧） ---
     {id:"B3", name:"叙杯", door:"赵登禹路144号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:25, lat:39.92912, lng:116.36765, interfere:0.1, tags:["food","photo"], desc:"赵登禹路东侧沿街特色空间，位于西四北五条与四条西口之间。"},
     {id:"B4", name:"无名蹄花", door:"赵登禹路148号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:35, lat:39.92888, lng:116.36758, interfere:0.1, tags:["food"], desc:"赵登禹路东侧人气餐饮小馆，临近西四北四条西口，充满胡同烟火气。"},
 
     // --- 西四北三条（严格对应原图9处蓝圈，由东向西排列） ---
-    {id:"N1", name:"圣祚隆长寺", door:"三条1-3号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92803, lng:116.37245, interfere:0.2, tags:["architecture","history"], desc:"【古寺山门】明万历年间圣祚隆长寺旧址，存有珍贵的历史遗存。"},
-    {id:"N2", name:"马福祥故居", door:"三条11号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92818, lng:116.37080, interfere:0.25, tags:["architecture","history"], desc:"【广亮大门】民国名将马福祥故居，高级官宦宅门代表，牡丹缠枝砖雕极尽考究。"},
-    {id:"N12", name:"拾光茶社", door:"三条15-19号", street:"santiao", theme:"创门·共生", type:"商业", stay:30, lat:39.92805, lng:116.37042, interfere:0.1, tags:["food","shopping"], desc:"【蛮子门】位于三条胡同内的一院一茗特调茶空间，古建形制与茶香共生。"},
-    {id:"N11", name:"西洋门 (三条23号)", door:"三条23号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92807, lng:116.36945, interfere:0.2, tags:["architecture","photo"], desc:"【西洋门】三条胡同中段西洋门形制代表院落，展现近代胡同建筑风貌演变。"},
-    {id:"N3", name:"金柱大门 (三条)", door:"三条31号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92809, lng:116.36878, interfere:0.25, tags:["architecture"], desc:"【金柱大门】等级仅次于广亮大门，门扇安在金柱位置，完整保留清末民初规制。"},
-    {id:"N4", name:"广亮大门 (三条)", door:"三条35-37号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92811, lng:116.36835, interfere:0.25, tags:["architecture"], desc:"【广亮大门】三条西段保存完好的广亮大门形制，梁架宽敞，气势庄重。"},
-    {id:"N39", name:"程砚秋故居 (如意门)", door:"三条39号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:25, lat:39.92814, lng:116.36798, interfere:0.25, tags:["history","architecture","photo"], desc:"【如意门】京剧大师、“四大名旦”之一程砚秋先生居住21年之故居。"},
-    {id:"N5", name:"蛮子门 (三条)", door:"三条41-43号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92815, lng:116.36768, interfere:0.2, tags:["architecture","shopping"], desc:"【蛮子门】门扉安在檐柱一线，槛框迎面齐平，兼具防卫与实用价值。"},
-    {id:"N10", name:"随墙门 (三条)", door:"三条45号院", street:"santiao", theme:"推门·生活", type:"文化", stay:10, lat:39.92816, lng:116.36742, interfere:0.3, tags:["architecture","history"], desc:"【随墙门】直接顺应院墙开辟门洞，质朴亲切，展现老北京胡同原真民居风貌。"},
+    {id:"N1", name:"圣祚隆长寺", door:"三条1-3号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92803, lng:116.37245, interfere:0.2, tags:["architecture","history"], desc:"始建于明万历四十五年（1617），原为汉经厂外厂。现存山门、残殿、古碑及明清彩画原迹。"},
+    {id:"N2", name:"马福祥故居", door:"三条11号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92818, lng:116.37080, interfere:0.25, tags:["architecture","history"], desc:"传统广亮大门形制，门扉设于中柱，门前宽敞；宅院曾为马福祥寓所，现作幼儿园。"},
+    {id:"N12", name:"拾光茶社", door:"三条15-19号", street:"santiao", theme:"创门·共生", type:"商业", stay:30, lat:39.92805, lng:116.37042, interfere:0.1, tags:["food","shopping"], desc:"街区茶饮空间，提供特调茶饮。"},
+    {id:"N11", name:"西洋门 (三条23号)", door:"三条23号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92807, lng:116.36945, interfere:0.2, tags:["architecture","photo"], desc:"清代中西文化交融的门楼形制，砖柱常饰冰盘檐，融合中式门框与西式构图。"},
+    {id:"N3", name:"金柱大门 (三条)", door:"三条31号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92809, lng:116.36878, interfere:0.25, tags:["architecture"], desc:"门屋不设中柱，门扇立于外金柱，门外空间较浅、门内较深，规模通常小于广亮大门。"},
+    {id:"N4", name:"广亮大门 (三条)", door:"三条35-37号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92811, lng:116.36835, interfere:0.25, tags:["architecture"], desc:"高等级屋宇式宅门，门扇设于中柱，将门庑均分为二，门前过道宽敞明亮。"},
+    {id:"N39", name:"程砚秋故居 (如意门)", door:"三条39号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:25, lat:39.92814, lng:116.36798, interfere:0.25, tags:["history","architecture","photo"], desc:"程砚秋1938年购置并居住至1958年的三进四合院，前院北房曾作“御霜书斋”。故居为私产，不对外开放。"},
+    {id:"N5", name:"蛮子门 (三条)", door:"三条41-43号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92815, lng:116.36768, interfere:0.2, tags:["architecture","shopping"], desc:"蛮子门等级低于金柱大门、高于如意门，门扉安装在前檐檐柱之间，门外没有停留空间。"},
+    {id:"N10", name:"随墙门 (三条)", door:"三条45号院", street:"santiao", theme:"推门·生活", type:"文化", stay:10, lat:39.92816, lng:116.36742, interfere:0.3, tags:["architecture","history"], desc:"门洞直接开在院墙上，形制简洁，常用作后门或旁门；门框直接嵌入墙体。"},
 
     // --- 西四北大街沿街（6处蓝圈，位于道路右侧） ---
     {id:"B5", name:"黑潮酿造", door:"西四北大街96-98号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92968, lng:116.37332, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街北段（五条与六条之间），安静型精酿品鉴空间首站。"},
@@ -929,44 +909,18 @@
     })();
   </script>
 
-  <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
   <script>
-    for (var i = localStorage.length - 1; i >= 0; i--) {
-        var key = localStorage.key(i);
-        if (key && key.indexOf('coze') > -1) {
-            localStorage.removeItem(key);
-        }
-    }
-
-    var cozeClient = new CozeWebSDK.WebChatClient({
-      config: {
-        bot_id: '7636701328664264704',
-      },
-      auth: {
-        type: 'token',
-        token: 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR',
-        onRefreshToken: function () {
-          return 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR'
-        }
-      },
-      ui: {
-        base: {
-          icon: './laojiefang_full.png',
-          zIndex: 10005
-        },
-        asstBtn: {
-          isNeed: false
-        },
-        chatBot: {
-          title: '老街坊',
-          titleAvatar: './laojiefang_full.png',
-        }
-      }
-    });
-
-    document.getElementById('laojiefang-fab').addEventListener('click', function () {
-      cozeClient.showChatBot();
-      this.classList.add('opened');
+    var guidePanel = document.getElementById('local-guide');
+    document.getElementById('laojiefang-fab').addEventListener('click', function () { guidePanel.classList.toggle('visible'); });
+    document.getElementById('local-guide-close').addEventListener('click', function () { guidePanel.classList.remove('visible'); });
+    document.getElementById('local-guide-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var query = document.getElementById('local-guide-query').value.trim();
+      var result = document.getElementById('local-guide-result');
+      if (!query) { result.textContent = '请输入点位名称或门牌号。'; return; }
+      var matches = allNodesMaster.filter(function (node) { return (node.name + ' ' + node.door + ' ' + node.desc).indexOf(query) !== -1; });
+      if (!matches.length) { result.textContent = '暂未找到“' + query + '”的介绍。试试输入门楼名称、胡同名称或门牌号。'; return; }
+      result.textContent = matches.slice(0, 3).map(function (node) { return node.name + '（' + node.door + '）\n' + node.desc; }).join('\n\n');
     });
   </script>
   <script src="assets/site.js"></script>

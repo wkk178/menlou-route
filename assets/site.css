@@ -10,6 +10,9 @@
   --white: #FFFFFF;
 }
 
+body { background-image: url('backgrounds/paper-texture.jpg') !important; background-repeat: repeat !important; background-size: 480px auto !important; }
+.app { background-image: url('backgrounds/paper-texture.jpg') !important; background-repeat: repeat !important; background-size: 480px auto !important; }
+
 h1, h2, h3, h4, .page-title, .hero-title, .section-title {
   font-family: "STSong", "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
 }
