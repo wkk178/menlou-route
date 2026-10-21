@@ -128,9 +128,9 @@ const id = params.get('id');
 // 内容数据库：只为已核对的点位展示对应档案
 const db = {
   "N3": {
-    title: "三条31号 · 金柱大门",
-    audio: "n3.mp3",
-    desc: `<span class="section-header">特点与历史</span>金柱大门是北京四合院中等级较高的屋宇式宅门，外观与广亮大门相似。两者的关键区别在门扇位置：金柱大门没有中柱，门扇设在外金柱处，门外空间较浅、门内空间较深。\n\n<span class="section-header">核心形制</span>门屋构造不设中柱，门扇立在外金柱位置；门外空间约占四分之一，门内约占四分之三。\n\n<span class="section-header">关键尺寸</span>规模通常小于广亮大门，门口也较窄，有的仅占半开间。门扉相较广亮大门向外移动一米多，开在院门的“金柱”位置。\n\n<span class="section-header">木构架</span>一般采用五檩前出廊式，个别采用七檩前后廊式；平面列三排或四排柱，金柱上承三架梁或五架梁，檐柱与金柱间施穿插枋或抱头梁。`
+    title: "三条31号 · 如意门",
+    audio: "",
+    desc: `<span class="section-header">特点与历史</span>如意门是北京四合院中数量最多、最常见的宅门形式，多供商人或士民家庭使用。门洞两侧的对称如意纹饰寄托对美好生活的向往。\n\n<span class="section-header">核心形制与尺寸</span>前檐柱间砌砖墙并居中留门洞，门洞上方两侧饰如意形砖雕，又称“象鼻枭”；门口净宽约0.9—1米、净高约1.9米。\n\n<span class="section-header">木构架</span>多采用五檩硬山式，平面有四根或六根柱；两根前檐柱嵌在墙内、不露明。`
   },
   "N2": { title: "马福祥故居 · 广亮大门", audio: "", desc: `<span class="section-header">特点与历史</span>广亮大门是北京传统四合院中等级较高的屋宇式大门，常见于有一定品级的官宦宅院。门扉开在门庑中柱位置，将门洞一分为二，形成宽敞明亮的门前过道。西四北三条11号院的大门保留这一形制。\n\n<span class="section-header">核心形制</span>门扇设于门庑中柱，将门庑均分为二，门前空间宽敞。\n\n<span class="section-header">关键尺寸</span>通常占倒座房东端第二间；进深、台基和柱高均明显大于倒座房，屋面沿街凸显。\n\n<span class="section-header">木构架</span>一般为五檩中柱式，六根柱包括前后檐柱和中柱；中柱上承脊檩，将五架梁分为双步梁与单步梁。\n\n<span class="section-header">院落与街区记忆</span>马福祥故居为坐北朝南的中型四合院，分东西两路，西为住宅、东为花园，院内曾有假山与爬山游廊。民国时期马福祥曾寓居于此，处理蒙藏事务、研读典籍；如今宅院用作幼儿园，见证院落功能随时代变化。` },
   "N39": { title: "程砚秋故居 · 如意门", audio: "", desc: `<span class="section-header">故居介绍</span>程砚秋故居位于西四北三条39号，旧称报子胡同18号，是北京市第三批市级文物保护单位。宅院为坐北朝南的三进四合院，东南角开如意门，院内有影壁与垂花门。前院北房曾作“御霜书斋”，后院为居所。程砚秋1938年购置此院，居住至1958年逝世。故居为私产，不对外开放。\n\n<span class="section-header">书斋记忆</span>前院北房是程砚秋的书房“御霜簃”。家人回忆，书房里有沙发、茶几、紫檀屏风、书柜和线装《四库全书》，正梁悬挂题字匾额。每年入秋，程砚秋会在书房插上桂花，满屋清香，访客常在这里相聚。` },
@@ -151,7 +151,7 @@ const db = {
   "B6": { title: "大宇宙", audio: "", desc: `西四北大街116—118号的青年生活方式与休闲消费空间。` },
   "B7": { title: "紫光园", audio: "", desc: `西四北大街122号京味餐饮老字号，可品尝北京风味小吃。` },
   "B8": { title: "蝗虫精酿", audio: "", desc: `西四北大街128号社区精酿体验店。` },
-  "N12": { title: "拾光茶社", audio: "", desc: `西四北三条15—19号茶饮空间，提供特调茶饮。` }
+  "N12": { title: "三条15—19号 · 金柱大门", audio: "", desc: `<span class="section-header">特点与历史</span>金柱大门是北京四合院中等级较高的屋宇式宅门，外观与广亮大门相似。两者的关键区别在门扇位置：金柱大门没有中柱，门扇设在外金柱处，门外空间较浅、门内空间较深。\n\n<span class="section-header">核心形制</span>门屋构造不设中柱，门扇立在外金柱位置；门外空间约占四分之一，门内约占四分之三。\n\n<span class="section-header">关键尺寸</span>规模通常小于广亮大门，门口较窄，有的仅占半开间。门扉开在院门的“金柱”位置。\n\n<span class="section-header">木构架</span>一般采用五檩前出廊式，个别采用七檩前后廊式；平面列三排或四排柱，金柱上承三架梁或五架梁。` }
 };
 
 const missingContent = {
@@ -174,7 +174,8 @@ else { player.hidden = true; }
 const viewer = document.getElementById('gate-viewer');
 const modelState = document.getElementById('model-state');
 const availableModels = [
-  { id: 'N3', label: '金柱大门', path: 'assets/models/jinzhu-gate/Jinzhu_Gate.glb' },
+  { id: 'N12', label: '金柱大门', path: 'assets/models/jinzhu-gate/Jinzhu_Gate.glb' },
+  { id: 'N3', label: '如意门', path: 'assets/models/ruyi-gate/Ruyi_Gate.glb' },
   { id: 'N39', label: '如意门', path: 'assets/models/ruyi-gate/Ruyi_Gate.glb' },
   { id: 'N2', label: '广亮大门', path: 'assets/models/guangliang-gate/Guangliang_Gate.glb' },
   { id: 'N5', label: '蛮子门', path: 'assets/models/manzi-gate/Manzi_Gate.glb' },
@@ -215,7 +216,7 @@ document.getElementById('back').addEventListener('click', goBack);
 document.getElementById('back2').addEventListener('click', goBack);
 
 // ===== 电子护照：浏览 / 听讲解 即可领取印章（仅记录点位编号、类型、时间，保存在本机）=====
-var STAMP_NAMES = {N1:'圣祚隆长寺',N2:'马福祥故居',N12:'拾光茶社',N11:'西洋门',N3:'金柱大门',N4:'广亮大门',N39:'程砚秋故居',N5:'蛮子门',N10:'随墙门',L5:'傅增湘故居',W1:'中央电影局旧址',S1:'如意门',S2:'麒麟图门墩',S3:'广亮大门',S4:'西洋门',B3:'叙杯',B4:'无名蹄花',B5:'黑潮酿造',B6:'大宇宙',B7:'紫光园',B8:'蝗虫精酿',B2:'易应茶舍',B1:'无问西东精酿'};
+var STAMP_NAMES = {N1:'圣祚隆长寺',N2:'马福祥故居',N12:'金柱大门',N11:'西洋门',N3:'如意门',N4:'广亮大门',N39:'程砚秋故居',N5:'蛮子门',N10:'随墙门',L5:'傅增湘故居',W1:'中央电影局旧址',S1:'如意门',S2:'麒麟图门墩',S3:'广亮大门',S4:'西洋门',B3:'叙杯',B4:'无名蹄花',B5:'黑潮酿造',B6:'大宇宙',B7:'紫光园',B8:'蝗虫精酿',B2:'易应茶舍',B1:'无问西东精酿'};
 function mlLoad(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
 function mlSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 function mlRecord(type) {
