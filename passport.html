@@ -145,10 +145,10 @@ button{font-family: inherit; border: none; background: none; cursor: pointer; co
 
   <section class="rules">
     <h3>怎么集章</h3>
-    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><div><b>浏览档案</b>　在 3D 展厅打开点位档案并停留片刻</div></div>
-    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></span><div><b>收听讲解</b>　播放点位的讲解音频</div></div>
-    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/></svg></span><div><b>现场打卡</b>　扫描点位二维码，或用手机轻触 NFC 标签</div></div>
-    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7 21l5-3 5 3-2-7.5"/></svg></span><div><b>集齐全部印章</b>　即可生成专属漫游证书</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span><div><b>浏览档案</b> 在 3D 展厅打开点位档案并停留片刻</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg></span><div><b>收听讲解</b> 播放点位的讲解音频</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/></svg></span><div><b>现场打卡</b> 扫描点位二维码，或用手机轻触 NFC 标签</div></div>
+    <div class="rule"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7 21l5-3 5 3-2-7.5"/></svg></span><div><b>集齐全部印章</b> 即可生成专属漫游证书</div></div>
   </section>
 
   <div id="pages"></div>
@@ -234,10 +234,10 @@ var NODES = [
   {id:'N11', ch:0, L:['西洋门','三条'], name:'西洋门', door:'三条23号', desc:'清代中西文化交融的门楼形制，砖柱饰有冰盘檐与装饰线。'},
   {id:'N3', ch:0, L:['如意门','三条'], name:'如意门', door:'三条31号', desc:'门洞两侧有对称如意形砖雕，寄托吉祥愿望。'},
   {id:'N4', ch:0, L:['广亮','大门'], name:'广亮大门', door:'三条35—37号', desc:'门扇开在门庑中柱位置，将门庑均分为二，形成宽敞明亮的过道。'},
-  {id:'N39', ch:0, L:['程砚秋','故居'], name:'程砚秋故居 · 如意门', door:'三条39号', desc:'程砚秋1938年购置并居住至1958年的三进四合院，故居不对外开放。'},
+  {id:'N39', ch:1, L:['程砚秋','故居'], name:'程砚秋故居 (如意门)', door:'三条39号', desc:'程砚秋1938年购置并居住至1958年的三进四合院，故居不对外开放。'},
   {id:'N5', ch:0, L:['蛮子门','三条'], name:'蛮子门', door:'三条41—43号', desc:'门扉安装在前檐檐柱之间，门外没有廊子和停留空间。'},
-  {id:'N10', ch:0, L:['随墙门','三条'], name:'随墙门', door:'三条45号', desc:'门洞直接开在院墙上，形制简洁，门框嵌入墙体。'},
-  {id:'L5', ch:0, L:['傅增湘','藏园'], name:'傅增湘故居 · 藏园', door:'五条7号', desc:'傅增湘1918年购置的四合院，曾设藏书楼“双鉴楼”，藏书最多二十余万卷。'},
+  {id:'N10', ch:1, L:['随墙门','三条'], name:'随墙门 (三条)', door:'三条45号', desc:'门洞直接开在院墙上，形制简洁，门框嵌入墙体。'},
+  {id:'L5', ch:1, L:['傅增湘','藏园'], name:'傅增湘故居 · 藏园', door:'五条7号', desc:'傅增湘1918年购置的四合院，曾设藏书楼“双鉴楼”，藏书最多二十余万卷。'},
   {id:'W1', ch:0, L:['电影局','旧址'], name:'中央电影局旧址', door:'五条15—19号', desc:'北京电影学院前身所在地，1950年开设表演班、编剧班。'},
   {id:'S1', ch:0, L:['如意门','四条'], name:'如意门', door:'四条2—4号', desc:'门洞两侧有对称如意形砖雕，寄托吉祥顺遂的愿望。'},
   {id:'S2', ch:0, L:['麒麟图','门墩'], name:'麒麟图门墩', door:'四条6号', desc:'麒麟浮雕抱鼓石门墩支撑门轴，也寄托祥瑞、文运与家宅平安的愿望。'},
