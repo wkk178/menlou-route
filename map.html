@@ -214,7 +214,7 @@
   <!-- 你原本定制的“老街坊”悬浮按钮和跳动气泡 -->
   <div id="laojiefang-fab" title="老街坊">
     <div id="laojiefang-bubble">老街坊
-点位故事</div>
+路线问我！</div>
     <img src="./laojiefang_full.png" alt="老街坊">
   </div>
 
@@ -810,38 +810,52 @@
     })();
   </script>
 
-  <!-- ================= 升级为扣子最新的 1.1.3 版 Web SDK ================= -->
-  <script src="https://lf-cdn-tos.bytescm.com/obj/rc-web-sdk/coze-web-sdk/1.1.3/coze-web-sdk.js"></script>
+  <!-- ================= 扣子对话版 Web SDK ================= -->
+  <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
 
   <script>
     var cozeClient = null;
+    var COZE_BOT_ID = '7636701328664264704';
 
     // 关键修复：等网页和 SDK 完全加载完毕后，再初始化 AI，防止网络延迟导致加载失败
     window.addEventListener('load', function() {
       if (typeof CozeWebSDK === 'undefined') {
         console.error("Coze SDK 未能成功加载，请检查网络。");
+        alert("老街坊对话组件加载失败，请刷新页面后重试。");
         return;
       }
 
       try {
+        var cozeToken = 'pat_PSVr2wMIINBH0E5ofSIL0gF8ApW6r6PE7mX6ydCG63F0MCXdCHNZe6GMQ1b9t0BR';
         cozeClient = new CozeWebSDK.WebChatClient({
           config: {
-            bot_id: '7636701328664264704',
+            bot_id: COZE_BOT_ID,
           },
-          componentProps: {
-            title: '老街坊 · 门里乾坤',
-            icon: './laojiefang_full.png', // 智能体头像
-            layout: 'mobile'
+          auth: {
+            type: 'token',
+            token: cozeToken,
+            onRefreshToken: function () {
+              return cozeToken;
+            }
           },
           ui: {
+            base: {
+              icon: './laojiefang_full.png',
+              layout: 'mobile',
+              zIndex: 10005
+            },
             asstBtn: {
               isNeed: false // 隐藏扣子自带的默认悬浮球
+            },
+            chatBot: {
+              title: '老街坊 · 胡同对话导览',
+              titleAvatar: './laojiefang_full.png'
             }
           }
         });
-        console.log("老街坊 AI 初始化成功！");
+        console.log("老街坊对话 AI 初始化成功！");
       } catch (error) {
-        alert("SDK 初始化底层报错: " + error.message);
+        alert("老街坊对话 AI 初始化失败: " + error.message);
       }
     });
 
@@ -863,7 +877,7 @@
           alert('打开对话框失败: ' + e.message);
         }
       } else {
-        alert('加载中，请稍后... \n(如果一直弹这个，说明 bot_id 没加单引号，或者网络拦截了扣子的 SDK)');
+        alert('老街坊对话正在加载，请稍后重试。');
       }
     });
   </script>
