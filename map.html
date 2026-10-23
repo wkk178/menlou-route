@@ -814,32 +814,52 @@
   <script src="https://lf-cdn-tos.bytescm.com/obj/rc-web-sdk/coze-web-sdk/1.0.1/coze-web-sdk.js"></script>
 
   <script>
-    // 1. 初始化 Coze 智能体
-    var cozeClient = new CozeWebSDK.WebChatClient({
-      config: {
-        bot_id: '7636701328664264704',
-      },
-      componentProps: {
-        title: '老街坊 · 门里乾坤',
-        icon: './laojiefang_full.png', // 智能体对话框里的头像
-        layout: 'mobile'
-      },
-      ui: {
+    var cozeClient = null;
 
-        asstBtn: {
-          isNeed: false
+    try {
+      // 1. 初始化 Coze 智能体
+      cozeClient = new CozeWebSDK.WebChatClient({
+        config: {
+          bot_id: '7636701328664264704',
+        },
+        componentProps: {
+          title: '老街坊 · 门里乾坤',
+          icon: './laojiefang_full.png', // 智能体对话框里的头像
+          layout: 'mobile'
+        },
+        ui: {
+          asstBtn: {
+            isNeed: false // 隐藏默认的悬浮按钮，采用我们自己的图标
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error("Coze SDK 初始化失败:", error);
+    }
 
-
+    // 2. 绑定点击事件，带防错提示
     document.getElementById('laojiefang-fab').addEventListener('click', function () {
-      // 当用户点击头像时，隐藏旁边跳动的提示气泡
+      // 点击后，隐藏原本跳动的文字气泡
       var bubble = document.getElementById('laojiefang-bubble');
       if (bubble) bubble.style.display = 'none';
 
-      // 展开真实的 Coze 对话窗口
-      cozeClient.showChatBot();
+      // 尝试唤起聊天窗
+      if (cozeClient) {
+        try {
+          // 兼容不同版本的 Coze SDK 方法名进行唤醒
+          if (typeof cozeClient.showChatBot === 'function') {
+            cozeClient.showChatBot();
+          } else if (typeof cozeClient.show === 'function') {
+            cozeClient.show();
+          } else {
+            alert('Coze SDK 接口有变，请检查浏览器控制台报错。');
+          }
+        } catch (e) {
+          alert('打开对话框失败，请检查 Bot ID 是否正确并已在后台发布：' + e.message);
+        }
+      } else {
+        alert('老街坊 AI 还没准备好。请检查代码里的 bot_id 是否填写正确，并在 Coze 平台点击了“发布”。');
+      }
     });
   </script>
 
