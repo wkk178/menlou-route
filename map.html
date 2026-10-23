@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>数字导览 | 门楼层记·故事里</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css" />
+  <script src="assets/vendor/leaflet/leaflet.js"></script>
+  <script src="assets/vendor/leaflet/leaflet.polylineDecorator.js"></script>
   <style>
     :root{--door-gray: #6B5B4F;--brick-green: #4A6B5A;--accent-gold: #C9A86C;--bg-cream: #F5F1E8;--text-dark: #2C2420;--white: #FFFFFF;}
     *{margin: 0;padding: 0;box-sizing: border-box;}
@@ -30,7 +30,7 @@
 
     /* --- 地图区域 --- */
     .map-wrapper{position: absolute; left: 0; right: 0; top: 0; bottom: calc(var(--tab-h) + env(safe-area-inset-bottom));}
-    #map{width: 100%;height: 100%;z-index: 1;background: #f0f0f0; position: absolute; top: 0; left: 0;}
+    #map{width: 100%;height: 100%;min-height: 100%;z-index: 1;background: #f0f0f0; position: absolute; top: 0; left: 0;}
 
     .compass{position: absolute;top: 20px;left: 20px;width: 50px;height: 50px;background: rgba(255,255,255,0.95);border-radius: 50%;box-shadow: 0 4px 16px rgba(0,0,0,0.15);z-index: 10;display: flex;align-items: center;justify-content: center;cursor: pointer;}
     .compass-arrow{width: 0;height: 0;border-left: 6px solid transparent;border-right: 6px solid transparent;border-bottom: 18px solid #c0392b;}
@@ -597,7 +597,19 @@
         map = L.map('map', {center: [39.92842, 116.37020], zoom: 16, zoomControl: false});
         map.on('click', function() { if (isMobile()) setDrawer(false); });
         map.on('zoomend', updateLabels);
-        L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}').addTo(map);
+        var tileLayer = L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+            subdomains: '1234',
+            maxZoom: 19,
+            maxNativeZoom: 18,
+            keepBuffer: 4,
+            updateWhenIdle: false
+        }).addTo(map);
+        var tileErrorCount = 0;
+        tileLayer.on('tileerror', function() {
+            tileErrorCount++;
+            if (tileErrorCount === 4) showMapToast('底图加载较慢，请检查网络或稍后重试');
+        });
+        tileLayer.on('load', function() { tileErrorCount = 0; });
         document.getElementById('loading').style.display = 'none';
 
         var outerBounds = [
@@ -614,6 +626,13 @@
 
         loadRoute();
         startLiveLocation();
+        syncMapSize();
+    }
+
+    function syncMapSize() {
+        if (!map) return;
+        map.invalidateSize({pan: false, animate: false});
+        updateLabels();
     }
 
     function loadRoute() {
@@ -771,7 +790,12 @@
         document.getElementById('panel-tab').textContent = open ? '收起' : (FREE ? '景点列表' : '路线详情');
     }
     function toggleDrawer() { setDrawer(!document.querySelector('.map-wrapper').classList.contains('drawer-open')); }
-    function updateLabels() { if (map) map.getContainer().classList.toggle('low-zoom', FREE && map.getZoom() < 16); }
+    function updateLabels() {
+        if (!map) return;
+        var narrowScreen = window.innerWidth <= 768;
+        var hideLabels = narrowScreen ? map.getZoom() < 17 : (FREE && map.getZoom() < 16);
+        map.getContainer().classList.toggle('low-zoom', hideLabels);
+    }
     function showCal(node, p) {
         var box = document.getElementById('cal-box');
         if (!box) {
@@ -797,7 +821,20 @@
             document.querySelectorAll('.stop-item').forEach(function(el, i) { el.classList.toggle('active', i === index); });
         }
     }
-    window.addEventListener('load', initMap);
+    // 地图必须独立于扣子 SDK 初始化，避免移动端被外部大脚本阻塞。
+    initMap();
+    requestAnimationFrame(syncMapSize);
+    setTimeout(syncMapSize, 250);
+    window.addEventListener('resize', syncMapSize, {passive: true});
+    window.addEventListener('orientationchange', function() {
+        setTimeout(syncMapSize, 250);
+    });
+    window.addEventListener('pageshow', function() {
+        setTimeout(syncMapSize, 100);
+    });
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', syncMapSize, {passive: true});
+    }
 
     (function () {
         var panel = document.querySelector('.map-controls');
@@ -810,18 +847,15 @@
     })();
   </script>
 
-  <!-- ================= 扣子对话版 Web SDK ================= -->
-  <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
-
   <script>
     var cozeClient = null;
     var COZE_BOT_ID = '7636701328664264704';
+    var cozeSdkLoading = false;
 
-    // 关键修复：等网页和 SDK 完全加载完毕后，再初始化 AI，防止网络延迟导致加载失败
-    window.addEventListener('load', function() {
+    // 扣子 SDK 较大，后台异步加载，不能阻塞地图和页面其它功能。
+    function initCozeClient() {
       if (typeof CozeWebSDK === 'undefined') {
         console.error("Coze SDK 未能成功加载，请检查网络。");
-        alert("老街坊对话组件加载失败，请刷新页面后重试。");
         return;
       }
 
@@ -855,9 +889,35 @@
         });
         console.log("老街坊对话 AI 初始化成功！");
       } catch (error) {
-        alert("老街坊对话 AI 初始化失败: " + error.message);
+        console.error("老街坊对话 AI 初始化失败:", error);
+        showMapToast('老街坊暂未连接，请稍后重试');
       }
-    });
+    }
+
+    function loadCozeSdk() {
+      if (typeof CozeWebSDK !== 'undefined') {
+        initCozeClient();
+        return;
+      }
+      if (cozeSdkLoading) return;
+      cozeSdkLoading = true;
+
+      var script = document.createElement('script');
+      script.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
+      script.async = true;
+      script.onload = function() {
+        cozeSdkLoading = false;
+        initCozeClient();
+      };
+      script.onerror = function() {
+        cozeSdkLoading = false;
+        console.error("Coze SDK 资源加载失败。");
+        showMapToast('老街坊加载失败，请检查网络后重试');
+      };
+      document.head.appendChild(script);
+    }
+
+    loadCozeSdk();
 
     // 绑定你的专属老街坊图标点击事件
     document.getElementById('laojiefang-fab').addEventListener('click', function () {
@@ -877,7 +937,8 @@
           alert('打开对话框失败: ' + e.message);
         }
       } else {
-        alert('老街坊对话正在加载，请稍后重试。');
+        loadCozeSdk();
+        showMapToast('老街坊正在加载，请稍后再点一次');
       }
     });
   </script>
