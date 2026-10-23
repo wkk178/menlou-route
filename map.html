@@ -47,7 +47,7 @@
     .gps-dot-core{position: relative; width: 14px; height: 14px; border-radius: 50%; background: #1677FF; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.35); z-index: 2;}
     @keyframes gpsPulse{0%{transform: scale(0.8); opacity: 0.9;} 100%{transform: scale(2.4); opacity: 0;}}
 
-    /* 路线导航方向箭头样式（高德风格） */
+    /* 路线导航方向箭头样式 */
     .route-dir-arrow{pointer-events: none; display: flex; align-items: center; justify-content: center;}
 
     /* 顶部轻提示 Toast */
@@ -111,7 +111,7 @@
     }
     .loading{position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);z-index: 1001;background: white;padding: 20px;border-radius: 10px;}
 
-    /* 老街坊智能体悬浮按钮 */
+    /* 老街坊智能体悬浮按钮样式（保留你的原样） */
     #laojiefang-fab {
         position: absolute;
         right: 14px;
@@ -131,6 +131,7 @@
     }
     #laojiefang-fab:active img { transform: scale(0.92); }
 
+    /* 跳动的提示气泡（保留你的原样） */
     #laojiefang-bubble {
         position: absolute;
         right: 0;
@@ -162,22 +163,10 @@
         border-bottom: 1px solid #e6a23c;
         transform: rotate(45deg);
     }
-    #laojiefang-fab.opened #laojiefang-bubble { display: none; }
-
     @keyframes bounceBubble {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-4px); }
     }
-
-    #local-guide{position:fixed;right:16px;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 92px);z-index:10003;width:min(350px,calc(100vw - 32px));max-height:min(62vh,520px);overflow:auto;padding:16px;background:#fffdf8;border:1px solid rgba(201,168,108,.55);border-radius:18px;box-shadow:0 12px 36px rgba(35,27,21,.24);display:none}
-    #local-guide.visible{display:block}
-    .local-guide-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#3c3028;font-weight:700}
-    #local-guide-close{font-size:24px;line-height:1;padding:2px 8px;color:#76685d}
-    #local-guide p{font-size:12px;color:#786c62;line-height:1.55;margin-bottom:10px}
-    #local-guide-form{display:flex;gap:7px}
-    #local-guide-query{min-width:0;flex:1;border:1px solid #d8c8aa;border-radius:10px;padding:10px;font:inherit;background:white}
-    #local-guide-form button{padding:0 14px;border-radius:10px;background:#3E5C4D;color:#fff;font-weight:700}
-    #local-guide-result{margin-top:12px;font-size:13px;line-height:1.7;color:#42362f;white-space:pre-wrap}
   </style>
   <link rel="stylesheet" href="assets/site.css">
 </head>
@@ -221,18 +210,16 @@
         <div class="legend-item"><div class="dot" style="background:#1677FF;border:2px solid #fff;box-shadow:0 0 4px rgba(22,119,255,0.6);"></div><span>我的当前位置</span></div>
     </div>
   </div>
+
+  <!-- 你原本定制的“老街坊”悬浮按钮和跳动气泡 -->
   <div id="laojiefang-fab" title="老街坊">
     <div id="laojiefang-bubble">老街坊
 点位故事</div>
     <img src="./laojiefang_full.png" alt="老街坊">
   </div>
-  <section id="local-guide" aria-label="点位故事查询">
-    <div class="local-guide-head"><span>老街坊 · 点位故事</span><button id="local-guide-close" type="button" aria-label="关闭">×</button></div>
-    <p>在线问答暂不可用时，可输入点位名称或门牌号，查询已整理的街区介绍。</p>
-    <form id="local-guide-form"><input id="local-guide-query" type="search" placeholder="如：金柱大门、隆长寺" autocomplete="off"><button type="submit">查找</button></form>
-    <div id="local-guide-result" aria-live="polite">试试搜索“广亮大门”或“程砚秋故居”。</div>
-  </section>
+
   </div>
+
   <nav class="tabbar">
     <a class="tab" href="index.html">
       <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>首页
@@ -255,26 +242,15 @@
 (function () {
   'use strict';
 
-  // ============================================================================
-  // 严格按手绘蓝圈图 + 高德底图真实胡同道路线 1:1 像素级双线性校准的 23 处蓝圈点位
-  // （纠正了此前整体偏北约 35 米的纬度误差：五条=39.92912，四条=39.92842，三条=39.92772）
-  // ============================================================================
   var NODES = [
-    // --- 一、西四北五条（2处蓝圈，紧贴高德底图“西四北五条”道路北侧） ---
     {id:"L5", name:"傅增湘故居 · 藏园", door:"五条23号院", street:"wutiao", theme:"阅巷·生活", type:"文化", stay:15, lat:39.92918, lng:116.36963, interfere:0.25, tags:["sound","history"], desc:"傅增湘购置的四合院，曾设藏书楼“双鉴楼”，收藏、校勘古籍。"},
     {id:"W1", name:"中央电影局旧址", door:"五条15-19号", street:"wutiao", theme:"读门·寻古", type:"文化", stay:20, lat:39.92918, lng:116.37127, interfere:0.2, tags:["history","architecture"], desc:"北京电影学院前身所在地，1950年开设表演班与编剧班，培养早期电影创作者。"},
-
-    // --- 二、西四北四条（严格仅保留原图4处蓝圈：如意门、麒麟图门墩、广亮大门、西洋门） ---
     {id:"S1", name:"如意门 (四条)", door:"四条2-4号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92847, lng:116.37279, interfere:0.2, tags:["architecture","photo"], desc:"门洞两侧有如意形砖雕（又称“象鼻枭”），门簪常刻“如意”二字，寄托吉祥愿望。"},
     {id:"S2", name:"麒麟图门墩", door:"四条6号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92847, lng:116.37243, interfere:0.2, tags:["architecture","photo"], desc:"麒麟纹样抱鼓石门墩支撑门轴，也寄托祥瑞、文运兴盛与家宅平安的愿望。"},
     {id:"S3", name:"广亮大门 (四条)", door:"四条20号院", street:"sitiao", theme:"读门·寻古", type:"文化", stay:12, lat:39.92847, lng:116.36994, interfere:0.25, tags:["architecture","history"], desc:"传统高等级宅门形制，门扉设于门庑中柱，门前空间宽阔。"},
     {id:"S4", name:"西洋门 (四条)", door:"四条22-24号", street:"sitiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92841, lng:116.36968, interfere:0.2, tags:["architecture","photo"], desc:"融合传统中式门框与西式建筑构图手法的近代门楼。"},
-
-    // --- 三、赵登禹路沿街（2处蓝圈，位于道路右侧） ---
     {id:"B3", name:"叙杯", door:"赵登禹路144号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:25, lat:39.92865, lng:116.36740, interfere:0.1, tags:["food","photo"], desc:"赵登禹路东侧沿街特色空间，位于西四北五条与四条西口之间。"},
     {id:"B4", name:"无名蹄花", door:"赵登禹路148号", street:"zhaodengyu", theme:"创门·共生", type:"商业", stay:35, lat:39.92849, lng:116.36733, interfere:0.1, tags:["food"], desc:"赵登禹路东侧人气餐饮小馆，紧邻西四北四条西口北侧，充满胡同烟火气。"},
-
-    // --- 四、西四北三条（严格对应手绘图 9 处蓝圈，由东向西排列） ---
     {id:"N1", name:"圣祚隆长寺", door:"三条1-3号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92779, lng:116.37284, interfere:0.2, tags:["architecture","history"], desc:"始建于明万历四十五年（1617），现存山门、残殿、古碑及明清彩画原迹。"},
     {id:"N2", name:"马福祥故居", door:"三条11号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92793, lng:116.37103, interfere:0.25, tags:["architecture","history"], desc:"传统广亮大门形制，门扉设于中柱，门前宽敞；宅院曾为马福祥寓所，如今用作幼儿园。"},
     {id:"N12", name:"金柱大门 (三条)", door:"三条15-19号", street:"santiao", theme:"读门·寻古", type:"文化", stay:15, lat:39.92778, lng:116.37072, interfere:0.25, tags:["architecture"], desc:"金柱大门门屋不设中柱，门扇立于外金柱，门外较浅、门内较深。"},
@@ -284,8 +260,6 @@
     {id:"N39", name:"程砚秋故居 (如意门)", door:"三条39号院", street:"santiao", theme:"读门·寻古", type:"文化", stay:25, lat:39.92779, lng:116.36764, interfere:0.25, tags:["history","architecture","photo"], desc:"程砚秋1938年购置并居住至1958年的三进四合院，前院北房曾作“御霜书斋”。故居不对外开放。"},
     {id:"N5", name:"蛮子门 (三条)", door:"三条41-43号", street:"santiao", theme:"读门·寻古", type:"文化", stay:10, lat:39.92777, lng:116.36733, interfere:0.2, tags:["architecture","shopping"], desc:"蛮子门门扉安装在前檐檐柱之间，门外没有廊子和停留空间。"},
     {id:"N10", name:"随墙门 (三条)", door:"三条45号院", street:"santiao", theme:"推门·生活", type:"文化", stay:10, lat:39.92776, lng:116.36714, interfere:0.3, tags:["architecture","history"], desc:"门洞直接开在院墙上，形制简洁，常作后门或旁门；门框直接嵌入墙体。"},
-
-    // --- 五、西四北大街沿街（共 6 处蓝圈，精准贴合西四北大街西侧路边，由北向南对应手绘图门牌） ---
     {id:"B5", name:"黑潮酿造", door:"西四北大街96-98号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92944, lng:116.37311, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街北段（六条与五条之间），安静型精酿品鉴空间首站。"},
     {id:"B6", name:"大宇宙", door:"西四北大街116-118号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92864, lng:116.37312, interfere:0.1, tags:["food","photo","shopping"], desc:"位于西四北大街（五条与四条东口北侧之间），融合新消费与青年生活方式的潮流空间。"},
     {id:"B7", name:"紫光园", door:"西四北大街122号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92835, lng:116.37313, interfere:0.1, tags:["food"], desc:"西四北大街京城老字号风味餐饮，位于四条东口南侧，适合品尝地道京味小吃。"},
@@ -294,18 +268,17 @@
     {id:"B1", name:"无问西东精酿", door:"西四北大街155号", street:"xisi_ave", theme:"创门·共生", type:"商业", stay:30, lat:39.92752, lng:116.37315, interfere:0.1, tags:["food","photo"], desc:"位于西四北大街155号，提供门楼主题特调精酿，是文商融合的代表站点。"}
   ];
 
-  // 胡同路口与内部南北向最近连接点
   var JUNCTIONS = {
     E_N:   {id: 'E_N',   lat: 39.92960, lng: 116.37310},
-    W5_E:  {id: 'W5_E',  lat: 39.92912, lng: 116.37311}, // 五条东口
-    W5_M:  {id: 'W5_M',  lat: 39.92912, lng: 116.37279}, // 五条东段支巷口（直通四条S1如意门，不绕去大宇宙）
-    W4_E:  {id: 'W4_E',  lat: 39.92842, lng: 116.37312}, // 四条东口
-    W3_E:  {id: 'W3_E',  lat: 39.92772, lng: 116.37314}, // 三条东口
+    W5_E:  {id: 'W5_E',  lat: 39.92912, lng: 116.37311},
+    W5_M:  {id: 'W5_M',  lat: 39.92912, lng: 116.37279},
+    W4_E:  {id: 'W4_E',  lat: 39.92842, lng: 116.37312},
+    W3_E:  {id: 'W3_E',  lat: 39.92772, lng: 116.37314},
     E_S:   {id: 'E_S',   lat: 39.92740, lng: 116.37316},
     W_N:   {id: 'W_N',   lat: 39.92930, lng: 116.36752},
-    W5_W:  {id: 'W5_W',  lat: 39.92912, lng: 116.36749}, // 五条西口
-    W4_W:  {id: 'W4_W',  lat: 39.92842, lng: 116.36726}, // 四条西口
-    W3_W:  {id: 'W3_W',  lat: 39.92772, lng: 116.36704}  // 三条西口
+    W5_W:  {id: 'W5_W',  lat: 39.92912, lng: 116.36749},
+    W4_W:  {id: 'W4_W',  lat: 39.92842, lng: 116.36726},
+    W3_W:  {id: 'W3_W',  lat: 39.92772, lng: 116.36704}
   };
 
   function haversine(a, b) {
@@ -333,29 +306,19 @@
     for (var k in JUNCTIONS) addN(k, JUNCTIONS[k]);
     NODES.forEach(function (n) { addN(n.id, n); });
 
-    // 1. 西四北五条：西口 -> 傅增湘故居 -> 中央电影局旧址 -> 东段支巷 -> 东口
     var wutiao = ['W5_W', 'L5', 'W1', 'W5_M', 'W5_E'];
     for (var i = 0; i < wutiao.length - 1; i++) addEdge(wutiao[i], wutiao[i+1]);
-
-    // 2. 西四北四条：西口 -> 西洋门 -> 广亮大门 -> 麒麟图门墩 -> 如意门 -> 东口
     var sitiao = ['W4_W', 'S4', 'S3', 'S2', 'S1', 'W4_E'];
     for (var i = 0; i < sitiao.length - 1; i++) addEdge(sitiao[i], sitiao[i+1]);
-
-    // 3. 西四北三条：西口 -> 随墙门 -> 蛮子门 -> 程砚秋故居 -> 广亮大门 -> 如意门 -> 西洋门 -> 金柱大门 -> 马福祥故居 -> 圣祚隆长寺 -> 东口
     var santiao = ['W3_W', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'W3_E'];
     for (var i = 0; i < santiao.length - 1; i++) addEdge(santiao[i], santiao[i+1]);
-
-    // 4. 西四北大街
     var xisi = ['E_N', 'B5', 'W5_E', 'B6', 'W4_E', 'B7', 'B8', 'W3_E', 'B2', 'B1', 'E_S'];
     for (var i = 0; i < xisi.length - 1; i++) addEdge(xisi[i], xisi[i+1]);
-
-    // 5. 赵登禹路
     var zhaodengyu = ['W_N', 'W5_W', 'B3', 'B4', 'W4_W', 'W3_W'];
     for (var i = 0; i < zhaodengyu.length - 1; i++) addEdge(zhaodengyu[i], zhaodengyu[i+1]);
 
-    // 6. 就近穿插通道（避免绕去最远端）
-    addEdge('W5_M', 'S1'); // 五条去四条S1走东段最近通道，不经过大宇宙(B6)
-    addEdge('S4', 'N11');  // 四条中段支巷直达三条中段
+    addEdge('W5_M', 'S1');
+    addEdge('S4', 'N11');
 
     return {nodes: graphNodes, adj: adj};
   }
@@ -396,10 +359,7 @@
 
   function buildFullWalkingRoute(stopNodes) {
     if (!stopNodes || stopNodes.length < 2) {
-      return {
-        distanceMeters: 0,
-        path: stopNodes && stopNodes[0] ? [[stopNodes[0].lat, stopNodes[0].lng]] : []
-      };
+      return { distanceMeters: 0, path: stopNodes && stopNodes[0] ? [[stopNodes[0].lat, stopNodes[0].lng]] : [] };
     }
     var fullPath = [], totalDist = 0;
     for (var i = 0; i < stopNodes.length - 1; i++) {
@@ -413,33 +373,12 @@
     return {distanceMeters: totalDist, path: fullPath};
   }
 
-  // 严格只使用原图中的蓝圈点位组成 5 条官方主题路线
   var OFFICIAL_ROUTES = {
-    '1': {
-      title: '【门楼图鉴】古建寻访线',
-      ids: ['S1', 'S2', 'S3', 'S4', 'N12', 'N11', 'N3', 'N4', 'N39', 'N5', 'N10'],
-      desc: '四条东口进→如意门→麒麟图门墩→广亮大门→西洋门→三条金柱大门→西洋门→如意门→广亮大门→程砚秋故居→蛮子门→随墙门，看全六大门楼形制。'
-    },
-    '2': {
-      title: '【古巷寻踪】名人与历史线',
-      ids: ['L5', 'W1', 'N39', 'N2', 'N1'],
-      desc: '五条西口进→傅增湘故居→中央电影局旧址→三条程砚秋故居→马福祥故居→圣祚隆长寺→三条东口出，单向不折返。'
-    },
-    '3': {
-      title: '【胡同烟火】文商体验线',
-      ids: ['B2', 'B4', 'B7', 'B6'],
-      desc: '三条东口易应茶舍→三条西口出→赵登禹路无名蹄花→转西四北大街→紫光园→大宇宙，单向不折返。'
-    },
-    '4': {
-      title: '【全景漫游】三条胡同全览大环线',
-      ids: ['L5', 'W1', 'S1', 'S2', 'S3', 'S4', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'B2', 'B7', 'B6'],
-      desc: '五条、四条、三条蓝圈核心点位一次走完。五条西口进→四条东进西出→三条西进东出→西四北大街收尾，全程单向不折返！'
-    },
-    '5': {
-      title: '【微醺漫步】精酿清酒线',
-      ids: ['B5', 'B6', 'B8', 'B1', 'B2'],
-      desc: '黑潮酿造→大宇宙→蝗虫精酿→无问西东精酿→易应茶舍收尾。安静品鉴，不喧哗、不外放、不聚集。'
-    }
+    '1': { title: '【门楼图鉴】古建寻访线', ids: ['S1', 'S2', 'S3', 'S4', 'N12', 'N11', 'N3', 'N4', 'N39', 'N5', 'N10'] },
+    '2': { title: '【古巷寻踪】名人与历史线', ids: ['L5', 'W1', 'N39', 'N2', 'N1'] },
+    '3': { title: '【胡同烟火】文商体验线', ids: ['B2', 'B4', 'B7', 'B6'] },
+    '4': { title: '【全景漫游】三条胡同全览大环线', ids: ['L5', 'W1', 'S1', 'S2', 'S3', 'S4', 'N10', 'N5', 'N39', 'N4', 'N3', 'N11', 'N12', 'N2', 'N1', 'B2', 'B7', 'B6'] },
+    '5': { title: '【微醺漫步】精酿清酒线', ids: ['B5', 'B6', 'B8', 'B1', 'B2'] }
   };
 
   var WALK_SPEED = 75;
@@ -664,26 +603,14 @@
         var outerBounds = [
             [-90, -360], [90, -360], [90, 360], [-90, 360]
         ];
-        // 反向遮罩高亮边界：严格包裹三条至五条（北界六条南侧 39.92965，南界二条北侧 39.92725，不含七条）
         var innerBounds = [
             [39.92725, 116.36680], [39.92965, 116.36735],
             [39.92965, 116.37340], [39.92725, 116.37340],
             [39.92725, 116.36680]
         ];
 
-        L.polygon([outerBounds, innerBounds], {
-            stroke: false,
-            fillColor: '#F5F1E8',
-            fillOpacity: 0.58,
-            interactive: false
-        }).addTo(map);
-
-        L.polygon(innerBounds, {
-            stroke: false,
-            fillColor: '#D8A94F',
-            fillOpacity: 0.24,
-            interactive: false
-        }).addTo(map);
+        L.polygon([outerBounds, innerBounds], { stroke: false, fillColor: '#F5F1E8', fillOpacity: 0.58, interactive: false }).addTo(map);
+        L.polygon(innerBounds, { stroke: false, fillColor: '#D8A94F', fillOpacity: 0.24, interactive: false }).addTo(map);
 
         loadRoute();
         startLiveLocation();
@@ -748,26 +675,15 @@
         var pathCoords = nav.path;
         var totalMeters = nav.distanceMeters;
 
-        // 高德步行导航风格：白色底座 + 绿色实线 + 箭头指向
         routeBgLine = L.polyline(pathCoords, {
-            color: '#FFFFFF',
-            weight: 10,
-            opacity: 0.9,
-            lineCap: 'round',
-            lineJoin: 'round',
-            interactive: false
+            color: '#FFFFFF', weight: 10, opacity: 0.9, lineCap: 'round', lineJoin: 'round', interactive: false
         }).addTo(map);
 
         routeLine = L.polyline(pathCoords, {
-            color: '#00B578',
-            weight: 6,
-            opacity: 1,
-            lineCap: 'round',
-            lineJoin: 'round'
+            color: '#00B578', weight: 6, opacity: 1, lineCap: 'round', lineJoin: 'round'
         }).addTo(map);
 
-        // 添加路线箭头指示（Amap风格）
-        routeArrows = L.polylineDecorator(routeLine, {
+        L.polylineDecorator(routeLine, {
             patterns: [
                 { offset: 25, repeat: 60, symbol: L.Symbol.arrowHead({pixelSize: 12, polygon: false, pathOptions: {stroke: true, weight: 2.5, color: '#FFFFFF', opacity: 1}}) }
             ]
@@ -894,20 +810,39 @@
     })();
   </script>
 
+  <!-- ================= 引入真实的 Coze Web SDK ================= -->
+  <script src="https://lf-cdn-tos.bytescm.com/obj/rc-web-sdk/coze-web-sdk/1.0.1/coze-web-sdk.js"></script>
+
   <script>
-    var guidePanel = document.getElementById('local-guide');
-    document.getElementById('laojiefang-fab').addEventListener('click', function () { guidePanel.classList.toggle('visible'); });
-    document.getElementById('local-guide-close').addEventListener('click', function () { guidePanel.classList.remove('visible'); });
-    document.getElementById('local-guide-form').addEventListener('submit', function (event) {
-      event.preventDefault();
-      var query = document.getElementById('local-guide-query').value.trim();
-      var result = document.getElementById('local-guide-result');
-      if (!query) { result.textContent = '请输入点位名称或门牌号。'; return; }
-      var matches = allNodesMaster.filter(function (node) { return (node.name + ' ' + node.door + ' ' + node.desc).indexOf(query) !== -1; });
-      if (!matches.length) { result.textContent = '暂未找到“' + query + '”的介绍。试试输入门楼名称、胡同名称或门牌号。'; return; }
-      result.textContent = matches.slice(0, 3).map(function (node) { return node.name + '（' + node.door + '）\n' + node.desc; }).join('\n\n');
+    // 1. 初始化 Coze 智能体
+    var cozeClient = new CozeWebSDK.WebChatClient({
+      config: {
+        bot_id: '7636701328664264704',
+      },
+      componentProps: {
+        title: '老街坊 · 门里乾坤',
+        icon: './laojiefang_full.png', // 智能体对话框里的头像
+        layout: 'mobile'
+      },
+      ui: {
+
+        asstBtn: {
+          isNeed: false
+        }
+      }
+    });
+
+
+    document.getElementById('laojiefang-fab').addEventListener('click', function () {
+      // 当用户点击头像时，隐藏旁边跳动的提示气泡
+      var bubble = document.getElementById('laojiefang-bubble');
+      if (bubble) bubble.style.display = 'none';
+
+      // 展开真实的 Coze 对话窗口
+      cozeClient.showChatBot();
     });
   </script>
+
   <script src="assets/site.js"></script>
 </body>
 </html>
